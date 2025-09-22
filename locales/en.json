@@ -1,0 +1,22 @@
+{
+  "app": {
+    "title": "Thai Platform"
+  },
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "videos": "Videos"
+  },
+  "lang": {
+    "english": "English",
+    "russian": "Russian",
+    "select": "Language"
+  },
+  "videos": {
+    "title": "Videos",
+    "add": "Add video",
+    "loading": "Loading…",
+    "error": "Loading error",
+    "edit": "Edit"
+  }
+}

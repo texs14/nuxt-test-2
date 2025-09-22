@@ -1,6 +1,6 @@
 <template>
   <div class="video-card">
-    <NuxtLink :to="`/videos/${id}`" class="video-card__main">
+    <NuxtLink :to="localePath({ name: 'videos-id', params: { id } })" class="video-card__main">
       <div class="video-card__thumb">
         <img :src="thumbnailUrl || defaultThumb" :alt="`${displayTitle} preview`" class="video-card__thumb_image" />
         <span class="video-card__level">{{ level }}</span>
@@ -9,11 +9,12 @@
         <h3 class="video-card__title">{{ displayTitle }}</h3>
       </div>
     </NuxtLink>
-    <NuxtLink :to="editLink" class="video-card__edit" @click.stop>Редактировать</NuxtLink>
+    <NuxtLink :to="editLink" class="video-card__edit" @click.stop>{{ t('videos.edit') }}</NuxtLink>
   </div>
 </template>
 
 <script setup lang="ts">
+import { useI18n, useLocalePath } from '#imports'
 type Title = Record<string, string | undefined>
 
 const props = defineProps<{ id: string | number, title?: Title | string | Record<string, any> | null, level?: string | null, thumbnailUrl?: string | null }>()
@@ -27,7 +28,9 @@ const displayTitle = computed(() => {
   return t?.ru || t?.en || t?.th || ''
 })
 
-const editLink = computed(() => `/videos/add-new?editId=${props.id}`)
+const { t } = useI18n()
+const localePath = useLocalePath()
+const editLink = computed(() => localePath({ name: 'videos-add-new', query: { editId: String(props.id) } }))
 </script>
 
 <style lang="scss" scoped>

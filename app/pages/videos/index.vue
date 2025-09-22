@@ -1,12 +1,12 @@
 <template>
   <section class="videos">
     <header class="videos__header">
-      <h1 class="videos__title">Видео</h1>
-      <NuxtLink to="/videos/add-new" class="videos__add">Добавить видео</NuxtLink>
+      <h1 class="videos__title">{{ t('videos.title') }}</h1>
+      <NuxtLink :to="localePath({ name: 'videos-add-new' })" class="videos__add">{{ t('videos.add') }}</NuxtLink>
     </header>
 
-    <div v-if="pending" class="videos__state">Загрузка…</div>
-    <div v-else-if="error" class="videos__state">Ошибка загрузки: {{ error.message }}</div>
+    <div v-if="pending" class="videos__state">{{ t('videos.loading') }}</div>
+    <div v-else-if="error" class="videos__state">{{ t('videos.error') }}: {{ error.message }}</div>
 
     <div v-else class="videos__grid">
       <VideoCard
@@ -23,6 +23,7 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n, useLocalePath } from '#imports'
 type Json = Record<string, any> | null
 
 interface VideoItem {
@@ -34,6 +35,8 @@ interface VideoItem {
 }
 
 const supabase = useSupabaseClient()
+const { t } = useI18n()
+const localePath = useLocalePath()
 
 const { data: items, pending, error } = await useAsyncData<VideoItem[]>(
   'video-items',

@@ -186,3 +186,41 @@ definePageMeta({ requiresAuth: true })
 
 - В корневом шаблоне `app/app.vue` используется `<NuxtPage />` для рендера страниц.
 - Публичные маршруты управляются в `auth.ts` и в `supabase.redirectOptions.exclude`.
+
+## Мультиязычность (i18n)
+
+Реализована полноценная мультиязычность на базе официального модуля `@nuxtjs/i18n`.
+
+- Стратегия URL: `prefix_except_default` — английская версия без префикса (`/`), русская — с префиксом (`/ru`).
+- Локали: `en` (default), `ru`. BCP 47 теги заданы в `nuxt.config.ts`.
+- Ленивые переводы: `lazy: true`, директория `locales/` (`en.json`, `ru.json`).
+- Детект языка: `detectBrowserLanguage.useCookie = true`, cookie `i18n_redirected`, `redirectOn = 'root'`.
+- SEO: глобальный вызов `useLocaleHead({ addDirAttribute: true, addSeoAttributes: true })` в `app/app.vue` формирует `<html lang/dir>`, `hreflang` и `canonical`.
+- Локализованные маршруты и ссылки: используем `useLocalePath()` и `useSwitchLocalePath()`.
+
+### Где настраивается
+
+- `nuxt.config.ts` → модуль `@nuxtjs/i18n` с опциями, `vueI18n: './i18n.config.ts'`.
+- `i18n.config.ts` → базовые опции Vue I18n (`legacy: false`, `fallbackLocale: 'en'`).
+- `locales/en.json`, `locales/ru.json` → словари.
+- `app/app.vue` → глобальный SEO-хед через `useLocaleHead()`.
+- `app/components/NavPanel.vue` → нативный `<select>` для смены языка и локализованные ссылки.
+
+### Как добавить ключ перевода
+
+1. Добавьте ключ в `locales/en.json` и `locales/ru.json`.
+2. Используйте в компонентах `const { t } = useI18n()` и далее `t('namespace.key')`.
+
+### Как добавить новый язык
+
+1. Добавьте файл в `locales/<code>.json`.
+2. В `nuxt.config.ts` → в `locales` добавьте `{ code: '<code>', language: '<bcp47>', name: '<Label>', file: '<code>.json' }`.
+3. При необходимости обновите селектор в `NavPanel.vue`.
+
+### Acceptance Checklist
+
+- GET `/` → английская версия без префикса; GET `/ru` → русская версия с префиксом.
+- Переключатель языка сохраняет текущий маршрут и query-параметры.
+- В `<head>/<html>` корректные `lang`, `dir`, `link[rel=alternate][hreflang]`.
+- Загружается только активная локаль (+ fallback) при первом заходе.
+- Cookie `i18n_redirected` устанавливается, редирект выполняется только на корне.
