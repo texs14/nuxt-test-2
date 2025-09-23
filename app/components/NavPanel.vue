@@ -5,7 +5,7 @@
         <NuxtLink :to="localePath({ name: 'index' })" class="navigation__link">{{ t('nav.home') }}</NuxtLink>
       </li>
       <li class="navigation__item">
-        <NuxtLink :to="localePath('/about')" class="navigation__link">{{ t('nav.about') }}</NuxtLink>
+        <NuxtLink :to="localePath({ name: 'about' })" class="navigation__link">{{ t('nav.about') }}</NuxtLink>
       </li>
       <li class="navigation__item">
         <NuxtLink :to="localePath({ name: 'videos' })" class="navigation__link">{{ t('nav.videos') }}</NuxtLink>

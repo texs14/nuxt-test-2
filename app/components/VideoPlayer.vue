@@ -40,8 +40,9 @@
         </div>
       </div>
 
-      <div class="video-player__subtitle" v-if="displaySubtitleText">
-        {{ displaySubtitleText }}
+      <div class="video-player__subtitle" v-if="hasAnySubtitle">
+        <div class="video-player__subtitle_line video-player__subtitle_line-primary">{{ activeThaiText }}</div>
+        <div v-if="showSecondary" class="video-player__subtitle_line video-player__subtitle_line-secondary">{{ activeSelectedText }}</div>
       </div>
 
       <button :class="['video-player__btn', 'video-player__btn_prev', { 'video-player__btn_visible': controlsVisible }]" :disabled="!hasPrev" @click="goPrev" aria-label="Назад по субтитрам">
@@ -65,7 +66,15 @@
         @click="seekTo(i)"
       >
         <span class="video-player__cue_time">{{ formatTime(s.start) }}–{{ formatTime(s.end) }}</span>
-        <span class="video-player__cue_text">{{ getText(s) }}</span>
+        <span v-if="!showAllLangs" class="video-player__cue_text">
+          <span class="video-player__cue_text-th">{{ getThaiText(s) }}</span>
+          <span v-if="getSelectedText(s)" class="video-player__cue_text-selected"> — {{ getSelectedText(s) }}</span>
+        </span>
+        <div v-else class="video-player__cue_text video-player__cue_text_all">
+          <span class="video-player__cue_text-th">{{ getThaiText(s) }}</span>
+          <span v-if="getTextForLocale(s, 'ru')" class="video-player__cue_text_ru">{{ getTextForLocale(s, 'ru') }}</span>
+          <span v-if="getTextForLocale(s, 'en')" class="video-player__cue_text_en">{{ getTextForLocale(s, 'en') }}</span>
+        </div>
       </div>
     </div>
   </div>
@@ -73,14 +82,17 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
+import { useI18n } from 'vue-i18n'
 import VideoControls from './VideoControls.vue'
 
 interface SubtitleText { th?: string; en?: string; ru?: string }
 interface SubtitleItem { id?: number|string; start: number; end: number; text?: SubtitleText | string }
 
-const props = defineProps<{ src: string; subtitles?: SubtitleItem[] | null; lang?: 'ru'|'en'|'th' }>()
+const props = defineProps<{ src: string; subtitles?: SubtitleItem[] | null; lang?: 'ru'|'en'|'th'; showAllLangs?: boolean }>()
 
-const lang = computed(() => props.lang || 'ru')
+const { locale } = useI18n()
+const selectedLocale = computed<'ru'|'en'|'th'>(() => props.lang ?? ((locale.value === 'ru' || locale.value === 'en') ? (locale.value as 'ru'|'en') : 'ru'))
+const showAllLangs = computed(() => !!props.showAllLangs)
 
 const videoRef = ref<HTMLVideoElement | null>(null)
 const currentTime = ref(0)
@@ -127,12 +139,22 @@ const activeIndex = computed(() => {
 
 const activeSubtitle = computed(() => normalizedSubtitles.value[activeIndex.value] || null)
 
-const getText = (s: SubtitleItem) => {
+const getTextForLocale = (s: SubtitleItem, code: 'ru'|'en'|'th') => {
   if (typeof s.text === 'string') return s.text
-  return s.text?.[lang.value] || s.text?.ru || s.text?.en || s.text?.th || ''
+  return s.text?.[code] || ''
+}
+const getThaiText = (s: SubtitleItem) => {
+  if (typeof s.text === 'string') return s.text
+  return s.text?.th || ''
 }
 
-const activeSubtitleText = computed(() => activeSubtitle.value ? getText(activeSubtitle.value) : '')
+const getSelectedText = (s: SubtitleItem) => {
+  if (selectedLocale.value === 'th') return ''
+  return getTextForLocale(s, selectedLocale.value)
+}
+
+const activeThaiText = computed(() => activeSubtitle.value ? getThaiText(activeSubtitle.value) : '')
+const activeSelectedText = computed(() => activeSubtitle.value ? getTextForLocale(activeSubtitle.value, selectedLocale.value) : '')
 
 // Запоминаем последний показываемый субтитр, чтобы не пропадал между паузами
 const lastSubtitle = ref<SubtitleItem | null>(null)
@@ -140,11 +162,11 @@ watch(activeSubtitle, (val) => {
   if (val) lastSubtitle.value = val
 })
 
-const displaySubtitleText = computed(() => {
-  if (activeSubtitle.value) return activeSubtitleText.value
-  if (lastSubtitle.value) return getText(lastSubtitle.value)
-  return ''
-})
+const lastThaiText = computed(() => lastSubtitle.value ? getThaiText(lastSubtitle.value) : '')
+const lastSelectedText = computed(() => lastSubtitle.value ? getTextForLocale(lastSubtitle.value, selectedLocale.value) : '')
+
+const hasAnySubtitle = computed(() => !!(activeThaiText.value || lastThaiText.value || activeSelectedText.value || lastSelectedText.value))
+const showSecondary = computed(() => selectedLocale.value !== 'th')
 
 const hasPrev = computed(() => {
   const subs = normalizedSubtitles.value
@@ -175,7 +197,7 @@ const seekTo = (index: number) => {
   if (!el || !s) return
   const wasPlaying = !el.paused
   el.currentTime = Math.max(s.start + 0.01, 0)
-  if (wasPlaying) el.play(); else el.pause()
+  if (wasPlaying) { void el.play()?.catch(() => {}) } else { el.pause() }
 }
 
 const seekToTime = (time: number) => {
@@ -183,7 +205,7 @@ const seekToTime = (time: number) => {
   if (!el) return
   const wasPlaying = !el.paused
   el.currentTime = Math.max(0, Math.min(time, el.duration || Number.MAX_SAFE_INTEGER))
-  if (wasPlaying) el.play(); else el.pause()
+  if (wasPlaying) { void el.play()?.catch(() => {}) } else { el.pause() }
 }
 
 const goPrev = () => {
@@ -198,7 +220,7 @@ const goPrev = () => {
     if (elapsed > 1.5) {
       const wasPlaying = !el.paused
       el.currentTime = Math.max(s.start + 0.01, 0)
-      if (wasPlaying) el.play(); else el.pause()
+      if (wasPlaying) { void el.play()?.catch(() => {}) } else { el.pause() }
     } else {
       const prevIndex = idx - 1
       if (prevIndex >= 0) {
@@ -209,7 +231,7 @@ const goPrev = () => {
         if (first) {
           const wasPlaying = !el.paused
           el.currentTime = Math.max(first.start + 0.01, 0)
-          if (wasPlaying) el.play(); else el.pause()
+          if (wasPlaying) { void el.play()?.catch(() => {}) } else { el.pause() }
         }
       }
     }
@@ -223,7 +245,7 @@ const goPrev = () => {
     if (currentTime.value >= last.end) {
       const wasPlaying = !el.paused
       el.currentTime = Math.max(last.start + 0.01, 0)
-      if (wasPlaying) el.play(); else el.pause()
+      if (wasPlaying) { void el.play()?.catch(() => {}) } else { el.pause() }
     } else if (currentTime.value < first.start) {
       seekTo(0)
     } else {
@@ -231,7 +253,7 @@ const goPrev = () => {
       if (ls) {
         const wasPlaying = !el.paused
         el.currentTime = Math.max(ls.start + 0.01, 0)
-        if (wasPlaying) el.play(); else el.pause()
+        if (wasPlaying) { void el.play()?.catch(() => {}) } else { el.pause() }
       }
     }
   }
@@ -266,7 +288,7 @@ const onPause = () => { isPlaying.value = false }
 const togglePlay = () => {
   const el = videoRef.value
   if (!el) return
-  if (el.paused) el.play()
+  if (el.paused) { void el.play()?.catch(() => {}) }
   else el.pause()
 }
 
@@ -441,6 +463,9 @@ watch(() => props.subtitles, () => {
     transform: translateX(-50%);
     width: 100%;
   }
+  &__subtitle_line { display: block; }
+  &__subtitle_line-primary { font-weight: 600; }
+  &__subtitle_line-secondary { opacity: 0.9; margin-top: 4px; }
 
   &__track {
     margin-top: 12px;
@@ -467,5 +492,10 @@ watch(() => props.subtitles, () => {
 
   &__cue_time { color: #666; font-variant-numeric: tabular-nums; }
   &__cue_text { color: #111; }
+  &__cue_text-th { font-weight: 600; }
+  &__cue_text-selected { opacity: 0.9; }
+  &__cue_text_all { display: grid; gap: 2px; }
+  &__cue_text_ru { opacity: 0.95; }
+  &__cue_text_en { opacity: 0.95; }
 }
 </style>

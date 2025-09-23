@@ -2,7 +2,7 @@
   <section class="video-upload-form">
     <h1 class="video-upload-form__title">{{ isEditMode ? 'Редактирование видео' : 'Загрузка нового видео' }}</h1>
 
-    <form class="video-upload-form__form" @submit.prevent="handleSubmit">
+    <form v-if="!isEditMode" class="video-upload-form__form" @submit.prevent="handleSubmit">
       <div class="video-upload-form__field">
         <label class="video-upload-form__label" for="video">Видео</label>
         <input
@@ -65,15 +65,18 @@
       </div>
 
       <VideoPlayer
+        :key="uploadedVideoUrl"
         class="video-upload-form__player"
         :src="uploadedVideoUrl"
         :subtitles="editorSubtitles"
         :lang="selectedLang"
+        :show-all-langs="true"
       />
     </section>
 
     <!-- скрытый видеотег для вычисления длительности -->
     <video
+      :key="uploadedVideoUrl + '-meta'"
       v-if="uploadedVideoUrl"
       :src="uploadedVideoUrl"
       @loadedmetadata="onMeta"
@@ -93,56 +96,21 @@
       <SubtitleEditor v-model="editorSubtitles" />
     </section>
 
-    <section class="video-upload-form__meta">
-      <h2 class="video-upload-form__subtitle">Метаданные</h2>
-      <div class="video-upload-form__grid">
-        <div class="video-upload-form__field">
-          <label class="video-upload-form__label">Название (TH)</label>
-          <input class="video-upload-form__input" v-model="title.th" />
-        </div>
-        <div class="video-upload-form__field">
-          <label class="video-upload-form__label">Название (RU)</label>
-          <input class="video-upload-form__input" v-model="title.ru" />
-        </div>
-        <div class="video-upload-form__field">
-          <label class="video-upload-form__label">Название (EN)</label>
-          <input class="video-upload-form__input" v-model="title.en" />
-        </div>
-
-        <div class="video-upload-form__field">
-          <label class="video-upload-form__label">Описание (TH)</label>
-          <textarea class="video-upload-form__textarea" rows="3" v-model="description.th" />
-        </div>
-        <div class="video-upload-form__field">
-          <label class="video-upload-form__label">Описание (RU)</label>
-          <textarea class="video-upload-form__textarea" rows="3" v-model="description.ru" />
-        </div>
-        <div class="video-upload-form__field">
-          <label class="video-upload-form__label">Описание (EN)</label>
-          <textarea class="video-upload-form__textarea" rows="3" v-model="description.en" />
-        </div>
-
-        <div class="video-upload-form__field">
-          <label class="video-upload-form__label">Уровень</label>
-          <select class="video-upload-form__input" v-model="level">
-            <option value="A1">A1</option>
-            <option value="A2">A2</option>
-            <option value="B1">B1</option>
-            <option value="B2">B2</option>
-            <option value="C1">C1</option>
-            <option value="C2">C2</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="video-upload-form__actions">
-        <button class="video-upload-form__button" :disabled="!uploadedVideoUrl || saving" @click="saveVideo">
-          {{ saving ? 'Сохранение...' : 'Сохранить' }}
-        </button>
-        <span v-if="saveError" class="video-upload-form__error">{{ saveError }}</span>
-        <span v-if="saveOk" class="video-upload-form__hint">Сохранено (ID: {{ saveId }})</span>
-      </div>
-    </section>
+    <VideoMetaForm
+      class="video-upload-form__meta"
+      :title="title"
+      :description="description"
+      :level="level"
+      :saving="saving"
+      :save-error="saveError"
+      :save-ok="saveOk"
+      :save-id="saveId"
+      :can-save="!!uploadedVideoUrl"
+      @update:title="onUpdateTitle"
+      @update:description="onUpdateDescription"
+      @update:level="onUpdateLevel"
+      @save="saveVideo"
+    />
   </section>
 </template>
 <script setup lang="ts">
@@ -161,8 +129,6 @@ const errorMessage = ref('')
 const videoName = computed(() => videoFile.value?.name ?? '')
 const subsName = computed(() => subtitlesFile.value?.name ?? '')
 
-useHead(() => ({ title: isEditMode.value ? 'Редактировать видео' : 'Добавить видео' }))
-
 type SubtitleText = { th?: string; en?: string; ru?: string }
 type SubtitleItem = { id?: number|string; start: number; end: number; text?: SubtitleText | string }
 
@@ -171,6 +137,7 @@ const route = useRoute()
 const supabase = useSupabaseClient()
 const editId = computed(() => (route.query.editId ? String(route.query.editId) : ''))
 const isEditMode = computed(() => !!editId.value)
+useHead(() => ({ title: isEditMode.value ? 'Редактировать видео' : 'Добавить видео' }))
 const uploadedVideoUrl = ref<string>('')
 const uploadedAudioUrl = ref<string>('')
 const uploadedPreviewUrl = ref<string>('')
@@ -340,6 +307,11 @@ function genId(): string {
   try { return crypto.randomUUID() } catch { return 'vid_' + Math.random().toString(36).slice(2) + Date.now().toString(36) }
 }
 
+type LocaleText = { th?: string; ru?: string; en?: string }
+function onUpdateTitle(v: LocaleText) { title.value = v }
+function onUpdateDescription(v: LocaleText) { description.value = v }
+function onUpdateLevel(v: string) { level.value = v }
+
 async function saveVideo() {
   saveError.value = ''
   saveOk.value = false
@@ -363,6 +335,8 @@ async function saveVideo() {
       if (!res.ok) throw new Error(json?.error || `Update failed (${res.status})`)
       saveOk.value = true
       saveId.value = json?.id || newId.value
+      // Обновляем локальное состояние из БД, чтобы сразу отобразить нормализованные данные
+      await loadExisting()
     } else {
       if (!uploadedVideoUrl.value) throw new Error('Нет ссылки на видео')
       const payload = {

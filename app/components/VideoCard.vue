@@ -14,18 +14,20 @@
 </template>
 
 <script setup lang="ts">
-import { useI18n, useLocalePath } from '#imports'
+import { useI18n } from 'vue-i18n'
 type Title = Record<string, string | undefined>
 
 const props = defineProps<{ id: string | number, title?: Title | string | Record<string, any> | null, level?: string | null, thumbnailUrl?: string | null }>()
 
 const defaultThumb = '/favicon.ico'
 
+const { locale } = useI18n()
 const displayTitle = computed(() => {
   if (!props.title) return ''
   if (typeof props.title === 'string') return props.title
-  const t = props.title as Title
-  return t?.ru || t?.en || t?.th || ''
+  const map = props.title as Title
+  const code = (locale.value as 'ru' | 'en' | 'th')
+  return map?.[code] ?? map?.en ?? map?.ru ?? map?.th ?? ''
 })
 
 const { t } = useI18n()

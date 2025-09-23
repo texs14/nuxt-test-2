@@ -1,8 +1,4 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
-import { fileURLToPath } from 'node:url'
-import { dirname, resolve as resolvePath } from 'node:path'
-
-const __root = dirname(fileURLToPath(import.meta.url))
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
@@ -21,7 +17,8 @@ export default defineNuxtConfig({
         redirectOn: 'root'
       },
       lazy: true,
-      langDir: resolvePath(__root, 'locales'),
+      langDir: '../locales',
+      baseUrl: process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000',
       vueI18n: './i18n.config.ts'
     }]
   ],

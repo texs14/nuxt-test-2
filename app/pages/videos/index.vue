@@ -23,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-import { useI18n, useLocalePath } from '#imports'
+import { useI18n } from 'vue-i18n'
 type Json = Record<string, any> | null
 
 interface VideoItem {

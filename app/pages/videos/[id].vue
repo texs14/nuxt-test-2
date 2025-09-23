@@ -9,6 +9,7 @@
         <header class="video-page__header">
           <h1 class="video-page__title">{{ titleText }}</h1>
           <span v-if="video.level" class="video-page__level">{{ video.level }}</span>
+          <NuxtLink :to="editLink" class="video-page__edit">{{ t('videos.edit') }}</NuxtLink>
         </header>
   
         <VideoPlayer
@@ -16,19 +17,18 @@
           class="video-page__player"
           :src="video.video_url"
           :subtitles="subs"
-          lang="ru"
         />
   
         <p v-if="descriptionText" class="video-page__description">{{ descriptionText }}</p>
   
         <section class="video-page__comments">
-          <h2 class="video-page__comments_title">Комментарии</h2>
-          <div v-if="pendingComments" class="video-page__state">Загрузка комментариев…</div>
-          <div v-else-if="errorComments" class="video-page__state">Ошибка: {{ errorComments.message }}</div>
+          <h2 class="video-page__comments_title">{{ t('comments.title') }}</h2>
+          <div v-if="pendingComments" class="video-page__state">{{ t('comments.loading') }}</div>
+          <div v-else-if="errorComments" class="video-page__state">{{ t('comments.error') }}: {{ errorComments.message }}</div>
           <ul v-else class="video-page__comments_list">
             <li v-for="c in comments" :key="c.id" class="video-page__comments_item">
               <div class="video-page__comments_head">
-                <strong class="video-page__comments_author">{{ c.author || 'Аноним' }}</strong>
+                <strong class="video-page__comments_author">{{ c.author || t('comments.anonymous') }}</strong>
                 <time v-if="c.created_at" class="video-page__comments_time">{{ new Date(c.created_at).toLocaleString() }}</time>
               </div>
               <p class="video-page__comments_text">{{ c.text }}</p>
@@ -41,6 +41,7 @@
   
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 const route = useRoute()
 const supabase = useSupabaseClient()
@@ -60,6 +61,8 @@ interface VideoItem {
 }
 
 const idParam = computed(() => route.params.id as string)
+const localePath = useLocalePath()
+const editLink = computed(() => localePath({ name: 'videos-add-new', query: { editId: idParam.value } }))
 
 const { data: video, pending: pendingVideo, error: errorVideo } = await useAsyncData<VideoItem | null>(
   () => `video-${idParam.value}`,
@@ -88,18 +91,21 @@ const { data: comments, pending: pendingComments, error: errorComments } = await
   }
 )
 
+const { locale, t } = useI18n()
+const currentLocale = computed<'ru'|'en'>(() => (locale.value === 'ru' || locale.value === 'en') ? locale.value as 'ru'|'en' : 'en')
+
 const titleText = computed(() => {
-  const t = video.value?.title
-  if (!t) return ''
-  if (typeof t === 'string') return t
-  return t.ru || t.en || t.th || ''
+  const val = video.value?.title as Record<string, string> | string | undefined | null
+  if (!val) return ''
+  if (typeof val === 'string') return val
+  return val[currentLocale.value] ?? val.en ?? val.ru ?? val.th ?? ''
 })
 
 const descriptionText = computed(() => {
-  const d = video.value?.description
-  if (!d) return ''
-  if (typeof d === 'string') return d
-  return d.ru || d.en || d.th || ''
+  const val = video.value?.description as Record<string, string> | string | undefined | null
+  if (!val) return ''
+  if (typeof val === 'string') return val
+  return val[currentLocale.value] ?? val.en ?? val.ru ?? val.th ?? ''
 })
 
 const subs = computed<SubtitleItem[]>(() => (video.value?.subtitles || []) as SubtitleItem[])
@@ -124,6 +130,16 @@ const subs = computed<SubtitleItem[]>(() => (video.value?.subtitles || []) as Su
     color: #fff;
     border-radius: 8px;
     font-size: 12px;
+  }
+
+  &__edit {
+    margin-left: auto;
+    padding: 6px 10px;
+    border-radius: 8px;
+    background: #2563eb;
+    color: #fff;
+    text-decoration: none;
+    font-size: 14px;
   }
 
   &__player { margin: auto; width: 50%; }
