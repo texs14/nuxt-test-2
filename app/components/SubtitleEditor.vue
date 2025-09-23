@@ -44,8 +44,8 @@
           <textarea
             class="subtitle-editor__textarea"
             rows="2"
-            :value="sanitizeThaiSpacing(row.text?.th || '')"
-            @input="onUpdateText(idx, 'th', sanitizeThaiSpacing(($event.target as HTMLTextAreaElement).value))"
+            :value="row.text?.th || ''"
+            @input="onUpdateText(idx, 'th', ($event.target as HTMLTextAreaElement).value)"
           />
 
           <button type="button" class="subtitle-editor__toggle" @click="toggleMore(row, idx)">

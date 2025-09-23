@@ -50,25 +50,13 @@ function hhmmssToSec(s?: string): number {
   return Number(s) || 0
 }
 
-function sanitizeThaiSpacing(text: string): string {
-  if (!text) return ''
-  // Удаляем пробелы только между тайскими символами
-  let out = text
-  const re = /([\u0E00-\u0E7F])\s+([\u0E00-\u0E7F])/g
-  for (let i = 0; i < 5; i++) {
-    const next = out.replace(re, '$1$2')
-    if (next === out) break
-    out = next
-  }
-  return out
-}
-
 function normalizeSegments(arr: RawSegment[]): SubtitleItem[] {
   return (arr || []).map((r, i) => ({
     id: i + 1,
     start: hhmmssToSec(r.start_time || r.start),
     end: hhmmssToSec(r.end_time || r.end),
-    text: { th: sanitizeThaiSpacing(r.text || r.text || '') }
+    // Пробелы очищаются на сервере. Здесь сохраняем как пришло.
+    text: { th: (r.corrected_text || r.text || '') }
   }))
 }
 
