@@ -23,10 +23,24 @@ export default defineNuxtConfig({
     }]
   ],
   supabase: {
+    clientOptions: {
+      auth: {
+        flowType: 'pkce',
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: true
+      }
+    },
     redirectOptions: {
       login: '/login',
       callback: '/confirm',
-      exclude: ['/', '/videos' , '/videos/**', '/ru', '/ru/videos', '/ru/videos/**']
+      exclude: ['/', '/ru/login', '/login', '/register', '/videos' , '/videos/**', '/ru', '/ru/videos', '/ru/videos/**']
+    },
+    cookieOptions: {
+      maxAge: 60 * 60 * 24 * 7,
+      path: '/',
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production'
     }
   },
   runtimeConfig: {
@@ -36,6 +50,7 @@ export default defineNuxtConfig({
     },
     supabaseServiceKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
     public: {
+      siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000',
       supabase: {
         url: process.env.SUPABASE_URL,
         key: process.env.SUPABASE_KEY

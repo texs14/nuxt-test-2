@@ -5,7 +5,11 @@
   "nav": {
     "home": "Главная",
     "about": "О проекте",
-    "videos": "Видео"
+    "videos": "Видео",
+    "login": "Войти",
+    "logout": "Выйти",
+    "profile": "Профиль",
+    "user": "Пользователь"
   },
   "lang": {
     "english": "Английский",
@@ -35,6 +39,15 @@
     "textEN": "Текст (EN)",
     "actions": "Действия",
     "delete": "Удалить"
+  },
+  "auth": {
+    "login": {
+      "email": "E-mail",
+      "password": "Пароль",
+      "submit": "Войти",
+      "google": "Войти через Google",
+      "register": "Создать аккаунт"
+    }
   },
   "meta": {
     "title": "Метаданные",

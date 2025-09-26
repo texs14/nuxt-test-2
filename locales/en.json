@@ -5,7 +5,11 @@
   "nav": {
     "home": "Home",
     "about": "About",
-    "videos": "Videos"
+    "videos": "Videos",
+    "login": "Sign in",
+    "logout": "Log out",
+    "profile": "Profile",
+    "user": "User"
   },
   "lang": {
     "english": "English",
@@ -35,6 +39,15 @@
     "textEN": "Text (EN)",
     "actions": "Actions",
     "delete": "Delete"
+  },
+  "auth": {
+    "login": {
+      "email": "E-mail",
+      "password": "Password",
+      "submit": "Sign in",
+      "google": "Sign in with Google",
+      "register": "Create account"
+    }
   },
   "meta": {
     "title": "Metadata",

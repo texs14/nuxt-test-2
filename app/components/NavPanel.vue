@@ -12,18 +12,30 @@
       </li>
     </ul>
 
-    <div class="navigation__lang">
-      <label :for="langSelectId" class="navigation__lang_label">{{ t('lang.select') }}</label>
-      <select
-        :id="langSelectId"
-        class="navigation__lang_select"
-        :aria-label="t('lang.select')"
-        :value="locale"
-        @change="onChange"
+    <div class="navigation__actions">
+      <div class="navigation__lang">
+        <label :for="langSelectId" class="navigation__lang_label">{{ t('lang.select') }}</label>
+        <select
+          :id="langSelectId"
+          class="navigation__lang_select"
+          :aria-label="t('lang.select')"
+          :value="locale"
+          @change="onChange"
+        >
+          <option value="en">{{ t('lang.english') }}</option>
+          <option value="ru">{{ t('lang.russian') }}</option>
+        </select>
+      </div>
+
+      <NuxtLink
+        v-if="!isAuthenticated"
+        :to="localePath({ name: 'login' })"
+        class="navigation__button navigation__button_login"
       >
-        <option value="en">{{ t('lang.english') }}</option>
-        <option value="ru">{{ t('lang.russian') }}</option>
-      </select>
+        {{ t('nav.login') }}
+      </NuxtLink>
+
+      <UserMenu v-else />
     </div>
   </nav>
 </template>
@@ -37,6 +49,8 @@ const switchLocalePath = useSwitchLocalePath()
 const localePath = useLocalePath()
 const router = useRouter()
 const langSelectId = 'lang-select'
+const { user } = useAuth()
+const isAuthenticated = computed(() => Boolean(user.value))
 
 function onChange(e: Event) {
   const target = e.target as HTMLSelectElement
@@ -44,10 +58,16 @@ function onChange(e: Event) {
   const path = switchLocalePath(code)
   if (path) router.push(path)
 }
+
 </script>
+
 
 <style lang="scss" scoped>
 .navigation {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
   &__list {
     display: flex;
     gap: 1rem;
@@ -69,8 +89,14 @@ function onChange(e: Event) {
     }
   }
 
-  &__lang {
+  &__actions {
     margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  &__lang {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
@@ -84,6 +110,28 @@ function onChange(e: Event) {
       border-radius: 6px;
       border: 1px solid #ccc;
       background: #fff;
+    }
+  }
+
+  &__button {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+
+    &_login {
+      color: #2563eb;
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    &:hover:not(:disabled) {
+      background-color: rgba(0, 0, 0, 0.05);
     }
   }
 }

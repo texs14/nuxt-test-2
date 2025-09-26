@@ -28,6 +28,7 @@
             min="0"
             :value="row.start"
             @input="onUpdate(idx, 'start', toNumber(($event.target as HTMLInputElement).value))"
+            @blur="onStartBlur"
           />
         </div>
         <div class="subtitle-editor__cell subtitle-editor__cell_time">
@@ -170,6 +171,23 @@ function onUpdateText(index: number, lang: 'th'|'ru'|'en', value: string) {
   const t = item.text || {}
   next[index] = { ...item, text: { ...t, [lang]: value } } as RequiredSubtitleItem
   rows.value = next
+  emit('update:modelValue', rows.value)
+}
+
+function onStartBlur() {
+  if (rows.value.length < 2) {
+    return
+  }
+
+  const sorted = [...rows.value].sort((a, b) => a.start - b.start)
+
+  const changed = sorted.some((item, index) => item !== rows.value[index])
+
+  if (!changed) {
+    return
+  }
+
+  rows.value = sorted
   emit('update:modelValue', rows.value)
 }
 </script>
