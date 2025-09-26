@@ -40,6 +40,23 @@
     "actions": "Actions",
     "delete": "Delete"
   },
+  "profile": {
+    "title": "Profile",
+    "loading": "Loading profile…",
+    "empty": "Profile not found",
+    "error": "Failed to load profile",
+    "notSpecified": "Not specified",
+    "fields": {
+      "id": "ID",
+      "username": "Username",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "age": "Age",
+      "city": "City",
+      "createdAt": "Created at",
+      "updatedAt": "Updated at"
+    }
+  },
   "auth": {
     "login": {
       "email": "E-mail",

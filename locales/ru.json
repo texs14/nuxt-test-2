@@ -40,6 +40,23 @@
     "actions": "Действия",
     "delete": "Удалить"
   },
+  "profile": {
+    "title": "Профиль",
+    "loading": "Загрузка профиля…",
+    "empty": "Профиль не найден",
+    "error": "Не удалось загрузить профиль",
+    "notSpecified": "Не указано",
+    "fields": {
+      "id": "ID",
+      "username": "Имя пользователя",
+      "firstName": "Имя",
+      "lastName": "Фамилия",
+      "age": "Возраст",
+      "city": "Город",
+      "createdAt": "Создан",
+      "updatedAt": "Обновлён"
+    }
+  },
   "auth": {
     "login": {
       "email": "E-mail",
