@@ -103,8 +103,8 @@
       class="video-upload-form__tg"
       :job-id="transgateJobId"
       @completed="onTgCompleted"
-      @status="(val) => (tgStatus = val)"
-      @error="(val) => (tgError = val)"
+      @status="(val: string) => (tgStatus = val)"
+      @error="(val: string) => (tgError = val)"
     />
 
     <section class="video-upload-form__editor">
@@ -402,7 +402,7 @@ async function saveVideo() {
 
 <style scoped>
 .video-upload-form {
-  max-width: 760px;
+  max-width: 1024px;
   margin: 24px auto;
   background: #ffffff;
   border-radius: 12px;
