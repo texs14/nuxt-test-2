@@ -14,6 +14,7 @@
   "lang": {
     "english": "Английский",
     "russian": "Русский",
+    "thai": "Тайский",
     "select": "Язык"
   },
   "videos": {
@@ -21,7 +22,29 @@
     "add": "Добавить видео",
     "loading": "Загрузка…",
     "error": "Ошибка загрузки",
-    "edit": "Редактировать"
+    "edit": "Редактировать",
+    "addNew": {
+      "titleEdit": "Редактирование видео",
+      "titleCreate": "Загрузка нового видео",
+      "headEdit": "Редактировать видео",
+      "headCreate": "Добавить видео",
+      "videoLabel": "Видео",
+      "subtitlesLabel": "Субтитры (SRT/VTT, опционально)",
+      "selected": "Выбрано: {name}",
+      "autoHint": "Выбор видео автоматически запускает отправку на сервер",
+      "serverResponse": "Ответ сервера",
+      "preview": "Предпросмотр",
+      "subtitleLang": "Язык субтитров",
+      "submitUploading": "Отправка…",
+      "submitAgain": "Отправить ещё раз",
+      "loadError": "Ошибка загрузки записи",
+      "networkError": "Сетевая ошибка при отправке файла",
+      "emptyResponse": "Пустой ответ",
+      "uploadError": "Ошибка отправки",
+      "missingId": "ID не найден",
+      "missingVideoUrl": "Нет ссылки на видео",
+      "saveError": "Ошибка сохранения"
+    }
   },
   "comments": {
     "title": "Комментарии",

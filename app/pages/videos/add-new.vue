@@ -1,16 +1,14 @@
 <template>
   <section class="video-upload-form">
     <h1 class="video-upload-form__title">
-      {{
-        isEditMode
-          ? 'Р РµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ РІРёРґРµРѕ'
-          : 'Р—Р°РіСЂСѓР·РєР° РЅРѕРІРѕРіРѕ РІРёРґРµРѕ'
-      }}
+      {{ isEditMode ? t('videos.addNew.titleEdit') : t('videos.addNew.titleCreate') }}
     </h1>
 
     <form v-if="!isEditMode" class="video-upload-form__form" @submit.prevent="handleSubmit">
       <div class="video-upload-form__field">
-        <label class="video-upload-form__label" for="video">Р’РёРґРµРѕ</label>
+        <label class="video-upload-form__label" for="video">
+          {{ t('videos.addNew.videoLabel') }}
+        </label>
         <input
           id="video"
           class="video-upload-form__input"
@@ -21,17 +19,18 @@
           required
           @change="onVideoChange"
         />
-        <p v-if="videoName" class="video-upload-form__hint">Р’С‹Р±СЂР°РЅРѕ: {{ videoName }}</p>
+        <p v-if="videoName" class="video-upload-form__hint">
+          {{ t('videos.addNew.selected', { name: videoName }) }}
+        </p>
         <p class="video-upload-form__hint">
-          Р’С‹Р±РѕСЂ РІРёРґРµРѕ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё Р·Р°РїСѓСЃРєР°РµС‚ РѕС‚РїСЂР°РІРєСѓ РЅР°
-          СЃРµСЂРІРµСЂ
+          {{ t('videos.addNew.autoHint') }}
         </p>
       </div>
 
       <div class="video-upload-form__field">
-        <label class="video-upload-form__label" for="subtitles"
-          >РЎСѓР±С‚РёС‚СЂС‹ (SRT/VTT, РѕРїС†РёРѕРЅР°Р»СЊРЅРѕ)</label
-        >
+        <label class="video-upload-form__label" for="subtitles">
+          {{ t('videos.addNew.subtitlesLabel') }}
+        </label>
         <input
           id="subtitles"
           class="video-upload-form__input"
@@ -41,7 +40,9 @@
           :disabled="isUploading"
           @change="onSubtitlesChange"
         />
-        <p v-if="subsName" class="video-upload-form__hint">Р’С‹Р±СЂР°РЅРѕ: {{ subsName }}</p>
+        <p v-if="subsName" class="video-upload-form__hint">
+          {{ t('videos.addNew.selected', { name: subsName }) }}
+        </p>
       </div>
 
       <div class="video-upload-form__actions">
@@ -50,7 +51,7 @@
           type="submit"
           :disabled="!videoFile || isUploading"
         >
-          {{ isUploading ? 'РћС‚РїСЂР°РІРєР°...' : 'РћС‚РїСЂР°РІРёС‚СЊ РµС‰С‘ СЂР°Р·' }}
+          {{ uploadButtonText }}
         </button>
       </div>
 
@@ -60,7 +61,7 @@
       </div>
 
       <div v-if="serverMessage" class="video-upload-form__status">
-        <h2 class="video-upload-form__status-title">РћС‚РІРµС‚ СЃРµСЂРІРµСЂР°</h2>
+        <h2 class="video-upload-form__status-title">{{ t('videos.addNew.serverResponse') }}</h2>
         <pre class="video-upload-form__status-body">{{ serverMessage }}</pre>
       </div>
 
@@ -68,14 +69,14 @@
     </form>
 
     <section v-if="uploadedVideoUrl" class="video-upload-form__preview">
-      <h2 class="video-upload-form__subtitle">РџСЂРµРґРїСЂРѕСЃРјРѕС‚СЂ</h2>
+      <h2 class="video-upload-form__subtitle">{{ t('videos.addNew.preview') }}</h2>
 
       <div class="video-upload-form__lang">
-        <label class="video-upload-form__label">РЇР·С‹Рє СЃСѓР±С‚РёС‚СЂРѕРІ</label>
+        <label class="video-upload-form__label">{{ t('videos.addNew.subtitleLang') }}</label>
         <select v-model="selectedLang" class="video-upload-form__input">
-          <option value="th">Thai</option>
-          <option value="ru">Р СѓСЃСЃРєРёР№</option>
-          <option value="en">English</option>
+          <option value="th">{{ t('lang.thai') }}</option>
+          <option value="ru">{{ t('lang.russian') }}</option>
+          <option value="en">{{ t('lang.english') }}</option>
         </select>
       </div>
 
@@ -89,7 +90,7 @@
       />
     </section>
 
-    <!-- СЃРєСЂС‹С‚С‹Р№ РІРёРґРµРѕС‚РµРі РґР»СЏ РІС‹С‡РёСЃР»РµРЅРёСЏ РґР»РёС‚РµР»СЊРЅРѕСЃС‚Рё -->
+    <!-- скрытый видеотег для вычисления длительности -->
     <video
       v-if="uploadedVideoUrl"
       :key="uploadedVideoUrl + '-meta'"
@@ -131,8 +132,11 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
 import { useHead, useRoute, useSupabaseClient } from '#imports';
+import { useI18n } from 'vue-i18n';
 
 const WEBHOOK_URL = '/api/webhook-upload';
+
+const { t } = useI18n();
 
 const videoFile = ref<File | null>(null);
 const subtitlesFile = ref<File | null>(null);
@@ -158,7 +162,7 @@ const supabase = useSupabaseClient();
 const editId = computed(() => (route.query.editId ? String(route.query.editId) : ''));
 const isEditMode = computed(() => !!editId.value);
 useHead(() => ({
-  title: isEditMode.value ? 'Р РµРґР°РєС‚РёСЂРѕРІР°С‚СЊ РІРёРґРµРѕ' : 'Р”РѕР±Р°РІРёС‚СЊ РІРёРґРµРѕ',
+  title: isEditMode.value ? t('videos.addNew.headEdit') : t('videos.addNew.headCreate'),
 }));
 const uploadedVideoUrl = ref<string>('');
 const uploadedAudioUrl = ref<string>('');
@@ -183,6 +187,10 @@ const saveId = ref<string | number>('');
 const loadingExisting = ref(false);
 const loadError = ref('');
 
+const uploadButtonText = computed(() =>
+  isUploading.value ? t('videos.addNew.submitUploading') : t('videos.addNew.submitAgain')
+);
+
 async function loadExisting() {
   if (!isEditMode.value || loadingExisting.value) return;
   loadingExisting.value = true;
@@ -202,7 +210,7 @@ async function loadExisting() {
       const d = data.duration as any;
       durationSeconds.value = Number(d?.seconds ?? 0);
       editorSubtitles.value = (data.subtitles as any[]) || [];
-      // Р·Р°РіРѕР»РѕРІРєРё/РѕРїРёСЃР°РЅРёСЏ/СѓСЂРѕРІРµРЅСЊ
+      // заголовки/описания/уровень
       const t = data.title;
       title.value = typeof t === 'object' ? (t as any) : { ru: String(t || '') };
       const desc = data.description;
@@ -210,7 +218,7 @@ async function loadExisting() {
       level.value = String(data.level || 'A1');
     }
   } catch (e: any) {
-    loadError.value = e?.message || 'РћС€РёР±РєР° Р·Р°РіСЂСѓР·РєРё Р·Р°РїРёСЃРё';
+    loadError.value = e?.message || t('videos.addNew.loadError');
   } finally {
     loadingExisting.value = false;
   }
@@ -230,7 +238,6 @@ function onVideoChange(e: Event) {
   serverMessage.value = '';
   errorMessage.value = '';
   if (videoFile.value) {
-    // РђРІС‚РѕР·Р°РїСѓСЃРє РѕС‚РїСЂР°РІРєРё СЃСЂР°Р·Сѓ РїРѕСЃР»Рµ РІС‹Р±РѕСЂР° РІРёРґРµРѕ
     // eslint-disable-next-line no-void
     void uploadNow();
   }
@@ -284,7 +291,7 @@ function uploadWithProgress(formData: FormData): Promise<string> {
 
     xhr.onerror = () => {
       isUploading.value = false;
-      reject(new Error('РЎРµС‚РµРІР°СЏ РѕС€РёР±РєР° РїСЂРё РѕС‚РїСЂР°РІРєРµ С„Р°Р№Р»Р°'));
+      reject(new Error(t('videos.addNew.networkError')));
     };
 
     isUploading.value = true;
@@ -299,7 +306,7 @@ async function uploadNow() {
   try {
     const fd = buildFormData();
     const respText = await uploadWithProgress(fd);
-    serverMessage.value = respText || 'РџСѓСЃС‚РѕР№ РѕС‚РІРµС‚';
+    serverMessage.value = respText || t('videos.addNew.emptyResponse');
     try {
       const data = JSON.parse(respText);
       if (data?.video?.url) uploadedVideoUrl.value = data.video.url;
@@ -311,7 +318,7 @@ async function uploadNow() {
       if (!newId.value) newId.value = genId();
     } catch {}
   } catch (e: any) {
-    errorMessage.value = e?.message || 'РћС€РёР±РєР° РѕС‚РїСЂР°РІРєРё';
+    errorMessage.value = e?.message || t('videos.addNew.uploadError');
   } finally {
     isUploading.value = false;
   }
@@ -351,9 +358,9 @@ async function saveVideo() {
   saving.value = true;
   try {
     if (isEditMode.value) {
-      if (!newId.value) throw new Error('ID РЅРµ РЅР°Р№РґРµРЅ');
+      if (!newId.value) throw new Error(t('videos.addNew.missingId'));
       const payload = {
-        // Р Р°Р·СЂРµС€Р°РµРј СЂРµРґР°РєС‚РёСЂРѕРІР°С‚СЊ СЃСѓР±С‚РёС‚СЂС‹ Рё РјРµС‚Сѓ РїСЂРё РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё
+        // Разрешаем редактировать субтитры и мету при необходимости
         subtitles: editorSubtitles.value,
         title: title.value,
         description: description.value,
@@ -368,10 +375,10 @@ async function saveVideo() {
       if (!res.ok) throw new Error(json?.error || `Update failed (${res.status})`);
       saveOk.value = true;
       saveId.value = json?.id || newId.value;
-      // РћР±РЅРѕРІР»СЏРµРј Р»РѕРєР°Р»СЊРЅРѕРµ СЃРѕСЃС‚РѕСЏРЅРёРµ РёР· Р‘Р”, С‡С‚РѕР±С‹ СЃСЂР°Р·Сѓ РѕС‚РѕР±СЂР°Р·РёС‚СЊ РЅРѕСЂРјР°Р»РёР·РѕРІР°РЅРЅС‹Рµ РґР°РЅРЅС‹Рµ
+      // Обновляем локальное состояние из БД, чтобы сразу отобразить нормализованные данные
       await loadExisting();
     } else {
-      if (!uploadedVideoUrl.value) throw new Error('РќРµС‚ СЃСЃС‹Р»РєРё РЅР° РІРёРґРµРѕ');
+      if (!uploadedVideoUrl.value) throw new Error(t('videos.addNew.missingVideoUrl'));
       const payload = {
         id: newId.value || genId(),
         preview_url: uploadedPreviewUrl.value,
@@ -393,7 +400,7 @@ async function saveVideo() {
       saveId.value = json?.id;
     }
   } catch (e: any) {
-    saveError.value = e?.message || 'РћС€РёР±РєР° СЃРѕС…СЂР°РЅРµРЅРёСЏ';
+    saveError.value = e?.message || t('videos.addNew.saveError');
   } finally {
     saving.value = false;
   }

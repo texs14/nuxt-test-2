@@ -1,4 +1,4 @@
-﻿{
+{
   "app": {
     "title": "Thai Platform"
   },
@@ -14,18 +14,41 @@
   "lang": {
     "english": "English",
     "russian": "Russian",
+    "thai": "Thai",
     "select": "Language"
   },
   "videos": {
     "title": "Videos",
     "add": "Add video",
-    "loading": "LoadingвЂ¦",
+    "loading": "Loading…",
     "error": "Loading error",
-    "edit": "Edit"
+    "edit": "Edit",
+    "addNew": {
+      "titleEdit": "Editing video",
+      "titleCreate": "Upload new video",
+      "headEdit": "Edit video",
+      "headCreate": "Add video",
+      "videoLabel": "Video",
+      "subtitlesLabel": "Subtitles (SRT/VTT, optional)",
+      "selected": "Selected: {name}",
+      "autoHint": "Selecting a video automatically starts uploading to the server",
+      "serverResponse": "Server response",
+      "preview": "Preview",
+      "subtitleLang": "Subtitle language",
+      "submitUploading": "Uploading…",
+      "submitAgain": "Submit again",
+      "loadError": "Failed to load entry",
+      "networkError": "Network error while uploading file",
+      "emptyResponse": "Empty response",
+      "uploadError": "Upload error",
+      "missingId": "ID not found",
+      "missingVideoUrl": "Missing video URL",
+      "saveError": "Save error"
+    }
   },
   "comments": {
     "title": "Comments",
-    "loading": "Loading commentsвЂ¦",
+    "loading": "Loading comments…",
     "error": "Error",
     "anonymous": "Anonymous"
   },
