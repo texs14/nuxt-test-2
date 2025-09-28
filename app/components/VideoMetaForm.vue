@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <section class="video-upload-form__meta">
     <h2 class="video-upload-form__subtitle">{{ t('meta.title') }}</h2>
     <div class="video-upload-form__grid">

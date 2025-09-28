@@ -1,9 +1,9 @@
-<template>
+﻿<template>
   <form class="auth-register" @submit.prevent="onSubmit">
     <div class="auth-register__field">
       <UiInput
         v-model="first_name"
-        label="Имя*"
+        label="РРјСЏ*"
         name="first_name"
         required
       />
@@ -12,7 +12,7 @@
     <div class="auth-register__field">
       <UiInput
         v-model="age"
-        label="Возраст*"
+        label="Р’РѕР·СЂР°СЃС‚*"
         name="age"
         type="number"
         min="1"
@@ -36,7 +36,7 @@
     <div class="auth-register__field">
       <UiInput
         v-model="password"
-        label="Пароль*"
+        label="РџР°СЂРѕР»СЊ*"
         name="password"
         type="password"
         autocomplete="new-password"
@@ -47,7 +47,7 @@
     <div class="auth-register__field">
       <UiInput
         v-model="last_name"
-        label="Фамилия"
+        label="Р¤Р°РјРёР»РёСЏ"
         name="last_name"
       />
     </div>
@@ -76,13 +76,13 @@
     <div class="auth-register__field">
       <UiInput
         v-model="city"
-        label="Город"
+        label="Р“РѕСЂРѕРґ"
         name="city"
       />
     </div>
 
     <div class="auth-register__actions">
-      <button class="auth-register__submit" type="submit" :disabled="loading">Зарегистрироваться</button>
+      <button class="auth-register__submit" type="submit" :disabled="loading">Р—Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°С‚СЊСЃСЏ</button>
     </div>
 
     <p v-if="message" class="auth-register__status auth-register__status_success">{{ message }}</p>
@@ -124,10 +124,10 @@ async function checkUsername() {
   try {
     const { available } = await $fetch<{ available: boolean }>(`/api/profile/username-available?u=${encodeURIComponent(u)}`)
     usernameStatus.value = available
-      ? { type: 'ok', text: 'Имя пользователя свободно' }
-      : { type: 'err', text: 'Имя пользователя занято' }
+      ? { type: 'ok', text: 'РРјСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ СЃРІРѕР±РѕРґРЅРѕ' }
+      : { type: 'err', text: 'РРјСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ Р·Р°РЅСЏС‚Рѕ' }
   } catch (e) {
-    // игнорируем сетевые ошибки для простоты
+    // РёРіРЅРѕСЂРёСЂСѓРµРј СЃРµС‚РµРІС‹Рµ РѕС€РёР±РєРё РґР»СЏ РїСЂРѕСЃС‚РѕС‚С‹
   }
 }
 
@@ -136,7 +136,7 @@ const onSubmit = async () => {
   message.value = ''
   loading.value = true
   try {
-    if (age.value == null) throw createError({ statusCode: 400, statusMessage: 'Укажите возраст' })
+    if (age.value == null) throw createError({ statusCode: 400, statusMessage: 'РЈРєР°Р¶РёС‚Рµ РІРѕР·СЂР°СЃС‚' })
     await signUpEmail({
       email: email.value,
       password: password.value,
@@ -147,9 +147,9 @@ const onSubmit = async () => {
       avatar_url: avatar_url.value || undefined,
       city: city.value || undefined
     })
-    message.value = 'Проверьте почту и перейдите по ссылке для входа'
+    message.value = 'РџСЂРѕРІРµСЂСЊС‚Рµ РїРѕС‡С‚Сѓ Рё РїРµСЂРµР№РґРёС‚Рµ РїРѕ СЃСЃС‹Р»РєРµ РґР»СЏ РІС…РѕРґР°'
   } catch (err: any) {
-    errorMessage.value = err?.statusMessage || err?.message || 'Ошибка регистрации'
+    errorMessage.value = err?.statusMessage || err?.message || 'РћС€РёР±РєР° СЂРµРіРёСЃС‚СЂР°С†РёРё'
   } finally {
     loading.value = false
   }

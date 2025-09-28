@@ -1,4 +1,4 @@
-# Nuxt Minimal Starter
+﻿# Nuxt Minimal Starter
 
 Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
 
@@ -75,14 +75,14 @@ bun run preview
 Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
 
 
-## Авторизация (Supabase)
+## РђРІС‚РѕСЂРёР·Р°С†РёСЏ (Supabase)
 
-Ниже описана структура и логика e‑mail авторизации через модуль `@nuxtjs/supabase`.
+РќРёР¶Рµ РѕРїРёСЃР°РЅР° СЃС‚СЂСѓРєС‚СѓСЂР° Рё Р»РѕРіРёРєР° eвЂ‘mail Р°РІС‚РѕСЂРёР·Р°С†РёРё С‡РµСЂРµР· РјРѕРґСѓР»СЊ `@nuxtjs/supabase`.
 
-### Структура
+### РЎС‚СЂСѓРєС‚СѓСЂР°
 
 - `nuxt.config.ts`
-  - Раздел `supabase.redirectOptions` управляет авто‑редиректами модуля:
+  - Р Р°Р·РґРµР» `supabase.redirectOptions` СѓРїСЂР°РІР»СЏРµС‚ Р°РІС‚РѕвЂ‘СЂРµРґРёСЂРµРєС‚Р°РјРё РјРѕРґСѓР»СЏ:
     ```ts
     export default defineNuxtConfig({
       modules: ['@nuxtjs/supabase'],
@@ -103,12 +103,12 @@ Check out the [deployment documentation](https://nuxt.com/docs/getting-started/d
       }
     })
     ```
-  - Переменные окружения читаются из `.env`: `SUPABASE_URL`, `SUPABASE_KEY`.
+  - РџРµСЂРµРјРµРЅРЅС‹Рµ РѕРєСЂСѓР¶РµРЅРёСЏ С‡РёС‚Р°СЋС‚СЃСЏ РёР· `.env`: `SUPABASE_URL`, `SUPABASE_KEY`.
 
 - `app/middleware/auth.ts`
-  - Кастомное middleware защищает только те страницы, где указана мета `requiresAuth: true`.
-  - Публичные маршруты не редиректятся: `'/', '/login', '/register', '/confirm'`.
-  - Перед редиректом на `/login` исходный путь сохраняется в cookie через `useSupabaseCookieRedirect()`.
+  - РљР°СЃС‚РѕРјРЅРѕРµ middleware Р·Р°С‰РёС‰Р°РµС‚ С‚РѕР»СЊРєРѕ С‚Рµ СЃС‚СЂР°РЅРёС†С‹, РіРґРµ СѓРєР°Р·Р°РЅР° РјРµС‚Р° `requiresAuth: true`.
+  - РџСѓР±Р»РёС‡РЅС‹Рµ РјР°СЂС€СЂСѓС‚С‹ РЅРµ СЂРµРґРёСЂРµРєС‚СЏС‚СЃСЏ: `'/', '/login', '/register', '/confirm'`.
+  - РџРµСЂРµРґ СЂРµРґРёСЂРµРєС‚РѕРј РЅР° `/login` РёСЃС…РѕРґРЅС‹Р№ РїСѓС‚СЊ СЃРѕС…СЂР°РЅСЏРµС‚СЃСЏ РІ cookie С‡РµСЂРµР· `useSupabaseCookieRedirect()`.
     ```ts
     export default defineNuxtRouteMiddleware((to) => {
       const user = useSupabaseUser()
@@ -124,8 +124,8 @@ Check out the [deployment documentation](https://nuxt.com/docs/getting-started/d
     })
     ```
 
-- Страницы
-  - `app/pages/login.vue` — форма входа по e‑mail (OTP/magic link). Используется `supabase.auth.signInWithOtp`:
+- РЎС‚СЂР°РЅРёС†С‹
+  - `app/pages/login.vue` вЂ” С„РѕСЂРјР° РІС…РѕРґР° РїРѕ eвЂ‘mail (OTP/magic link). РСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ `supabase.auth.signInWithOtp`:
     ```ts
     const supabase = useSupabaseClient()
     const signInWithOtp = async () => {
@@ -135,9 +135,9 @@ Check out the [deployment documentation](https://nuxt.com/docs/getting-started/d
       })
     }
     ```
-    Страница помечена как публичная: `definePageMeta({ requiresAuth: false })`.
+    РЎС‚СЂР°РЅРёС†Р° РїРѕРјРµС‡РµРЅР° РєР°Рє РїСѓР±Р»РёС‡РЅР°СЏ: `definePageMeta({ requiresAuth: false })`.
 
-  - `app/pages/confirm.vue` — обработка коллбэка после входа. Ждёт появления пользователя и возвращает на сохранённый маршрут:
+  - `app/pages/confirm.vue` вЂ” РѕР±СЂР°Р±РѕС‚РєР° РєРѕР»Р»Р±СЌРєР° РїРѕСЃР»Рµ РІС…РѕРґР°. Р–РґС‘С‚ РїРѕСЏРІР»РµРЅРёСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ Рё РІРѕР·РІСЂР°С‰Р°РµС‚ РЅР° СЃРѕС…СЂР°РЅС‘РЅРЅС‹Р№ РјР°СЂС€СЂСѓС‚:
     ```ts
     const user = useSupabaseUser()
     const redirectInfo = useSupabaseCookieRedirect()
@@ -148,79 +148,79 @@ Check out the [deployment documentation](https://nuxt.com/docs/getting-started/d
       }
     }, { immediate: true })
     ```
-    Тоже публичная: `definePageMeta({ requiresAuth: false })`.
+    РўРѕР¶Рµ РїСѓР±Р»РёС‡РЅР°СЏ: `definePageMeta({ requiresAuth: false })`.
 
-### Поток авторизации
+### РџРѕС‚РѕРє Р°РІС‚РѕСЂРёР·Р°С†РёРё
 
-1. Пользователь открывает защищённую страницу (где `definePageMeta({ requiresAuth: true })`).
-2. `auth`‑middleware сохраняет целевой путь и перенаправляет на `/login`.
-3. На `/login` пользователь вводит e‑mail, отправляется magic‑ссылка.
-4. После перехода по ссылке Supabase перенаправляет на `/confirm`.
-5. `/confirm` обнаруживает активного пользователя и возвращает на сохранённый путь (или `/`).
+1. РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ РѕС‚РєСЂС‹РІР°РµС‚ Р·Р°С‰РёС‰С‘РЅРЅСѓСЋ СЃС‚СЂР°РЅРёС†Сѓ (РіРґРµ `definePageMeta({ requiresAuth: true })`).
+2. `auth`вЂ‘middleware СЃРѕС…СЂР°РЅСЏРµС‚ С†РµР»РµРІРѕР№ РїСѓС‚СЊ Рё РїРµСЂРµРЅР°РїСЂР°РІР»СЏРµС‚ РЅР° `/login`.
+3. РќР° `/login` РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ РІРІРѕРґРёС‚ eвЂ‘mail, РѕС‚РїСЂР°РІР»СЏРµС‚СЃСЏ magicвЂ‘СЃСЃС‹Р»РєР°.
+4. РџРѕСЃР»Рµ РїРµСЂРµС…РѕРґР° РїРѕ СЃСЃС‹Р»РєРµ Supabase РїРµСЂРµРЅР°РїСЂР°РІР»СЏРµС‚ РЅР° `/confirm`.
+5. `/confirm` РѕР±РЅР°СЂСѓР¶РёРІР°РµС‚ Р°РєС‚РёРІРЅРѕРіРѕ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ Рё РІРѕР·РІСЂР°С‰Р°РµС‚ РЅР° СЃРѕС…СЂР°РЅС‘РЅРЅС‹Р№ РїСѓС‚СЊ (РёР»Рё `/`).
 
-### Настройки в Supabase Dashboard
+### РќР°СЃС‚СЂРѕР№РєРё РІ Supabase Dashboard
 
-- В разделе Authentication → URL Configuration добавьте в Allowed Redirect URLs адрес:
-  - для локальной разработки: `http://localhost:<порт>/confirm` (например, `3000` или `3001`).
-- Убедитесь, что `.env` содержит корректные `SUPABASE_URL` и `SUPABASE_KEY`.
+- Р’ СЂР°Р·РґРµР»Рµ Authentication в†’ URL Configuration РґРѕР±Р°РІСЊС‚Рµ РІ Allowed Redirect URLs Р°РґСЂРµСЃ:
+  - РґР»СЏ Р»РѕРєР°Р»СЊРЅРѕР№ СЂР°Р·СЂР°Р±РѕС‚РєРё: `http://localhost:<РїРѕСЂС‚>/confirm` (РЅР°РїСЂРёРјРµСЂ, `3000` РёР»Рё `3001`).
+- РЈР±РµРґРёС‚РµСЃСЊ, С‡С‚Рѕ `.env` СЃРѕРґРµСЂР¶РёС‚ РєРѕСЂСЂРµРєС‚РЅС‹Рµ `SUPABASE_URL` Рё `SUPABASE_KEY`.
 
-### Как пометить страницу как защищённую
+### РљР°Рє РїРѕРјРµС‚РёС‚СЊ СЃС‚СЂР°РЅРёС†Сѓ РєР°Рє Р·Р°С‰РёС‰С‘РЅРЅСѓСЋ
 
-Добавьте в компонент страницы:
+Р”РѕР±Р°РІСЊС‚Рµ РІ РєРѕРјРїРѕРЅРµРЅС‚ СЃС‚СЂР°РЅРёС†С‹:
 
 ```ts
 definePageMeta({ requiresAuth: true })
 ```
 
-### Примеры
+### РџСЂРёРјРµСЂС‹
 
-- Выйти из аккаунта:
+- Р’С‹Р№С‚Рё РёР· Р°РєРєР°СѓРЅС‚Р°:
   ```ts
   const supabase = useSupabaseClient()
   await supabase.auth.signOut()
   ```
 
-- Навигация (BEM‑классы используются в стилях компонентов, например, в `app/components/NavPanel.vue`).
+- РќР°РІРёРіР°С†РёСЏ (BEMвЂ‘РєР»Р°СЃСЃС‹ РёСЃРїРѕР»СЊР·СѓСЋС‚СЃСЏ РІ СЃС‚РёР»СЏС… РєРѕРјРїРѕРЅРµРЅС‚РѕРІ, РЅР°РїСЂРёРјРµСЂ, РІ `app/components/NavPanel.vue`).
 
-### Примечания
+### РџСЂРёРјРµС‡Р°РЅРёСЏ
 
-- В корневом шаблоне `app/app.vue` используется `<NuxtPage />` для рендера страниц.
-- Публичные маршруты управляются в `auth.ts` и в `supabase.redirectOptions.exclude`.
+- Р’ РєРѕСЂРЅРµРІРѕРј С€Р°Р±Р»РѕРЅРµ `app/app.vue` РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ `<NuxtPage />` РґР»СЏ СЂРµРЅРґРµСЂР° СЃС‚СЂР°РЅРёС†.
+- РџСѓР±Р»РёС‡РЅС‹Рµ РјР°СЂС€СЂСѓС‚С‹ СѓРїСЂР°РІР»СЏСЋС‚СЃСЏ РІ `auth.ts` Рё РІ `supabase.redirectOptions.exclude`.
 
-## Мультиязычность (i18n)
+## РњСѓР»СЊС‚РёСЏР·С‹С‡РЅРѕСЃС‚СЊ (i18n)
 
-Реализована полноценная мультиязычность на базе официального модуля `@nuxtjs/i18n`.
+Р РµР°Р»РёР·РѕРІР°РЅР° РїРѕР»РЅРѕС†РµРЅРЅР°СЏ РјСѓР»СЊС‚РёСЏР·С‹С‡РЅРѕСЃС‚СЊ РЅР° Р±Р°Р·Рµ РѕС„РёС†РёР°Р»СЊРЅРѕРіРѕ РјРѕРґСѓР»СЏ `@nuxtjs/i18n`.
 
-- Стратегия URL: `prefix_except_default` — английская версия без префикса (`/`), русская — с префиксом (`/ru`).
-- Локали: `en` (default), `ru`. BCP 47 теги заданы в `nuxt.config.ts`.
-- Ленивые переводы: `lazy: true`, директория `locales/` (`en.json`, `ru.json`).
-- Детект языка: `detectBrowserLanguage.useCookie = true`, cookie `i18n_redirected`, `redirectOn = 'root'`.
-- SEO: глобальный вызов `useLocaleHead({ addDirAttribute: true, addSeoAttributes: true })` в `app/app.vue` формирует `<html lang/dir>`, `hreflang` и `canonical`.
-- Локализованные маршруты и ссылки: используем `useLocalePath()` и `useSwitchLocalePath()`.
+- РЎС‚СЂР°С‚РµРіРёСЏ URL: `prefix_except_default` вЂ” Р°РЅРіР»РёР№СЃРєР°СЏ РІРµСЂСЃРёСЏ Р±РµР· РїСЂРµС„РёРєСЃР° (`/`), СЂСѓСЃСЃРєР°СЏ вЂ” СЃ РїСЂРµС„РёРєСЃРѕРј (`/ru`).
+- Р›РѕРєР°Р»Рё: `en` (default), `ru`. BCP 47 С‚РµРіРё Р·Р°РґР°РЅС‹ РІ `nuxt.config.ts`.
+- Р›РµРЅРёРІС‹Рµ РїРµСЂРµРІРѕРґС‹: `lazy: true`, РґРёСЂРµРєС‚РѕСЂРёСЏ `locales/` (`en.json`, `ru.json`).
+- Р”РµС‚РµРєС‚ СЏР·С‹РєР°: `detectBrowserLanguage.useCookie = true`, cookie `i18n_redirected`, `redirectOn = 'root'`.
+- SEO: РіР»РѕР±Р°Р»СЊРЅС‹Р№ РІС‹Р·РѕРІ `useLocaleHead({ addDirAttribute: true, addSeoAttributes: true })` РІ `app/app.vue` С„РѕСЂРјРёСЂСѓРµС‚ `<html lang/dir>`, `hreflang` Рё `canonical`.
+- Р›РѕРєР°Р»РёР·РѕРІР°РЅРЅС‹Рµ РјР°СЂС€СЂСѓС‚С‹ Рё СЃСЃС‹Р»РєРё: РёСЃРїРѕР»СЊР·СѓРµРј `useLocalePath()` Рё `useSwitchLocalePath()`.
 
-### Где настраивается
+### Р“РґРµ РЅР°СЃС‚СЂР°РёРІР°РµС‚СЃСЏ
 
-- `nuxt.config.ts` → модуль `@nuxtjs/i18n` с опциями, `vueI18n: './i18n.config.ts'`.
-- `i18n.config.ts` → базовые опции Vue I18n (`legacy: false`, `fallbackLocale: 'en'`).
-- `locales/en.json`, `locales/ru.json` → словари.
-- `app/app.vue` → глобальный SEO-хед через `useLocaleHead()`.
-- `app/components/NavPanel.vue` → нативный `<select>` для смены языка и локализованные ссылки.
+- `nuxt.config.ts` в†’ РјРѕРґСѓР»СЊ `@nuxtjs/i18n` СЃ РѕРїС†РёСЏРјРё, `vueI18n: './i18n.config.ts'`.
+- `i18n.config.ts` в†’ Р±Р°Р·РѕРІС‹Рµ РѕРїС†РёРё Vue I18n (`legacy: false`, `fallbackLocale: 'en'`).
+- `locales/en.json`, `locales/ru.json` в†’ СЃР»РѕРІР°СЂРё.
+- `app/app.vue` в†’ РіР»РѕР±Р°Р»СЊРЅС‹Р№ SEO-С…РµРґ С‡РµСЂРµР· `useLocaleHead()`.
+- `app/components/NavPanel.vue` в†’ РЅР°С‚РёРІРЅС‹Р№ `<select>` РґР»СЏ СЃРјРµРЅС‹ СЏР·С‹РєР° Рё Р»РѕРєР°Р»РёР·РѕРІР°РЅРЅС‹Рµ СЃСЃС‹Р»РєРё.
 
-### Как добавить ключ перевода
+### РљР°Рє РґРѕР±Р°РІРёС‚СЊ РєР»СЋС‡ РїРµСЂРµРІРѕРґР°
 
-1. Добавьте ключ в `locales/en.json` и `locales/ru.json`.
-2. Используйте в компонентах `const { t } = useI18n()` и далее `t('namespace.key')`.
+1. Р”РѕР±Р°РІСЊС‚Рµ РєР»СЋС‡ РІ `locales/en.json` Рё `locales/ru.json`.
+2. РСЃРїРѕР»СЊР·СѓР№С‚Рµ РІ РєРѕРјРїРѕРЅРµРЅС‚Р°С… `const { t } = useI18n()` Рё РґР°Р»РµРµ `t('namespace.key')`.
 
-### Как добавить новый язык
+### РљР°Рє РґРѕР±Р°РІРёС‚СЊ РЅРѕРІС‹Р№ СЏР·С‹Рє
 
-1. Добавьте файл в `locales/<code>.json`.
-2. В `nuxt.config.ts` → в `locales` добавьте `{ code: '<code>', language: '<bcp47>', name: '<Label>', file: '<code>.json' }`.
-3. При необходимости обновите селектор в `NavPanel.vue`.
+1. Р”РѕР±Р°РІСЊС‚Рµ С„Р°Р№Р» РІ `locales/<code>.json`.
+2. Р’ `nuxt.config.ts` в†’ РІ `locales` РґРѕР±Р°РІСЊС‚Рµ `{ code: '<code>', language: '<bcp47>', name: '<Label>', file: '<code>.json' }`.
+3. РџСЂРё РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РѕР±РЅРѕРІРёС‚Рµ СЃРµР»РµРєС‚РѕСЂ РІ `NavPanel.vue`.
 
 ### Acceptance Checklist
 
-- GET `/` → английская версия без префикса; GET `/ru` → русская версия с префиксом.
-- Переключатель языка сохраняет текущий маршрут и query-параметры.
-- В `<head>/<html>` корректные `lang`, `dir`, `link[rel=alternate][hreflang]`.
-- Загружается только активная локаль (+ fallback) при первом заходе.
-- Cookie `i18n_redirected` устанавливается, редирект выполняется только на корне.
+- GET `/` в†’ Р°РЅРіР»РёР№СЃРєР°СЏ РІРµСЂСЃРёСЏ Р±РµР· РїСЂРµС„РёРєСЃР°; GET `/ru` в†’ СЂСѓСЃСЃРєР°СЏ РІРµСЂСЃРёСЏ СЃ РїСЂРµС„РёРєСЃРѕРј.
+- РџРµСЂРµРєР»СЋС‡Р°С‚РµР»СЊ СЏР·С‹РєР° СЃРѕС…СЂР°РЅСЏРµС‚ С‚РµРєСѓС‰РёР№ РјР°СЂС€СЂСѓС‚ Рё query-РїР°СЂР°РјРµС‚СЂС‹.
+- Р’ `<head>/<html>` РєРѕСЂСЂРµРєС‚РЅС‹Рµ `lang`, `dir`, `link[rel=alternate][hreflang]`.
+- Р—Р°РіСЂСѓР¶Р°РµС‚СЃСЏ С‚РѕР»СЊРєРѕ Р°РєС‚РёРІРЅР°СЏ Р»РѕРєР°Р»СЊ (+ fallback) РїСЂРё РїРµСЂРІРѕРј Р·Р°С…РѕРґРµ.
+- Cookie `i18n_redirected` СѓСЃС‚Р°РЅР°РІР»РёРІР°РµС‚СЃСЏ, СЂРµРґРёСЂРµРєС‚ РІС‹РїРѕР»РЅСЏРµС‚СЃСЏ С‚РѕР»СЊРєРѕ РЅР° РєРѕСЂРЅРµ.

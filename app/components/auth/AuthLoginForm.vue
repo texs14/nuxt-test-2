@@ -1,3 +1,4 @@
+﻿<!-- eslint-disable prettier/prettier -->
 <template>
   <form class="auth-login" @submit.prevent="onSubmit">
     <div class="auth-login__field">
@@ -23,58 +24,70 @@
     </div>
 
     <div class="auth-login__actions">
-      <button class="auth-login__submit" type="submit" :disabled="loading">{{ t('auth.login.submit') }}</button>
-      <button class="auth-login__submit auth-login__submit_google" type="button" @click="signInGoogle" :disabled="loading">{{ t('auth.login.google') }}</button>
-      <NuxtLink class="auth-login__link" :to="localePath('/register')">{{ t('auth.login.register') }}</NuxtLink>
+      <button class="auth-login__submit" type="submit" :disabled="loading">
+        {{ t('auth.login.submit') }}
+      </button>
+      <button
+        class="auth-login__submit auth-login__submit_google"
+        type="button"
+        :disabled="loading"
+        @click="signInGoogle"
+      >
+        {{ t('auth.login.google') }}
+      </button>
+      <NuxtLink class="auth-login__link" :to="localePath('/register')">{{
+        t('auth.login.register')
+      }}</NuxtLink>
     </div>
 
     <p v-if="message" class="auth-login__status auth-login__status_success">{{ message }}</p>
-    <p v-if="errorMessage" class="auth-login__status auth-login__status_error">{{ errorMessage }}</p>
+    <p v-if="errorMessage" class="auth-login__status auth-login__status_error">
+      {{ errorMessage }}
+    </p>
   </form>
 </template>
 
 <script setup lang="ts">
-const { t } = useI18n()
-const localePath = useLocalePath()
+const { t } = useI18n();
+const localePath = useLocalePath();
 
-const email = ref('')
-const password = ref('')
-const loading = ref(false)
-const message = ref('')
-const errorMessage = ref('')
+const email = ref('');
+const password = ref('');
+const loading = ref(false);
+const message = ref('');
+const errorMessage = ref('');
 
-const redirectInfo = useSupabaseCookieRedirect()
-const { signInWithPassword, signInWithGoogleOAuth } = useAuth()
+const redirectInfo = useSupabaseCookieRedirect();
+const { signInWithPassword, signInWithGoogleOAuth } = useAuth();
 
 const onSubmit = async () => {
-  errorMessage.value = ''
-  message.value = ''
-  loading.value = true
+  errorMessage.value = '';
+  message.value = '';
+  loading.value = true;
   try {
-    await signInWithPassword(email.value, password.value)
-    const path = redirectInfo.pluck()
-    return navigateTo(path || '/')
+    await signInWithPassword(email.value, password.value);
+    const path = redirectInfo.pluck();
+    return navigateTo(path || '/');
   } catch (err: any) {
-    errorMessage.value = err?.statusMessage || err?.message || 'Ошибка входа'
+    errorMessage.value = err?.statusMessage || err?.message || 'РћС€РёР±РєР° РІС…РѕРґР°';
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
+};
 
 const signInGoogle = async () => {
-  errorMessage.value = ''
+  errorMessage.value = '';
   try {
-    await signInWithGoogleOAuth()
+    await signInWithGoogleOAuth();
   } catch (err: any) {
-    errorMessage.value = err?.statusMessage || err?.message || 'Ошибка OAuth'
+    errorMessage.value = err?.statusMessage || err?.message || 'РћС€РёР±РєР° OAuth';
   }
-}
+};
 </script>
-
 
 <style lang="scss" scoped>
 .auth-login {
-  width: 50% ;
+  width: 50%;
 
   margin: auto;
 

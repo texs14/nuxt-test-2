@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <section class="subtitle-editor">
     <header class="subtitle-editor__head">
       <h2 class="subtitle-editor__title">{{ t('editor.title') }}</h2>
@@ -51,7 +51,7 @@
 
           <button type="button" class="subtitle-editor__toggle" @click="toggleMore(row, idx)">
             RU / EN
-            <span class="subtitle-editor__toggle_icon" :class="{ 'subtitle-editor__toggle_icon_open': expandedMap[row.id ?? idx] }">▾</span>
+            <span class="subtitle-editor__toggle_icon" :class="{ 'subtitle-editor__toggle_icon_open': expandedMap[row.id ?? idx] }">в–ѕ</span>
           </button>
 
           <div class="subtitle-editor__more" :class="{ 'subtitle-editor__more_open': expandedMap[row.id ?? idx] }">
@@ -105,7 +105,7 @@ const rows = ref<RequiredSubtitleItem[]>(props.modelValue.map((s, i) => normaliz
 
 const { t } = useI18n()
 
-// Карта развёрнутости для RU/EN по ключу строки
+// РљР°СЂС‚Р° СЂР°Р·РІС‘СЂРЅСѓС‚РѕСЃС‚Рё РґР»СЏ RU/EN РїРѕ РєР»СЋС‡Сѓ СЃС‚СЂРѕРєРё
 const expandedMap = ref<Record<string, boolean>>({})
 
 function rowKey(row: RequiredSubtitleItem, idx: number): string {
@@ -115,7 +115,7 @@ function rowKey(row: RequiredSubtitleItem, idx: number): string {
 function toggleMore(row: RequiredSubtitleItem, idx: number) {
   const k = rowKey(row, idx)
   expandedMap.value[k] = !expandedMap.value[k]
-  // Триггерим обновление
+  // РўСЂРёРіРіРµСЂРёРј РѕР±РЅРѕРІР»РµРЅРёРµ
   expandedMap.value = { ...expandedMap.value }
 }
 
@@ -130,7 +130,7 @@ const toNumber = (v: string) => {
 
 function sanitizeThaiSpacing(text: string): string {
   if (!text) return ''
-  // Удаляем пробелы между тайскими буквами
+  // РЈРґР°Р»СЏРµРј РїСЂРѕР±РµР»С‹ РјРµР¶РґСѓ С‚Р°Р№СЃРєРёРјРё Р±СѓРєРІР°РјРё
   let out = text
   const re = /([\u0E00-\u0E7F])\s+([\u0E00-\u0E7F])/g
   for (let i = 0; i < 5; i++) {
@@ -213,15 +213,15 @@ function onStartBlur() {
 .subtitle-editor__input { width: 100%; padding: 6px 8px; border: 1px solid #e5e7eb; border-radius: 8px; }
 .subtitle-editor__textarea { width: 100%; padding: 6px 8px; border: 1px solid #e5e7eb; border-radius: 8px; resize: vertical; }
 
-/* Стек текстовых полей */
+/* РЎС‚РµРє С‚РµРєСЃС‚РѕРІС‹С… РїРѕР»РµР№ */
 .subtitle-editor__cell_text_stack { display: flex; flex-direction: column; gap: 8px; }
 
-/* Кнопка сворачивания */
+/* РљРЅРѕРїРєР° СЃРІРѕСЂР°С‡РёРІР°РЅРёСЏ */
 .subtitle-editor__toggle { align-self: flex-start; appearance: none; border: 1px solid #ddd; background: #f6f6f6; padding: 4px 8px; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-size: 12px; }
 .subtitle-editor__toggle_icon { display: inline-block; transition: transform .2s ease; }
 .subtitle-editor__toggle_icon_open { transform: rotate(180deg); }
 
-/* Плавное сворачивание/разворачивание */
+/* РџР»Р°РІРЅРѕРµ СЃРІРѕСЂР°С‡РёРІР°РЅРёРµ/СЂР°Р·РІРѕСЂР°С‡РёРІР°РЅРёРµ */
 .subtitle-editor__more { overflow: hidden; max-height: 0; opacity: 0; transition: max-height .25s ease, opacity .2s ease; }
 .subtitle-editor__more_open { max-height: 420px; opacity: 1; }
 .subtitle-editor__more_inner { padding-top: 6px; display: grid; gap: 8px; }

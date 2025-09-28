@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="video-card">
     <NuxtLink :to="localePath({ name: 'videos-id', params: { id } })" class="video-card__main">
       <div class="video-card__thumb">

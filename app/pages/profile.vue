@@ -10,25 +10,25 @@
 <script setup lang="ts">
 definePageMeta({
   middleware: ['auth'],
-  requiresAuth: true
-})
+  requiresAuth: true,
+});
 
-const { t } = useI18n()
-const { profile, fetchProfile } = useProfile()
+const { t } = useI18n();
+const { profile, fetchProfile } = useProfile();
 
-const { pending, error } = await useAsyncData('profile-current', fetchProfile)
+const { pending, error } = await useAsyncData('profile-current', fetchProfile);
 
-const loading = computed(() => pending.value)
+const loading = computed(() => pending.value);
 
 const errorMessage = computed(() => {
   if (!error.value) {
-    return null
+    return null;
   }
 
-  const cause = (error.value as { data?: Record<string, unknown>; message?: string }).data
-  const statusMessage = typeof cause?.statusMessage === 'string' ? cause.statusMessage : null
-  return statusMessage ?? error.value.message ?? t('profile.error')
-})
+  const cause = (error.value as { data?: Record<string, unknown>; message?: string }).data;
+  const statusMessage = typeof cause?.statusMessage === 'string' ? cause.statusMessage : null;
+  return statusMessage ?? error.value.message ?? t('profile.error');
+});
 </script>
 
 <style scoped lang="scss">

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="ui-input" :class="{ 'ui-input_error': hasError }">
     <label v-if="label" class="ui-input__label" :for="inputId">{{ label }}</label>
 

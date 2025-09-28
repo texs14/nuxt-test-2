@@ -1,8 +1,8 @@
-<template>
+﻿<template>
   <section class="tg-loader">
     <div class="tg-loader__spinner" aria-hidden="true"></div>
     <div class="tg-loader__info">
-      <div class="tg-loader__text">Обработка аудио…</div>
+      <div class="tg-loader__text">РћР±СЂР°Р±РѕС‚РєР° Р°СѓРґРёРѕвЂ¦</div>
       <div class="tg-loader__status">{{ viewStatus }}</div>
       <div v-if="error" class="tg-loader__error">{{ error }}</div>
     </div>
@@ -34,7 +34,7 @@ const emit = defineEmits<{
 const timer = ref<any>(null)
 const status = ref<string>('queued')
 const error = ref<string>('')
-const viewStatus = computed(() => status.value || 'ожидание…')
+const viewStatus = computed(() => status.value || 'РѕР¶РёРґР°РЅРёРµвЂ¦')
 
 function hhmmssToSec(s?: string): number {
   if (!s) return 0
@@ -55,7 +55,7 @@ function normalizeSegments(arr: RawSegment[]): SubtitleItem[] {
     id: i + 1,
     start: hhmmssToSec(r.start_time || r.start),
     end: hhmmssToSec(r.end_time || r.end),
-    // Пробелы очищаются на сервере. Здесь сохраняем как пришло.
+    // РџСЂРѕР±РµР»С‹ РѕС‡РёС‰Р°СЋС‚СЃСЏ РЅР° СЃРµСЂРІРµСЂРµ. Р—РґРµСЃСЊ СЃРѕС…СЂР°РЅСЏРµРј РєР°Рє РїСЂРёС€Р»Рѕ.
     text: { th: (r.corrected_text || r.text || '') }
   }))
 }
@@ -84,7 +84,7 @@ async function poll() {
       return
     }
   } catch (e: any) {
-    error.value = e?.message || 'Ошибка опроса Transgate'
+    error.value = e?.message || 'РћС€РёР±РєР° РѕРїСЂРѕСЃР° Transgate'
     emit('error', error.value)
   }
 }

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <section class="profile-details">
     <div v-if="loading" class="profile-details__status profile-details__status_loading">
       <span class="profile-details__spinner" aria-hidden="true" />

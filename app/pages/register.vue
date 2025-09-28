@@ -3,5 +3,5 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ requiresAuth: false })
+definePageMeta({ requiresAuth: false });
 </script>

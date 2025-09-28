@@ -1,13 +1,13 @@
-<template>
-  <div class="video-controls" role="group" aria-label="Панель управления видео">
+﻿<template>
+  <div class="video-controls" role="group" aria-label="РџР°РЅРµР»СЊ СѓРїСЂР°РІР»РµРЅРёСЏ РІРёРґРµРѕ">
     <button
       class="video-controls__btn video-controls__btn_play"
       type="button"
-      :aria-label="playing ? 'Пауза' : 'Старт'"
+      :aria-label="playing ? 'РџР°СѓР·Р°' : 'РЎС‚Р°СЂС‚'"
       @click="$emit('toggle-play')"
     >
-      <span v-if="!playing">▶</span>
-      <span v-else>⏸</span>
+      <span v-if="!playing">в–¶</span>
+      <span v-else>вЏё</span>
     </button>
 
     <div class="video-controls__time">
@@ -40,7 +40,7 @@
       <button
         type="button"
         class="video-controls__volume_btn"
-        aria-label="Громкость"
+        aria-label="Р“СЂРѕРјРєРѕСЃС‚СЊ"
         @click="onVolumeToggleTouch"
       >
         <svg class="video-controls__volume_icon" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -56,7 +56,7 @@
           step="0.01"
           :value="volume"
           @input="onVolumeInput"
-          aria-label="Громкость"
+          aria-label="Р“СЂРѕРјРєРѕСЃС‚СЊ"
         />
       </div>
     </div>
@@ -64,10 +64,10 @@
     <button
       class="video-controls__btn video-controls__btn_fullscreen"
       type="button"
-      aria-label="На весь экран"
+      aria-label="РќР° РІРµСЃСЊ СЌРєСЂР°РЅ"
       @click="$emit('toggle-fullscreen')"
     >
-      ⛶
+      в›¶
     </button>
   </div>
 </template>

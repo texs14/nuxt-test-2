@@ -1,4 +1,4 @@
-{
+﻿{
   "app": {
     "title": "Thai Platform"
   },
@@ -19,13 +19,13 @@
   "videos": {
     "title": "Videos",
     "add": "Add video",
-    "loading": "Loading…",
+    "loading": "LoadingвЂ¦",
     "error": "Loading error",
     "edit": "Edit"
   },
   "comments": {
     "title": "Comments",
-    "loading": "Loading comments…",
+    "loading": "Loading commentsвЂ¦",
     "error": "Error",
     "anonymous": "Anonymous"
   },
@@ -42,7 +42,7 @@
   },
   "profile": {
     "title": "Profile",
-    "loading": "Loading profile…",
+    "loading": "Loading profileвЂ¦",
     "empty": "Profile not found",
     "error": "Failed to load profile",
     "notSpecified": "Not specified",

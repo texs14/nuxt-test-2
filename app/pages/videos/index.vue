@@ -2,7 +2,9 @@
   <section class="videos">
     <header class="videos__header">
       <h1 class="videos__title">{{ t('videos.title') }}</h1>
-      <NuxtLink :to="localePath({ name: 'videos-add-new' })" class="videos__add">{{ t('videos.add') }}</NuxtLink>
+      <NuxtLink :to="localePath({ name: 'videos-add-new' })" class="videos__add">{{
+        t('videos.add')
+      }}</NuxtLink>
     </header>
 
     <div v-if="pending" class="videos__state">{{ t('videos.loading') }}</div>
@@ -11,8 +13,8 @@
     <div v-else class="videos__grid">
       <VideoCard
         v-for="item in items"
-        :key="item.id"
         :id="item.id"
+        :key="item.id"
         :title="item.title"
         :level="item.level"
         :thumbnail-url="item.preview_url"
@@ -23,41 +25,41 @@
 </template>
 
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n'
-type Json = Record<string, any> | null
+import { useI18n } from 'vue-i18n';
+type Json = Record<string, any> | null;
 
 interface VideoItem {
-  id: string | number
-  title: Json | string
-  description?: Json | string | null
-  level?: string | null
-  preview_url?: string | null
+  id: string | number;
+  title: Json | string;
+  description?: Json | string | null;
+  level?: string | null;
+  preview_url?: string | null;
 }
 
-const supabase = useSupabaseClient()
-const { t } = useI18n()
-const localePath = useLocalePath()
+const supabase = useSupabaseClient();
+const { t } = useI18n();
+const localePath = useLocalePath();
 
-const { data: items, pending, error } = await useAsyncData<VideoItem[]>(
-  'video-items',
-  async () => {
-    const { data, error } = await supabase
-      .from('video_items')
-      .select('id, title, description, level, preview_url')
-      .order('id', { ascending: true })
+const {
+  data: items,
+  pending,
+  error,
+} = await useAsyncData<VideoItem[]>('video-items', async () => {
+  const { data, error } = await supabase
+    .from('video_items')
+    .select('id, title, description, level, preview_url')
+    .order('id', { ascending: true });
 
-    if (error) throw error
-    return data || []
-  }
-)
+  if (error) throw error;
+  return data || [];
+});
 </script>
-
 
 <style lang="scss" scoped>
 .videos {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
   &__grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -72,7 +74,7 @@ const { data: items, pending, error } = await useAsyncData<VideoItem[]>(
     font-weight: 600;
     font-size: 18px;
     cursor: pointer;
-    transition: background .2s ease;
+    transition: background 0.2s ease;
   }
 }
 </style>

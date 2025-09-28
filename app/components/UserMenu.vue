@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div ref="menuRef" class="user-menu">
     <button
       type="button"
@@ -20,7 +20,7 @@
         <span class="user-menu__name">{{ displayName }}</span>
         <span v-if="userEmail" class="user-menu__email">{{ userEmail }}</span>
       </span>
-      <span class="user-menu__chevron" aria-hidden="true">▾</span>
+      <span class="user-menu__chevron" aria-hidden="true">в–ѕ</span>
     </button>
 
     <div v-if="isOpen" class="user-menu__dropdown">

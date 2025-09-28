@@ -1,0 +1,2832 @@
+[
+  {
+    "word_th": "ไทย",
+    "translation": [
+      "person; human being",
+      "(archaic) person; human being",
+      "(ชาว~, คน~) Siamese person",
+      "(archaic) (ชาว~, คน~) Siamese person",
+      "Thai person.",
+      "(ชาว~, คน~) Thai person."
+    ],
+    "synonyms": [],
+    "links": [
+      "person",
+      "human being",
+      "ชาว#Thai",
+      "คน#Thai",
+      "Thai"
+    ],
+    "transcription_en": "tai",
+    "examples": [
+      {
+        "text": "ภาษาไทยเหนือเขาใช้คำ \"มี\" หมายความเหมือนอย่างไทยใต้ว่า \"อยู่\"",
+        "translation": "[In] the language of the Northern Thais, they use the word \"mi\" in the same meaning as \"yu\" employed by the Southern [Central] Thais.",
+        "roman": "paa-sǎa tai nʉ̌ʉa kǎo chái kam · “mii” · mǎai-kwaam mʉ̌ʉan yàang tai dtâai wâa · “yùu”",
+        "ref": "1944, สมเด็จพระเจ้าบรมวงศ์เธอ กรมพระยาดำรงราชานุภาพ, “นิทานที่ ๑๘ เรื่องค้นเมืองโบราณ”, in นิทานโบราณคดี, Bangkok: n.p.:",
+        "english": "[In] the language of the Northern Thais, they use the word \"mi\" in the same meaning as \"yu\" employed by the Southern [Central] Thais."
+      }
+    ],
+    "antonyms": []
+  },
+  {
+    "word_th": "ไหม",
+    "translation": [
+      "silkworm.",
+      "thread.",
+      "silk."
+    ],
+    "synonyms": [],
+    "links": [
+      "silkworm",
+      "thread",
+      "silk"
+    ],
+    "transcription_en": "mǎi",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "ฝรั่ง",
+    "translation": [
+      "(classifiers: คน, ท่าน) farang; Westerner.",
+      "(informal) (classifiers: คน, ท่าน) farang; Westerner.",
+      "a category of traditional Thai songs, such as ฝรั่งกลาย (fà-ràng-glaai), ฝรั่งควง (fà-ràng-kuuang), ฝรั่งจรกา (fà-ràng-jɔɔ-rá-gaa), ฝรั่งรำเท้า (fà-ràng-ram-táao), etc.",
+      "common guava: the plant Psidium guajava of the family Myrtaceae.",
+      "(botany) common guava: the plant Psidium guajava of the family Myrtaceae.",
+      "any guava."
+    ],
+    "synonyms": [],
+    "links": [
+      "คน#Thai",
+      "ท่าน#Thai",
+      "farang",
+      "Westerner",
+      "category",
+      "traditional",
+      "Thai",
+      "song",
+      "ฝรั่ง#Thai",
+      "กลาย#Thai",
+      "ควง#Thai",
+      "จรกา#Thai",
+      "รำ#Thai",
+      "เท้า#Thai",
+      "botany",
+      "Psidium guajava#Translingual",
+      "family",
+      "Myrtaceae#Translingual",
+      "guava"
+    ],
+    "transcription_en": "f r ạ ˋ ŋ",
+    "examples": [
+      {
+        "text": "สมัยก่อนช่วงฝรั่งไปทำมาหากินกับจีนนั้นมักเอาพ่อครัวจีนลงเรือไปทำอาหารให้กิน",
+        "translation": "In the past, whenever farangs travelled to trade with the Chinese, they usually brought Chinese cooks on board to prepare foods for them.",
+        "roman": "sà-mǎi gɔ̀ɔn chûuang fà-ràng bpai tam-maa-hǎa-gin gàp jiin nán mák ao pɔ̂ɔ-kruua jiin long rʉʉa bpai tam aa-hǎan hâi gin",
+        "ref": "2004, ละเลงครัว, ยุวดี ต้นสกุลรุ่งเรือง, →ISBN, page 27:",
+        "english": "In the past, whenever farangs travelled to trade with the Chinese, they usually brought Chinese cooks on board to prepare foods for them."
+      },
+      {
+        "text": "แต่ทุนไม่พอใช้จำต้องหารายได้เสริมด้วยการสอนภรรยาฝรั่งทำอาหารไทย",
+        "translation": "The insufficiency of capital forced her to find additional income by teaching Thai cookery to farang housewives.",
+        "roman": "dtɛ̀ɛ tun mâi pɔɔ chái jam-dtɔ̂ng hǎa raai-dâai sə̌əm dûai gaan-sɔ̌ɔn pan-yaa fà-ràng tam aa-hǎan tai",
+        "ref": "2014, คีตะธารา, ซีรี่ย์รักชุด เพลิงเสน่หา, page 8:",
+        "english": "The insufficiency of capital forced her to find additional income by teaching Thai cookery to farang housewives."
+      },
+      {
+        "text": "\"แล้วใครล่ะที่เป็นไส้ศึกให้ฝรั่ง\" เป็นคำถามที่ไม่มีใครตอบได้ \"บางทีฝรั่งอาจจะส่งพวกสายลับเข้ามาก่อนไอ้ยุ่นก็ได้\"",
+        "translation": "\"Then who are working as spies for the farangs?\". It was a question which no one could answer. \"Maybe the farangs have sent some spies in before the Japs.\"",
+        "roman": "“lɛ́ɛo krai lâ tîi bpen sâi-sʉ̀k hâi fà-ràng” · bpen kam-tǎam tîi mâi mii krai dtɔ̀ɔp dâai · “baang-tii fà-ràng àat jà sòng pûuak sǎai-láp kâo maa gɔ̀ɔn âi yûn gɔ̂ɔ-dâai”",
+        "ref": "2004, ศรี เกศมณี, เมื่อวานนี้, →ISBN, page 73:",
+        "english": "\"Then who are working as spies for the farangs?\". It was a question which no one could answer. \"Maybe the farangs have sent some spies in before the Japs.\""
+      }
+    ],
+    "antonyms": []
+  },
+  {
+    "word_th": "ภาษา",
+    "translation": [
+      "language (form of communication using words: spoken, gestured, or written).",
+      "language (computer language).",
+      "a minority that speaks a certain language.",
+      "(archaic) a minority that speaks a certain language.",
+      "any matter, content, or story that is understood by the people discussing it.",
+      "(figurative) any matter, content, or story that is understood by the people discussing it."
+    ],
+    "synonyms": [],
+    "links": [
+      "language",
+      "computer language#English",
+      "minority",
+      "speaks",
+      "matter",
+      "content",
+      "story",
+      "understood"
+    ],
+    "transcription_en": "paa-sǎa",
+    "examples": [
+      {
+        "text": "ภาษาไทย",
+        "translation": "Thai language",
+        "roman": "paa-sǎa tai",
+        "english": "Thai language"
+      },
+      {
+        "text": "ภาษาอังกฤษ",
+        "translation": "English language",
+        "roman": "paa-sǎa ang-grìt",
+        "english": "English language"
+      },
+      {
+        "text": "ภาษาพูด",
+        "translation": "spoken language",
+        "roman": "paa-sǎa-pûut",
+        "english": "spoken language"
+      },
+      {
+        "text": "ภาษามือ",
+        "translation": "sign language",
+        "roman": "paa-sǎa-mʉʉ",
+        "english": "sign language"
+      },
+      {
+        "text": "ภาษาจาวา",
+        "translation": "Java language",
+        "roman": "paa-sǎa jaa-wâa",
+        "english": "Java language"
+      },
+      {
+        "text": "ภาษาซี",
+        "translation": "C language",
+        "roman": "paa-sǎa sii",
+        "english": "C language"
+      }
+    ],
+    "antonyms": []
+  },
+  {
+    "word_th": "วัด",
+    "translation": [
+      "religious compound or place of worship, as temple, sanctuary, monastery, etc.",
+      "(irrespective of the religion) religious compound or place of worship, as temple, sanctuary, monastery, etc.",
+      "Buddhist compound; Buddhist place of worship; Buddhist temple; Buddhist monastery.",
+      "(Thailand law) Buddhist compound; Buddhist place of worship; Buddhist temple; Buddhist monastery."
+    ],
+    "synonyms": [],
+    "links": [
+      "religion",
+      "religious",
+      "compound",
+      "place of worship",
+      "temple",
+      "sanctuary",
+      "monastery",
+      "law#English",
+      "Buddhist"
+    ],
+    "transcription_en": "wát",
+    "examples": [
+      {
+        "text": "ด้วยในศก ๑๒๗ บาดหลวงอีกอลอมเบต์วัดอาซัมชั่นกรุงเทพฯได้ออกเงินเกื้อกูลแก่อาไศรยสถานณะตำบลอ่างศิลา...",
+        "translation": "Whereas, in the year 127, the priest I-ko-lom-be of Bangkok Assumption Cathedral had provided support money for the housing at Ang Sila Subdistrict...",
+        "roman": "dûai nai sòk · rɔ́ɔi yîi-sìp jèt · bàat-lǔuang ii-gɔɔ-lɔɔm-bee wát aa-sam-chân grung-têep dâai ɔ̀ɔk ngən gʉ̂ʉa-guun gɛ̀ɛ aa-sǎi-sà-tǎan ná dtam-bon àang-sì-laa ...",
+        "ref": "1908 August 30, “แจ้งความกระทรวงมหาดไทย ลงวันที่ ๒๔ สิงหาคม รัตนโกสินทรศก ๑๒๗”, in ราชกิจจานุเบกษา, volume 25, retrieved 31 Oct 2019, page 633:",
+        "english": "Whereas, in the year 127, the priest I-ko-lom-be of Bangkok Assumption Cathedral had provided support money for the housing at Ang Sila Subdistrict..."
+      },
+      {
+        "text": "มาตรา ๑๖๒๓ ทรัพย์สินของพระภิกษุที่ได้มาในระหว่างเวลาที่อยู่ในสมณเพศนั้น เมื่อพระภิกษุนั้นถึงแก่มรณภาพ ให้ตกเป็นสมบัติของวัดที่เป็นภูมิลำเนาของพระภิกษุนั้น เว้นไว้แต่พระภิกษุนั้นจะได้จำหน่ายไปในระหว่างชีวิตหรือโดยพินัยกรรม์",
+        "translation": "Section 1623 When a bhikṣu dies, the property of the bhikṣu which [the bhikṣu] had obtained during the time he was in the priesthood shall devolve upon the wat which is the domicile of that bhikṣu as the possession [of that wat], save where the bhikṣu has [already] disposed of [the property by means of a transaction] inter vivos or by [means of] a will.",
+        "roman": "mâat-dtraa · nʉ̀ng-pan hòk-rɔ́ɔi yîi-sìp sǎam · sáp-sǐn kɔ̌ɔng prá pík-sù tîi dâai maa nai rá-wàang wee-laa tîi yùu nai sà-má-ná-pêet nán · mʉ̂ʉa prá pík-sù nán tʉ̌ng-gɛ̀ɛ-mɔɔ-rá-ná-pâap · hâi dtòk bpen sǒm-bàt kɔ̌ɔng wát tîi bpen puum-lam-nao kɔ̌ɔng prá pík-sù nán · wéen-wái-dtɛ̀ɛ prá pík-sù nán jà dâai jam-nàai bpai nai rá-wàang chii-wít rʉ̌ʉ dooi pí-nai-gan",
+        "ref": "1935 June 7, “พระราชบัญญัติให้ใช้บทบัญญัติบรรพ ๖ แห่งประมวลกฎหมายแพ่งและพาณิชย์ พุทธศักราช ๒๔๗๗”, in ราชกิจจานุเบกษา, volume 52, retrieved 31 Oct 2019, page 544:",
+        "english": "Section 1623 When a bhikṣu dies, the property of the bhikṣu which [the bhikṣu] had obtained during the time he was in the priesthood shall devolve upon the wat which is the domicile of that bhikṣu as the possession [of that wat], save where the bhikṣu has [already] disposed of [the property by means of a transaction] inter vivos or by [means of] a will."
+      },
+      {
+        "text": "มาตรา ๑๖๒๔ ทรัพย์สินใดเป็นของบุคคลก่อนอุปสมบทเป็นพระภิกษุ ทรัพย์สินนั้นหาตกเป็นสมบัติของวัดไม่ และให้เป็นมฤดกตกทอดแก่ทายาทโดยธรรมของบุคคลนั้นหรือบุคคลนั้นจะจำหน่ายโดยประการใดตามกฎหมายก็ได้",
+        "translation": "Section 1624 [When] any [item of] property has belonged to a person [since] before his ordination as a bhikṣu, such [item of] property does not devolve upon his wat as its possession and shall become the estate [which] passes on to the statutory heirs of that person or may be disposed of by that person in whatever manner according to the law.",
+        "roman": "mâat-dtraa · nʉ̀ng-pan hòk-rɔ́ɔi yîi-sìp sìi · sáp-sǐn dai bpen kɔ̌ɔng bùk-kon gɔ̀ɔn ùp-bpà-sǒm-bòt bpen prá pík-sù · sáp-sǐn nán hǎa dtòk bpen sǒm-bàt kɔ̌ɔng wát mâi · lɛ́ hâi bpen má-rʉ́-dòk dtòk-tɔ̂ɔt gɛ̀ɛ taa-yâat-dooi-tam kɔ̌ɔng bùk-kon nán rʉ̌ʉ bùk-kon nán jà jam-nàai dooi bprà-gaan dai dtaam gòt-mǎai gɔ̂ɔ-dâai",
+        "ref": "1935 June 7, “พระราชบัญญัติให้ใช้บทบัญญัติบรรพ ๖ แห่งประมวลกฎหมายแพ่งและพาณิชย์ พุทธศักราช ๒๔๗๗”, in ราชกิจจานุเบกษา, volume 52, retrieved 31 Oct 2019, page 544:",
+        "english": "Section 1624 [When] any [item of] property has belonged to a person [since] before his ordination as a bhikṣu, such [item of] property does not devolve upon his wat as its possession and shall become the estate [which] passes on to the statutory heirs of that person or may be disposed of by that person in whatever manner according to the law."
+      },
+      {
+        "text": "มาตรา ๕ วัดกำหนดตามพระราชบัญญัตินี้เปน ๓ อย่าง คือ พระอารามหลวงอย่าง ๑ อารามราษฎร์อย่าง ๑ ที่สำนักสงฆ์อย่าง ๑...พระอารามหลวง คือ วัดที่พระเจ้าแผ่นดินทรงสร้าง...อารามราษฎร์นั้น คือ วัดซึ่งได้พระราชทานวิสุงคามสีมาแต่มิได้เข้าบาญชีนับว่าเปนวัดหลวง...ที่สำนักสงฆ์นั้น คือ วัดซึ่งยังไม่ได้รับพระราชทานที่วิสุงคามสีมา",
+        "translation": "Section 5 Wat are divided by this Law into three types, namely, phra aram luang [being] one type, aram rat [being] one type, [and] thi samnak song [being] the other type... Phra aram luang are wat established by the monarch... Aram rat are wat which have been granted the wisungkhammasima but [whose names] have not yet been entered in the [public] register for recognition as public wat... Thi samnak song are wat which have not yet been granted the wisungkhammasima land.",
+        "roman": "mâat-dtraa · hâa · wát gam-nòt dtaam prá-râat-chá-ban-yàt níi bpen · sǎam · yàang · kʉʉ · prá aa-raam-lǔuang yàang · nʉ̀ng · aa-raam-râat yàang · nʉ̀ng · tîi-sǎm-nák-sǒng yàang · nʉ̀ng ... prá aa-raam-lǔuang · kʉʉ · wát tîi prá jâao-pɛ̀n-din song sâang ... aa-raam-râat nán · kʉʉ · wát sʉ̂ng dâai prá-râat-chá-taan wí-sǔng-kaam-má-sǐi-maa dtɛ̀ɛ mí dâai kâo baan-chii náp wâa bpen wát lǔuang ... tîi-sǎm-nák-sǒng nán · kʉʉ · wát sʉ̂ng yang mâi dâai ráp prá-râat-chá-taan tîi wí-sǔng-kaam-má-sǐi-maa",
+        "ref": "1902 June 29, “พระราชบัญญัติลักษณปกครองคณะสงฆ์ (ร.ศ. ๑๒๑)”, in ราชกิจจานุเบกษา, volume 19, retrieved 31 Oct 2019, page 215:",
+        "english": "Section 5 Wat are divided by this Law into three types, namely, phra aram luang [being] one type, aram rat [being] one type, [and] thi samnak song [being] the other type... Phra aram luang are wat established by the monarch... Aram rat are wat which have been granted the wisungkhammasima but [whose names] have not yet been entered in the [public] register for recognition as public wat... Thi samnak song are wat which have not yet been granted the wisungkhammasima land."
+      },
+      {
+        "text": "มาตรา ๘ วัดใดร้างสงฆ์ไม่อาไศรย ให้เจ้าพนักงาน...ปกครองรักษาวัดนั้น",
+        "translation": "Section 8 [When] any wat is deserted [or] unoccupied by saṅgha, the [competent]...public officer shall take charge and care of that wat.",
+        "roman": "mâat-dtraa · bpɛ̀ɛt · wát dai ráang sǒng mâi aa-sǎi · hâi jâao-pá-nák-ngaan ... bpòk-krɔɔng rák-sǎa wát nán",
+        "ref": "1902 June 29, “พระราชบัญญัติลักษณปกครองคณะสงฆ์ (ร.ศ. ๑๒๑)”, in ราชกิจจานุเบกษา, volume 19, retrieved 31 Oct 2019, page 215:",
+        "english": "Section 8 [When] any wat is deserted [or] unoccupied by saṅgha, the [competent]...public officer shall take charge and care of that wat."
+      }
+    ],
+    "antonyms": []
+  },
+  {
+    "word_th": "รัก",
+    "translation": [
+      "to love, to have affection (for), to adore, to admire, to cherish, to be fond (of); to prefer, to favour."
+    ],
+    "synonyms": [],
+    "links": [
+      "love",
+      "have",
+      "affection",
+      "adore",
+      "admire",
+      "cherish",
+      "be",
+      "fond",
+      "prefer",
+      "favour"
+    ],
+    "transcription_en": "rák",
+    "examples": [
+      {
+        "text": "ครั้นอ่านสัจอธิษฐานทั้ง ๒ ฝ่ายแล้ว พระสงฆ์แลอำมาตย์ทั้ง ๒ ฝ่ายก็หลั่งน้ำสัจจะในมหาปฐพี...มีเสน่หาไมตรีรักแพงกันเท่าเสี้ยงมหาปฐพี",
+        "translation": "Once both sides had pronounced the wishes of sincerity, the holy clergy and nobility [from] both sides then poured the water of truth onto the great ground...[with the intention] to extend affectionate amity [towards each other and to] dearly love each other until the Great Earth perisheth.",
+        "roman": "krán àan sàt-jà à-tít-tǎan táng · sɔ̌ɔng · fàai lɛ́ɛo · prá sǒng lɛɛ am-màat táng · sɔ̌ɔng · fàai gɔ̂ làng náam sàt-jà nai má-hǎa bpà-tà-pii ... mii sà-nèe-hǎa mai-dtrii rák pɛɛng gan tâo sîiang má-hǎa bpà-tà-pii",
+        "ref": "1563, “จารึกวัดพระธาตุศรีสองรัก ๑”, in ฐานข้อมูลจารึกในประเทศไทย, Bangkok: ศูนย์มานุษยวิทยาสิรินธร (องค์การมหาชน), published 2019-07-24, retrieved 17 Sep 2019:",
+        "english": "Once both sides had pronounced the wishes of sincerity, the holy clergy and nobility [from] both sides then poured the water of truth onto the great ground...[with the intention] to extend affectionate amity [towards each other and to] dearly love each other until the Great Earth perisheth."
+      },
+      {
+        "text": "ขาวสุดพุดจีบจีน เจ้ามีสีนพี่มีศักดิ์ ทั้งวังเขาชังนัก แต่พี่รักเจ้าคนเดียว",
+        "translation": "[My] whitest Chinese pinwheel, thou art of wealth, I am of worth. Though they, [the people] throughout the palace, hate [thee that] much, I [am] the only one that loveth thee.",
+        "roman": "kǎao sùt pút-jìip jiin · jâao mii sǐin pîi mii sàk · táng wang kǎo chang nák · dtɛ̀ɛ pîi rák jâao kon diao",
+        "ref": "18th century, เจ้าฟ้าธรรมธิเบศไชยเชษฐ์สุริยวงศ์, “บทเห่เรือ พระนิพนธ์เจ้าฟ้าธรรมธิเบศร”, in ประชุมกาพย์เห่เรือ, Bangkok: โรงพิมพ์โสภณพิพรรฒธนากร, published 1917, retrieved 17 Sep 2019:",
+        "english": "[My] whitest Chinese pinwheel, thou art of wealth, I am of worth. Though they, [the people] throughout the palace, hate [thee that] much, I [am] the only one that loveth thee."
+      },
+      {
+        "text": "ถ้าสมเด็จพระเชษฐาเรา...รักช้าง ๒ ช้างยิ่งกว่าทางพระราชไมตรี ก็เห็นว่า กรุงหงสาวดีกับกรุงศรีอยุธยาขาดกัน",
+        "translation": "Should His Divine Majesty the Elder Brother of Ours...love the two elephants more than the ties of sacred royal amity [betwixt us], then meseemeth that the Realm of Hongsawadi and the Realm of Si Ayutthaya are through.",
+        "roman": "tâa sǒm-dèt prá chêet-tǎa rao ... rák cháang · sɔ̌ɔng · cháang yîng gwàa taang prá râat-chá mai-dtrii · gɔ̂ hěn wâa · grung hǒng-sǎa-wá-dii gàp grung sǐi à-yút-tá-yaa kàat-gan",
+        "ref": "1795, “พระราชพงศาวดารกรุงศรีอยุธยา ฉบับพันจันทนุมาศ (เจิม)”, in ประชุมพงศาวดาร ฉบับกาญจนาภิเษก เล่ม ๓, Bangkok: กรมศิลปากร, กองวรรณกรรมและประวัติศาสตร์, published 1999, →ISBN, page 246:",
+        "english": "Should His Divine Majesty the Elder Brother of Ours...love the two elephants more than the ties of sacred royal amity [betwixt us], then meseemeth that the Realm of Hongsawadi and the Realm of Si Ayutthaya are through."
+      },
+      {
+        "text": "เมื่อรักกันไม่ได้ก็ไม่รัก ไม่เห็นจักเกรงการสถานไหน ไม่รักกูกูก็จักไม่รักใคร เอ๊ะน้ำตากูไหลทำไมฤๅ",
+        "translation": "When [we] can't love each other, then [I just] won't love [you]. [I] don't think [I] have to fear anything whatsoever. [When] no one loves me, I just won't love anyone. Eh, why am I shedding tears?",
+        "roman": "mʉ̂ʉa rák gan mâi dâai gɔ̂ mâi rák · mâi hěn jàk greeng gaan sà-tǎan nǎi · mâi rák guu guu gɔ̂ jàk mâi rák krai · é nám-dtaa guu lǎi tam-mai rʉʉ",
+        "ref": "1965, สุจิตต์ วงษ์เทศ, “Untitled”, in บันทึกไว้ในวงวรรณเรื่องของวรรคทอง, Bangkok: สมาคมนักกลอนแห่งประเทศไทย, published 2003-06-09, retrieved 17 Sep 2019:",
+        "english": "When [we] can't love each other, then [I just] won't love [you]. [I] don't think [I] have to fear anything whatsoever. [When] no one loves me, I just won't love anyone. Eh, why am I shedding tears?"
+      }
+    ],
+    "antonyms": []
+  },
+  {
+    "word_th": "ออสเตรเลีย",
+    "translation": [
+      "Australia (a country consisting of a main island, the island of Tasmania and other smaller islands, located in Oceania; historically, a collection of former colonies of the British Empire)",
+      "Australia (a continent consisting of the land on the Australian tectonic plate, i.e. Australia, New Guinea and intervening islands)",
+      "(geology) Australia (a continent consisting of the land on the Australian tectonic plate, i.e. Australia, New Guinea and intervening islands)"
+    ],
+    "synonyms": [],
+    "links": [
+      "Australia#English:_Q408",
+      "country",
+      "island",
+      "Tasmania",
+      "Oceania#English",
+      "colony",
+      "British Empire#English",
+      "geology",
+      "Australia#English:_Q3960",
+      "continent",
+      "Australian",
+      "tectonic plate",
+      "Australia",
+      "New Guinea"
+    ],
+    "transcription_en": "ɔ́s-dtree-liia",
+    "examples": [
+      {
+        "text": "ประเทศออสเตรเลีย",
+        "translation": "Australia (country)",
+        "roman": "bprà-têet ɔ́s-dtree-liia",
+        "english": "Australia (country)"
+      },
+      {
+        "text": "เครือรัฐออสเตรเลีย",
+        "translation": "Commonwealth of Australia",
+        "roman": "krʉʉa-rát ɔ́s-dtree-liia",
+        "english": "Commonwealth of Australia"
+      },
+      {
+        "text": "ชาวออสเตรเลีย",
+        "translation": "Australian (person)",
+        "roman": "chaao ɔ́s-dtree-liia",
+        "english": "Australian (person)"
+      },
+      {
+        "text": "คนออสเตรเลีย",
+        "translation": "Australian (person)",
+        "roman": "kon ɔ́s-dtree-liia",
+        "english": "Australian (person)"
+      },
+      {
+        "text": "ทวีปออสเตรเลีย",
+        "translation": "(continent of) Australia",
+        "roman": "tá-wîip ɔ́s-dtree-liia",
+        "english": "(continent of) Australia"
+      }
+    ],
+    "antonyms": []
+  },
+  {
+    "word_th": "๑",
+    "translation": [
+      "1 (one)."
+    ],
+    "synonyms": [],
+    "links": [
+      "1",
+      "one"
+    ],
+    "transcription_en": null,
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "๕",
+    "translation": [
+      "5 (five)."
+    ],
+    "synonyms": [],
+    "links": [
+      "5",
+      "five"
+    ],
+    "transcription_en": null,
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "๒",
+    "translation": [
+      "2 (two)."
+    ],
+    "synonyms": [],
+    "links": [
+      "2",
+      "two"
+    ],
+    "transcription_en": null,
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "๓",
+    "translation": [
+      "3 (three)."
+    ],
+    "synonyms": [],
+    "links": [
+      "3",
+      "three"
+    ],
+    "transcription_en": null,
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "๔",
+    "translation": [
+      "4 (four)."
+    ],
+    "synonyms": [],
+    "links": [
+      "4",
+      "four"
+    ],
+    "transcription_en": null,
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "๖",
+    "translation": [
+      "6 (six)."
+    ],
+    "synonyms": [],
+    "links": [
+      "6",
+      "six"
+    ],
+    "transcription_en": null,
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "๗",
+    "translation": [
+      "7 (seven)."
+    ],
+    "synonyms": [],
+    "links": [
+      "7",
+      "seven"
+    ],
+    "transcription_en": null,
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "๙",
+    "translation": [
+      "9 (nine)."
+    ],
+    "synonyms": [],
+    "links": [
+      "9",
+      "nine"
+    ],
+    "transcription_en": null,
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "๘",
+    "translation": [
+      "8 (eight)."
+    ],
+    "synonyms": [],
+    "links": [
+      "8",
+      "eight"
+    ],
+    "transcription_en": null,
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "๐",
+    "translation": [
+      "0 (zero)."
+    ],
+    "synonyms": [],
+    "links": [
+      "0",
+      "zero"
+    ],
+    "transcription_en": null,
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "ญี่ปุ่น",
+    "translation": [
+      "Japan (a country and archipelago of East Asia)",
+      "(ประเทศ~) Japan (a country and archipelago of East Asia)"
+    ],
+    "synonyms": [
+      "เจแปน",
+      "แจแปน",
+      "แดนชาเขียว",
+      "แดนซากูระ",
+      "แดนซามูไร",
+      "แดนปลาดิบ",
+      "แดนอะนิเมะ",
+      "ยุ่น",
+      "ยุ่นปี่",
+      "อาทิตย์อุทัย"
+    ],
+    "links": [
+      "ประเทศ#Thai",
+      "Japan#English:_Q17",
+      "country",
+      "archipelago",
+      "East Asia#English"
+    ],
+    "transcription_en": "yîi-bpùn",
+    "examples": [
+      {
+        "text": "(ภาษา~) Japanese language"
+      },
+      {
+        "text": "(คน~, ชาว~) Japanese (native or inhabitant of Japan)"
+      }
+    ],
+    "antonyms": []
+  },
+  {
+    "word_th": "ลาว",
+    "translation": [
+      "Laos (a country in Southeast Asia)",
+      "(ประเทศ~) Laos (a country in Southeast Asia)",
+      "Lan Na, an ancient kingdom in Northern Thailand",
+      "(archaic) Lan Na, an ancient kingdom in Northern Thailand",
+      "Lao:",
+      "the language of the people of Laos",
+      "(ภาษา~) Lao:",
+      "Lan Na language, now known as Northern Thai language",
+      "(archaic) Lan Na language, now known as Northern Thai language"
+    ],
+    "synonyms": [],
+    "links": [
+      "ประเทศ#Thai",
+      "Laos#English:_Q819",
+      "country",
+      "Southeast Asia#English",
+      "Lan Na",
+      "ancient",
+      "kingdom",
+      "northern",
+      "Thailand",
+      "ภาษา#Thai",
+      "Lao",
+      "language",
+      "people",
+      "Laos",
+      "now",
+      "know",
+      "Northern Thai"
+    ],
+    "transcription_en": "laao",
+    "examples": [
+      {
+        "text": "2005, ฉัตรชัย ดุริยประณีต, ลาวม่านแก้ว:\nดอกเอ๋ยเจ้าดอกจำปาลาว ตัวพี่รักเจ้าเท่าท้องนภาเอย\ndɔ̀ɔk ə̌əi jâo dɔ̀ɔk jam-bpaa laao · dtuua pîi rák jâo tâo tɔ́ɔng ná-paa əəi\nFlower, oh, My Laotian Champak Flower, my love for you is as wide as the contents of the sky."
+      }
+    ],
+    "antonyms": []
+  },
+  {
+    "word_th": "ใหม่",
+    "translation": [
+      "new; fresh.",
+      "latest; recent.",
+      "modern."
+    ],
+    "synonyms": [],
+    "links": [
+      "new",
+      "fresh",
+      "latest",
+      "recent",
+      "modern"
+    ],
+    "transcription_en": "mài",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "ตะเกียบ",
+    "translation": [
+      "chopstick(s).",
+      "fork: support of the front wheel axles of a bicycle or motorcycle.",
+      "pair of poles fixed into the ground for the purpose of bracing another pole.",
+      "(architecture) pair of poles fixed into the ground for the purpose of bracing another pole.",
+      "the lower part of the pelvis that would touch the seat when sitting.",
+      "(anatomy) the lower part of the pelvis that would touch the seat when sitting.",
+      "pectoral fin of a fish.",
+      "(anatomy, zoology) pectoral fin of a fish.",
+      "pair of cartilages at the buttock of a bird (any vertebrate of the class Aves).",
+      "(anatomy, zoology) pair of cartilages at the buttock of a bird (any vertebrate of the class Aves)."
+    ],
+    "synonyms": [],
+    "links": [
+      "chopstick",
+      "fork",
+      "support",
+      "front",
+      "wheel",
+      "axle",
+      "bicycle",
+      "motorcycle",
+      "architecture",
+      "pair",
+      "pole",
+      "fix",
+      "ground",
+      "purpose",
+      "brace",
+      "anatomy",
+      "lower",
+      "part",
+      "pelvis",
+      "touch",
+      "seat",
+      "sit",
+      "zoology",
+      "pectoral",
+      "fin",
+      "fish",
+      "cartilage",
+      "buttock",
+      "bird",
+      "vertebrate",
+      "class",
+      "Aves"
+    ],
+    "transcription_en": "dtà-gìiap",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "กัมพูชา",
+    "translation": [
+      "Cambodia (a country in Southeast Asia)"
+    ],
+    "synonyms": [],
+    "links": [
+      "Cambodia#English:_Q424",
+      "country",
+      "Southeast Asia#English"
+    ],
+    "transcription_en": "gam-puu-chaa",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "ตัว",
+    "translation": [
+      "self.",
+      "figure; form; shape; body; embodiment.",
+      "figure, number; character; letter.",
+      "main part; material part; essence.",
+      "used as a prefix to indicate the state of being, of having a form, or of being an individual, animal, object, etc.",
+      "(อี~) prostitute.",
+      "(slang, derogatory, offensive) (อี~) prostitute."
+    ],
+    "synonyms": [],
+    "links": [
+      "self",
+      "figure",
+      "form",
+      "shape",
+      "body",
+      "embodiment",
+      "number",
+      "character",
+      "letter",
+      "main",
+      "part",
+      "material",
+      "essence",
+      "derogatory",
+      "อี#Thai",
+      "prostitute"
+    ],
+    "transcription_en": "dtuua",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "เล่ม",
+    "translation": [
+      "Classifier for books, candles, carts and sharp-edged objects, such as knives, axes, swords, pins, needles, etc. ⇒ all nouns using this classifier"
+    ],
+    "synonyms": [],
+    "links": [
+      "book",
+      "candle",
+      "cart",
+      "sharp",
+      "edge",
+      "knives",
+      "axes",
+      "sword",
+      "pin",
+      "needle"
+    ],
+    "transcription_en": "lêm",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "ลูก",
+    "translation": [
+      "child; offspring; issue.",
+      "(classifier คน for a human being or ตัว for a nonhuman animal)",
+      "son; daughter.",
+      "ball; round object.",
+      "(classifier ลูก) ball; round object.",
+      "fruit.",
+      "(classifier ลูก or ผล) fruit.",
+      "subordinate; person of subordinate or inferior status; person subject to someone or something.",
+      "(classifier คน) subordinate; person of subordinate or inferior status; person subject to someone or something.",
+      "subordinate member; member of an entity other than its leader.",
+      "(classifier คน) subordinate member; member of an entity other than its leader.",
+      "used as a term of address or title",
+      "used as an affectionate term of address to or title for an offspring, person regarded as one's offspring, or young person; and used by such person to refer to oneself.",
+      "used as a title for a ball, round object, or fruit."
+    ],
+    "synonyms": [],
+    "links": [
+      "คน#Thai",
+      "ตัว#Thai",
+      "child",
+      "offspring",
+      "issue",
+      "son",
+      "daughter",
+      "ลูก#Thai",
+      "ball",
+      "round",
+      "object",
+      "ผล#Thai",
+      "fruit",
+      "subordinate",
+      "inferior",
+      "status"
+    ],
+    "transcription_en": "lûuk",
+    "examples": [
+      {
+        "text": "ลูกหนี้",
+        "translation": "obligor\n (literally) luk of an obligation",
+        "roman": "lûuk nîi",
+        "english": "obligor\n (literally) luk of an obligation"
+      },
+      {
+        "text": "ลูกทีม",
+        "translation": "(literally) luk of a team (referring to the members of a team other than the team leader)",
+        "roman": "lûuk tiim",
+        "english": "(literally) luk of a team (referring to the members of a team other than the team leader)"
+      },
+      {
+        "text": "ลูกบ้าน",
+        "translation": "(literally) luk of a village (referring to the members of a village other than the village chief)",
+        "roman": "lûuk bâan",
+        "english": "(literally) luk of a village (referring to the members of a village other than the village chief)"
+      },
+      {
+        "text": "ลูกทัพฟ้า",
+        "translation": "(literally) luk of a sky force (referring to the members of an air force other than its commander)",
+        "roman": "lûuk táp fáa",
+        "english": "(literally) luk of a sky force (referring to the members of an air force other than its commander)"
+      },
+      {
+        "text": "ลูกพรรค",
+        "translation": "(literally) luk of a party (referring to the members of a political party other than its leader)",
+        "roman": "lûuk pák",
+        "english": "(literally) luk of a party (referring to the members of a political party other than its leader)"
+      }
+    ],
+    "antonyms": []
+  },
+  {
+    "word_th": "ฟอง",
+    "translation": [
+      "egg. (Classifier: ฟอง)",
+      "(formal, dated) egg. (Classifier: ฟอง)",
+      "bubble; foam. (Classifier: ฟอง)",
+      "sea wave.",
+      "(poetic) sea wave."
+    ],
+    "synonyms": [],
+    "links": [
+      "egg",
+      "ฟอง#Thai",
+      "bubble",
+      "foam",
+      "sea",
+      "wave"
+    ],
+    "transcription_en": "fɔɔng",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "แก้ว",
+    "translation": [
+      "any clear, transparent substance, as crystal, diamond, glass, etc, whether natural or artificial.",
+      "anything made of or resembling such a substance.",
+      "anyone or anything considered precious, dear, or excellent like crystal or diamond.",
+      "glass: drinking container. (Classifiers: ใบ or แก้ว)"
+    ],
+    "synonyms": [
+      "จินดา",
+      "รัตนะ"
+    ],
+    "links": [
+      "clear",
+      "transparent",
+      "substance",
+      "crystal",
+      "diamond",
+      "glass",
+      "whether",
+      "natural",
+      "artificial",
+      "anything",
+      "made",
+      "resemble",
+      "such",
+      "anyone",
+      "consider",
+      "precious",
+      "dear",
+      "excellent",
+      "like",
+      "drink",
+      "container",
+      "ใบ#Thai",
+      "แก้ว#Thai"
+    ],
+    "transcription_en": "gɛ̂ɛo",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "หลัง",
+    "translation": [
+      "back.",
+      "(anatomy) back.",
+      "back; rear."
+    ],
+    "synonyms": [],
+    "links": [
+      "anatomy",
+      "back",
+      "rear"
+    ],
+    "transcription_en": "lǎng",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "ฉบับ",
+    "translation": [
+      "edition; copy; issue; version."
+    ],
+    "synonyms": [],
+    "links": [
+      "edition",
+      "copy",
+      "issue",
+      "version"
+    ],
+    "transcription_en": "chà-bàp",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "รูป",
+    "translation": [
+      "outward appearance.",
+      "shape; form; figure.",
+      "image: physical representation or likeness, as picture, photograph, painting, sculpture, etc.",
+      "structure."
+    ],
+    "synonyms": [],
+    "links": [
+      "outward",
+      "appearance",
+      "shape",
+      "form",
+      "figure",
+      "image",
+      "physical",
+      "representation",
+      "likeness",
+      "picture",
+      "photograph",
+      "painting",
+      "sculpture",
+      "structure"
+    ],
+    "transcription_en": "rûup",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "คู่",
+    "translation": [
+      "pair.",
+      "even number.",
+      "couple; partner."
+    ],
+    "synonyms": [],
+    "links": [
+      "pair",
+      "even number",
+      "couple",
+      "partner"
+    ],
+    "transcription_en": "kûu",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "คน",
+    "translation": [
+      "person; people; human being. (Classifiers: คน or หัว or ราย or นาย or ท่าน)"
+    ],
+    "synonyms": [],
+    "links": [
+      "person",
+      "people",
+      "human being",
+      "คน#Thai",
+      "หัว#Thai",
+      "ราย#Thai",
+      "นาย#Thai",
+      "ท่าน#Thai"
+    ],
+    "transcription_en": "kon",
+    "examples": [
+      {
+        "text": "คนไทย",
+        "translation": "Thai people.",
+        "roman": "kon tai",
+        "english": "Thai people."
+      }
+    ],
+    "antonyms": []
+  },
+  {
+    "word_th": "ชิ้น",
+    "translation": [
+      "Classifier for pieces, slices (cakes, cloth). ⇒ all nouns using this classifier"
+    ],
+    "synonyms": [],
+    "links": [
+      "piece",
+      "slice"
+    ],
+    "transcription_en": "chín",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "เม็ด",
+    "translation": [
+      "seed; grain; kernel.",
+      "any small round object.",
+      "queen.",
+      "(chess) queen.",
+      "pimple.",
+      "clitoris."
+    ],
+    "synonyms": [],
+    "links": [
+      "seed",
+      "grain",
+      "kernel",
+      "small",
+      "round",
+      "object",
+      "chess",
+      "queen",
+      "pimple",
+      "clitoris"
+    ],
+    "transcription_en": "mét",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "ใบ",
+    "translation": [
+      "leaf (of a plant).",
+      "sail (of a boat).",
+      "sheet (as of paper).",
+      "used as a title for certain documents.",
+      "used as a title for something hollow or flat."
+    ],
+    "synonyms": [],
+    "links": [
+      "leaf",
+      "plant",
+      "sail",
+      "boat",
+      "sheet",
+      "paper"
+    ],
+    "transcription_en": "bai",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "จาน",
+    "translation": [
+      "plate; dish"
+    ],
+    "synonyms": [],
+    "links": [
+      "plate",
+      "dish"
+    ],
+    "transcription_en": "jaan",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "ม้วน",
+    "translation": [
+      "to roll; to roll up; to curl."
+    ],
+    "synonyms": [],
+    "links": [
+      "roll",
+      "roll up",
+      "curl"
+    ],
+    "transcription_en": "múuan",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "องค์",
+    "translation": [
+      "body; form.",
+      "(of a god, high priest, or royal person) body; form.",
+      "used as an honorific for or term of address to:",
+      "gods, high priests, and royal persons, as well as things and beings relating to them.",
+      "religious or sacred objects.",
+      "psychic ability or power.",
+      "(slang)",
+      "supernatural being.",
+      "body; embodiment.",
+      "component; constituent; element."
+    ],
+    "synonyms": [],
+    "links": [
+      "god",
+      "high priest",
+      "royal",
+      "person",
+      "body",
+      "form",
+      "use",
+      "honorific",
+      "term",
+      "address",
+      "thing",
+      "being",
+      "relate",
+      "them",
+      "religious",
+      "sacred",
+      "object",
+      "psychic",
+      "ability",
+      "power",
+      "supernatural",
+      "embodiment",
+      "component",
+      "constituent",
+      "element"
+    ],
+    "transcription_en": "ong",
+    "examples": [
+      {
+        "text": "John 20:28, KJV:\nโธมัสทูลตอบพระองค์ว่า \"องค์พระผู้เป็นเจ้าของข้าพระองค์และพระเจ้าของข้าพระองค์\"\ntoo-más tuun dtɔ̀ɔp prá-ong wâa \"ong prá-pûu-bpen-jâao kɔ̌ɔng kâa-prá-ong lɛ́ prá-jâao kɔ̌ɔng kâa-prá-ong\"\nAnd Thomas answered and said unto him, My Lord and my God."
+      },
+      {
+        "text": "Psalm 39:7, KJV:\nข้าแต่องค์พระผู้เป็นเจ้า บัดนี้ ข้าพระองค์จะรอคอยอะไร ความหวังของข้าพระองค์อยู่ในพระองค์\nkâa-dtɛ̀ɛ ong prá-pûu-bpen-jâao bàt-níi kâa-prá-ong jà rɔɔ-kɔɔi à-rai kwaam-wǎng kɔ̌ɔng kâa-prá-ong yùu nai prá-ong\nAnd now, Lord, what wait I for? my hope is in thee."
+      },
+      {
+        "text": "มันมีองค์",
+        "translation": "He's psychic! — (literally) He has ong!",
+        "roman": "man mii ong",
+        "english": "He's psychic! — (literally) He has ong!"
+      },
+      {
+        "text": "องค์ลง",
+        "translation": "A spirit has descended [into the body of a medium].",
+        "roman": "ong long",
+        "english": "A spirit has descended [into the body of a medium]."
+      },
+      {
+        "text": "องค์ประทับร่าง",
+        "translation": "A spirit is possessing the body [of a medium].",
+        "roman": "ong bprà-táp râang",
+        "english": "A spirit is possessing the body [of a medium]."
+      },
+      {
+        "text": "องค์ความรู้",
+        "translation": "Body of knowledge",
+        "roman": "ong kwaam-rúu",
+        "english": "Body of knowledge"
+      }
+    ],
+    "antonyms": []
+  },
+  {
+    "word_th": "ม้ง",
+    "translation": [
+      "Hmong; Miao: Meo (an Asian ethnic group whose homeland is in the mountainous regions around Guizhou, southern China, and northern Vietnam, Laos, and Thailand)."
+    ],
+    "synonyms": [
+      "แม้ว"
+    ],
+    "links": [
+      "Hmong",
+      "Miao",
+      "Meo",
+      "Guizhou",
+      "Vietnam",
+      "Laos",
+      "Thailand"
+    ],
+    "transcription_en": "móng",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "แม้ว",
+    "translation": [
+      "Miao; Hmong; Meo (an Asian ethnic group whose homeland is in the mountainous regions around Guizhou, southern China, and northern Vietnam, Laos, and Thailand)"
+    ],
+    "synonyms": [
+      "ชนเผ่าแม้ว",
+      "ม้ง"
+    ],
+    "links": [
+      "Miao",
+      "Hmong",
+      "Meo",
+      "Guizhou#English",
+      "Vietnam#English",
+      "Laos#English",
+      "Thailand#English"
+    ],
+    "transcription_en": "mɛ́o",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "ย่า",
+    "translation": [
+      "paternal grandmother."
+    ],
+    "synonyms": [],
+    "links": [
+      "paternal grandmother"
+    ],
+    "transcription_en": "yâa",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "-",
+    "translation": [
+      "Visual rendering of Morse code for ฏ.",
+      "Visual rendering of Morse code for ต."
+    ],
+    "synonyms": [],
+    "links": [
+      "ฏ#Translingual",
+      "ต#Translingual"
+    ],
+    "transcription_en": null,
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "บาท",
+    "translation": [
+      "priest.",
+      "(Christianity, now only in combination) priest."
+    ],
+    "synonyms": [],
+    "links": [
+      "Christianity",
+      "priest"
+    ],
+    "transcription_en": "bàat",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "ตุ๊กตุ๊ก",
+    "translation": [
+      "misspelling of ตุ๊ก ๆ (dtúk-dtúk)"
+    ],
+    "synonyms": [],
+    "links": [
+      "ตุ๊ก ๆ#Thai"
+    ],
+    "transcription_en": "dtúk-dtúk",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "฿",
+    "translation": [
+      "a currency sign representing the Thai baht, spelled in words as บาท (bàat)."
+    ],
+    "synonyms": [],
+    "links": [
+      "baht#English",
+      "บาท#Thai"
+    ],
+    "transcription_en": "฿",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "ตัวอักษร",
+    "translation": [
+      "alphabet; letter."
+    ],
+    "synonyms": [],
+    "links": [
+      "alphabet",
+      "letter"
+    ],
+    "transcription_en": "dtuua-àk-sɔ̌ɔn",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "เจได",
+    "translation": [
+      "Jedi."
+    ],
+    "synonyms": [],
+    "links": [
+      "Jedi"
+    ],
+    "transcription_en": "jee-dai",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "ชุมชน",
+    "translation": [
+      "community."
+    ],
+    "synonyms": [
+      "ประชาคม"
+    ],
+    "links": [
+      "community"
+    ],
+    "transcription_en": "chum-chon",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "สึนามิ",
+    "translation": [
+      "tsunami."
+    ],
+    "synonyms": [],
+    "links": [
+      "tsunami"
+    ],
+    "transcription_en": "sʉ̀-naa-mí",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "บ้า",
+    "translation": [
+      "mad; insane; crazy.",
+      "wild; frantic; frenzied.",
+      "wild; violent; turbulent.",
+      "foolish; absurd.",
+      "eccentric; erratic; unorthodox.",
+      "goofy; silly; nutty."
+    ],
+    "synonyms": [],
+    "links": [
+      "mad",
+      "insane",
+      "crazy",
+      "wild",
+      "frantic",
+      "frenzied",
+      "violent",
+      "turbulent",
+      "foolish",
+      "absurd",
+      "eccentric",
+      "erratic",
+      "unorthodox",
+      "goofy",
+      "silly",
+      "nutty"
+    ],
+    "transcription_en": "bâa",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "เย็ด",
+    "translation": [
+      "to do, to make",
+      "(archaic) to do, to make",
+      "to fuck",
+      "(vulgar) to fuck"
+    ],
+    "synonyms": [],
+    "links": [
+      "do",
+      "make",
+      "fuck"
+    ],
+    "transcription_en": "yét",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "ผีเสื้อ",
+    "translation": [
+      "tutelar spirit.",
+      "(classifier ตน) tutelar spirit.",
+      "(classifier ตัว) butterfly: insect of the order Lepidoptera.",
+      "(zoology) (classifier ตัว) butterfly: insect of the order Lepidoptera.",
+      "(classifier ตัว) butterflyfish: fish of the family Chaetodontidae, except โนรี (noo-rii), Heniochus spp.",
+      "(zoology) (classifier ตัว) butterflyfish: fish of the family Chaetodontidae, except โนรี (noo-rii), Heniochus spp."
+    ],
+    "synonyms": [],
+    "links": [
+      "ตน#Thai",
+      "tutelar",
+      "spirit",
+      "zoology",
+      "ตัว#Thai",
+      "butterfly",
+      "insect",
+      "order",
+      "Lepidoptera#Translingual",
+      "butterflyfish",
+      "fish",
+      "family",
+      "Chaetodontidae#Translingual",
+      "except",
+      "โนรี#Thai"
+    ],
+    "transcription_en": "pǐi-sʉ̂ʉa",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "บางกอก",
+    "translation": [
+      "Bangkok (the capital city of Thailand)",
+      "(now informal) Bangkok (the capital city of Thailand)"
+    ],
+    "synonyms": [],
+    "links": [
+      "Bangkok#English",
+      "capital city",
+      "Thailand#English"
+    ],
+    "transcription_en": "baang-gɔ̀ɔk",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "กรุงเทพ",
+    "translation": [
+      "Ayutthaya Kingdom (a kingdom based in present-day Phra Nakhon Si Ayutthaya Province, Thailand)",
+      "(historical) Ayutthaya Kingdom (a kingdom based in present-day Phra Nakhon Si Ayutthaya Province, Thailand)",
+      "Thon Buri Kingdom (a kingdom based in present-day Thon Buri District, Thailand, the successor of Ayutthaya)",
+      "(historical) Thon Buri Kingdom (a kingdom based in present-day Thon Buri District, Thailand, the successor of Ayutthaya)",
+      "Rattanakosin Kingdom (a kingdom based in present-day Bangkok, Thailand, the successor of Thon Buri)",
+      "(historical) Rattanakosin Kingdom (a kingdom based in present-day Bangkok, Thailand, the successor of Thon Buri)"
+    ],
+    "synonyms": [],
+    "links": [
+      "w:Ayutthaya Kingdom",
+      "kingdom",
+      "w:Phra Nakhon Si Ayutthaya Province",
+      "Thailand#English",
+      "w:Thon Buri Kingdom",
+      "w:Thon Buri District",
+      "successor",
+      "w:Rattanakosin Kingdom",
+      "Bangkok#English"
+    ],
+    "transcription_en": "grung-têep",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "นิรุกติศาสตร์",
+    "translation": [
+      "philology: branch of study concerning the structure, historical development, and relationships of languages."
+    ],
+    "synonyms": [],
+    "links": [
+      "philology",
+      "branch",
+      "study",
+      "concern",
+      "structure",
+      "historical",
+      "development",
+      "relationship",
+      "language"
+    ],
+    "transcription_en": "ní-rúk-dtì-sàat",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "ศาสตร์",
+    "translation": [
+      "science; field or branch of knowledge; -ology.",
+      "(chiefly in compounds) science; field or branch of knowledge; -ology."
+    ],
+    "synonyms": [],
+    "links": [
+      "compound",
+      "science",
+      "field",
+      "branch",
+      "knowledge",
+      "-ology"
+    ],
+    "transcription_en": "sàat",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "นิรุกติ",
+    "translation": [
+      "language; speech; words."
+    ],
+    "synonyms": [],
+    "links": [
+      "language",
+      "speech",
+      "words"
+    ],
+    "transcription_en": "ní-rúk-dtì",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "กิน",
+    "translation": [
+      "to consume:",
+      "to eat; to take; to drink.",
+      "to absorb; to engross; to occupy.",
+      "to destroy, as by decomposition or burning.",
+      "to use up.",
+      "to waste.",
+      "to wrongfully accept, take, or receive.",
+      "to govern a polity and enjoy benefits derived from the polity, as taxes, forced labour, etc.",
+      "(historical) to govern a polity and enjoy benefits derived from the polity, as taxes, forced labour, etc.",
+      "to hold; to occupy; to possess.",
+      "(somewhat archaic, used of an office, position, rank, status, etc) to hold; to occupy; to possess.",
+      "to capture.",
+      "(games, e.g. chess) to capture.",
+      "to win.",
+      "(gambling) to win.",
+      "to seek or have a romantic or sexual relationship (with).",
+      "(slang) to seek or have a romantic or sexual relationship (with)."
+    ],
+    "synonyms": [],
+    "links": [
+      "consume",
+      "eat",
+      "take",
+      "drink",
+      "absorb",
+      "engross",
+      "occupy",
+      "destroy",
+      "decomposition",
+      "burn",
+      "use up",
+      "waste",
+      "wrongfully",
+      "accept",
+      "receive",
+      "govern",
+      "polity",
+      "enjoy",
+      "benefits",
+      "derive",
+      "tax",
+      "forced labour",
+      "use",
+      "office",
+      "position",
+      "rank",
+      "status",
+      "hold",
+      "possess",
+      "game#Noun",
+      "chess",
+      "capture",
+      "gambling#Noun",
+      "win",
+      "seek",
+      "have",
+      "romantic",
+      "sexual",
+      "relationship"
+    ],
+    "transcription_en": "gin",
+    "examples": [
+      {
+        "text": "กินหมากฝรั่ง",
+        "translation": "To chew gum",
+        "roman": "gin màak-fà-ràng",
+        "english": "To chew gum"
+      },
+      {
+        "text": "กินก๋วยเตี๋ยว",
+        "translation": "To eat noodles",
+        "roman": "gin gǔai-dtǐao",
+        "english": "To eat noodles"
+      },
+      {
+        "text": "กินเหล้า",
+        "translation": "To drink liquor",
+        "roman": "gin lâo",
+        "english": "To drink liquor"
+      },
+      {
+        "text": "กินสินบน",
+        "translation": "To take bribes",
+        "roman": "gin sǐn-bon",
+        "english": "To take bribes"
+      },
+      {
+        "text": "กินเด็ก",
+        "translation": "To rob the cradle — (literally) To eat a kid",
+        "roman": "gin dèk",
+        "english": "To rob the cradle — (literally) To eat a kid"
+      },
+      {
+        "text": "กินพระ",
+        "translation": "(literally) To eat a monk",
+        "roman": "gin prá",
+        "english": "(literally) To eat a monk"
+      }
+    ],
+    "antonyms": []
+  },
+  {
+    "word_th": "ของ",
+    "translation": [
+      "thing; item; article; stuff; matter.",
+      "possession; belonging; property; someone or something that is owned or possessed.",
+      "occult thing, magical thing; the magic or occult science itself.",
+      "(slang) occult thing, magical thing; the magic or occult science itself.",
+      "talent; ability.",
+      "(slang) talent; ability."
+    ],
+    "synonyms": [],
+    "links": [
+      "thing",
+      "item",
+      "article",
+      "stuff",
+      "matter",
+      "possession",
+      "belonging",
+      "property",
+      "own",
+      "possess",
+      "occult",
+      "magical",
+      "magic",
+      "science",
+      "itself",
+      "talent",
+      "ability"
+    ],
+    "transcription_en": "kɔ̌ɔng",
+    "examples": [
+      {
+        "text": "พราหมณ์ ส่วนอันเลิศก็ดี ภัตที่ท่านแบ่งครึ่งบริโภคแล้วก็ดี เป็นของสมควรแก่เราทั้งนั้น แม้ก้อนภัตที่เป็นเดนเป็นของสมควรแก่เราเหมือนกัน",
+        "translation": "Brahman, the parts that are excellent [in taste], the victuals that thou hast already divided in half [and] consumed, are things suiting me in every respect. Even a lump of rice which is a leftover is a thing befitting me likewise.",
+        "roman": "praam · sùuan an lə̂ət gɔ̂ɔ-dii · pát tîi tâan bɛ̀ng krʉ̂ng bɔɔ-rí-pôok lɛ́ɛo gɔ̂ɔ-dii · bpen kɔ̌ɔng sǒm-kuuan gɛ̀ɛ rao táng-nán · mɛ́ɛ gɔ̂ɔn pát tîi bpen deen bpen kɔ̌ɔng sǒm-kuuan gɛ̀ɛ rao mʉ̌ʉan-gan",
+        "ref": "(Can we date this quote?), มูลนิธิอุทยานธรรม, อารยธรรมบท ชุดที่ ๑, compiled by ณัฐกร ทับทอง, illustrated by มลฤดี ตั้งสกุลพิทักษ์, Bangkok: Uttayarndham, page 135:",
+        "english": "Brahman, the parts that are excellent [in taste], the victuals that thou hast already divided in half [and] consumed, are things suiting me in every respect. Even a lump of rice which is a leftover is a thing befitting me likewise."
+      },
+      {
+        "text": "มีของฉลากต่าง ๆ",
+        "translation": "[There] were various carved objects.",
+        "roman": "mii kɔ̌ɔng chà-làak dtàang dtàang",
+        "ref": "1884, พระบาทสมเด็จพระจุลจอมเกล้าเจ้าอยู่หัว, “เดือน ๕ จุลศักราช ๑๒๔๖”, in จดหมายเหตุพระราชกิจรายวัน พระราชนิพนธ์ในพระบาทสมเด็จพระจุลจอมเกล้าเจ้าอยู่หัว ภาค ๑๗, Bangkok: n.p., published 1938:",
+        "english": "[There] were various carved objects."
+      },
+      {
+        "text": "โดนของ",
+        "translation": "to be subjected to [black] magic; to be put under [black] magic; to be used [black] magic with\n (literally) to be subjected to a thing",
+        "roman": "doon kɔ̌ɔng",
+        "english": "to be subjected to [black] magic; to be put under [black] magic; to be used [black] magic with\n (literally) to be subjected to a thing"
+      },
+      {
+        "text": "ทำของ",
+        "translation": "to perform [black] magic [upon]; to use a [black] spell [on]; to exercise a [black] art [on]\n (literally) to do a thing",
+        "roman": "tam kɔ̌ɔng",
+        "english": "to perform [black] magic [upon]; to use a [black] spell [on]; to exercise a [black] art [on]\n (literally) to do a thing"
+      },
+      {
+        "text": "เล่นของ",
+        "translation": "to master a [black] art; to be a master of the occult\n (literally) to enjoy a thing",
+        "roman": "lên kɔ̌ɔng",
+        "english": "to master a [black] art; to be a master of the occult\n (literally) to enjoy a thing"
+      },
+      {
+        "text": "มีของ",
+        "translation": "to be talented; to have a talent\n (literally) to have stuff",
+        "roman": "mii kɔ̌ɔng",
+        "english": "to be talented; to have a talent\n (literally) to have stuff"
+      }
+    ],
+    "antonyms": []
+  },
+  {
+    "word_th": "น้ำ",
+    "translation": [
+      "water; any liquid or fluid. (Classifier changes according to its container.)",
+      "body of water, as lake, river, sea, ocean, etc; water thereof.",
+      "used as a title for a body of water, often prefixed to its name.",
+      "semen; discharge thereof upon orgasm; orgasm. (Classifier: น้ำ)",
+      "(slang) semen; discharge thereof upon orgasm; orgasm. (Classifier: น้ำ)",
+      "round; occasion; time; period of time. (Classifier: น้ำ)",
+      "(slang) round; occasion; time; period of time. (Classifier: น้ำ)",
+      "content; essence; main part; material part.",
+      "(chiefly in combination) content; essence; main part; material part.",
+      "nonessential, immaterial, or nonsensical part of a content; verbose or circumlocutory part of a content; as opposed to เนื้อ (nʉ́ʉa).",
+      "(slang) nonessential, immaterial, or nonsensical part of a content; verbose or circumlocutory part of a content; as opposed to เนื้อ (nʉ́ʉa).",
+      "glitter; sparkle; sheen; luster.",
+      "(of jewelry) glitter; sparkle; sheen; luster."
+    ],
+    "synonyms": [],
+    "links": [
+      "water",
+      "liquid",
+      "fluid",
+      "body of water",
+      "lake",
+      "river",
+      "sea",
+      "ocean",
+      "semen",
+      "discharge",
+      "orgasm",
+      "น้ำ#Thai",
+      "round",
+      "occasion",
+      "time",
+      "period of time",
+      "content",
+      "essence",
+      "main",
+      "part",
+      "material",
+      "nonessential",
+      "immaterial",
+      "nonsensical",
+      "verbose",
+      "circumlocutory",
+      "เนื้อ#Thai",
+      "glitter",
+      "sparkle",
+      "sheen",
+      "luster"
+    ],
+    "transcription_en": "náam",
+    "examples": [
+      {
+        "text": "น้ำดื่ม",
+        "translation": "drinking water",
+        "roman": "náam dʉ̀ʉm",
+        "english": "drinking water"
+      },
+      {
+        "text": "น้ำตก",
+        "translation": "waterfall",
+        "roman": "náam dtòk",
+        "english": "waterfall"
+      },
+      {
+        "text": "น้ำฝน",
+        "translation": "rainwater",
+        "roman": "náam fǒn",
+        "english": "rainwater"
+      },
+      {
+        "text": "น้ำมะพร้าว",
+        "translation": "coconut water",
+        "roman": "náam má-práao",
+        "english": "coconut water"
+      },
+      {
+        "text": "น้ำเค็ม",
+        "translation": "salt water (sea water)",
+        "roman": "náam kem",
+        "english": "salt water (sea water)"
+      },
+      {
+        "text": "ช้างน้ำ",
+        "translation": "water elephant (hippopotamus)",
+        "roman": "cháang náam",
+        "english": "water elephant (hippopotamus)"
+      },
+      {
+        "text": "น้ำหอม",
+        "translation": "fragrant liquid (perfume)",
+        "roman": "náam hɔ̌ɔm",
+        "english": "fragrant liquid (perfume)"
+      },
+      {
+        "text": "น้ำโขง",
+        "translation": "Mekong River",
+        "roman": "náam kǒong",
+        "english": "Mekong River"
+      },
+      {
+        "text": "น้ำปิง",
+        "translation": "Ping River (in Chiang Mai, Thailand)",
+        "roman": "náam bping",
+        "english": "Ping River (in Chiang Mai, Thailand)"
+      },
+      {
+        "text": "จะทนได้กี่น้ำ",
+        "translation": "How much further would [a pronoun] bear [with this]?\n (literally) How many times would [a pronoun] bear [with this]?",
+        "roman": "jà ton dâai gìi náam",
+        "english": "How much further would [a pronoun] bear [with this]?\n (literally) How many times would [a pronoun] bear [with this]?"
+      },
+      {
+        "text": "จะไปได้กี่น้ำ",
+        "translation": "How much further could [a pronoun] go?\n(literally) How many times could [a pronoun] go?",
+        "roman": "jà bpai dâai gìi náam",
+        "english": "How much further could [a pronoun] go?\n(literally) How many times could [a pronoun] go?"
+      }
+    ],
+    "antonyms": []
+  },
+  {
+    "word_th": "สุขสันต์วันเกิด",
+    "translation": [
+      "happy birthday."
+    ],
+    "synonyms": [],
+    "links": [
+      "happy birthday"
+    ],
+    "transcription_en": "s u kʰ s ạ n t ʻ w ạ n e k i ɗ",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "รัสเซีย",
+    "translation": [
+      "Russia (a transcontinental country in Eastern Europe and North Asia)"
+    ],
+    "synonyms": [],
+    "links": [
+      "Russia#English:_Q159",
+      "transcontinental",
+      "country",
+      "Eastern Europe#English",
+      "North Asia#English"
+    ],
+    "transcription_en": "rát-siia",
+    "examples": [
+      {
+        "text": "ประเทศรัสเซีย",
+        "translation": "Russia (country)",
+        "roman": "bprà-têet rát-siia",
+        "english": "Russia (country)"
+      },
+      {
+        "text": "สหพันธรัฐรัสเซีย",
+        "translation": "Russian Federation",
+        "roman": "sà-hà-pan-tá-rát rát-siia",
+        "english": "Russian Federation"
+      },
+      {
+        "text": "โซเวียตรัสเซีย",
+        "translation": "Soviet Russia",
+        "roman": "soo-wîiat rát-siia",
+        "english": "Soviet Russia"
+      },
+      {
+        "text": "ภาษารัสเซีย",
+        "translation": "Russian language",
+        "roman": "paa-sǎa rát-siia",
+        "english": "Russian language"
+      },
+      {
+        "text": "ชาวรัสเซีย",
+        "translation": "Russian (person)",
+        "roman": "chaao rát-siia",
+        "english": "Russian (person)"
+      },
+      {
+        "text": "คนรัสเซีย",
+        "translation": "Russian (person)",
+        "roman": "kon rát-siia",
+        "english": "Russian (person)"
+      }
+    ],
+    "antonyms": []
+  },
+  {
+    "word_th": "การเงิน",
+    "translation": [
+      "finance; monetary affair."
+    ],
+    "synonyms": [],
+    "links": [
+      "finance",
+      "monetary",
+      "affair"
+    ],
+    "transcription_en": "gaan-ngən",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "พม่า",
+    "translation": [
+      "Burma (a country in Southeast Asia)",
+      "Burmese"
+    ],
+    "synonyms": [],
+    "links": [
+      "Burma#English:_Q836",
+      "country",
+      "Southeast Asia#English",
+      "Burmese"
+    ],
+    "transcription_en": "pá-mâa",
+    "examples": [
+      {
+        "text": "ประเทศพม่า",
+        "translation": "Burma (country)",
+        "roman": "bprà-têet pá-mâa",
+        "english": "Burma (country)"
+      },
+      {
+        "text": "สาธารณรัฐแห่งสหภาพพม่า",
+        "translation": "Republic of the Union of Myanmar",
+        "roman": "sǎa-taa-rá-ná-rát hɛ̀ng sà-hà-pâap pá-mâa",
+        "english": "Republic of the Union of Myanmar"
+      },
+      {
+        "text": "ภาษาพม่า",
+        "translation": "Burmese (language)",
+        "roman": "paa-sǎa pá-mâa",
+        "english": "Burmese (language)"
+      }
+    ],
+    "antonyms": []
+  },
+  {
+    "word_th": "...",
+    "translation": [
+      "Visual rendering of Morse code for ศ.",
+      "Visual rendering of Morse code for ษ.",
+      "Visual rendering of Morse code for ส."
+    ],
+    "synonyms": [],
+    "links": [
+      "ศ#Translingual",
+      "ษ#Translingual",
+      "ส#Translingual"
+    ],
+    "transcription_en": null,
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "แตงโม",
+    "translation": [
+      "watermelon."
+    ],
+    "synonyms": [],
+    "links": [
+      "watermelon"
+    ],
+    "transcription_en": "dtɛɛng-moo",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "อาจารย์",
+    "translation": [
+      "teacher: one who teaches, especially as a profession.",
+      "instructor: teacher in a higher education institution who ranks below assistant professor.",
+      "(education, law)",
+      "used as a rank for such person. Abbreviation: อ. (ɔɔ)",
+      "teacher in a higher education institution, irrespective of the rank.",
+      "(colloquial) teacher in a higher education institution, irrespective of the rank.",
+      "expert; specialist.",
+      "(colloquial) expert; specialist.",
+      "religious teacher; spiritual preceptor.",
+      "master of the occult or black magic, as sorcerer, shaman, exorcist, etc.",
+      "(slang) master of the occult or black magic, as sorcerer, shaman, exorcist, etc.",
+      "used as a term of address to or title for such person, and used by such person to refer to oneself."
+    ],
+    "synonyms": [],
+    "links": [
+      "teacher",
+      "one",
+      "teach",
+      "especially",
+      "profession",
+      "education",
+      "law#English",
+      "instructor",
+      "higher education",
+      "institution",
+      "rank",
+      "assistant professor",
+      "อ.#Thai",
+      "expert",
+      "specialist",
+      "religious",
+      "spiritual",
+      "preceptor",
+      "master",
+      "occult",
+      "black magic",
+      "sorcerer",
+      "shaman",
+      "exorcist"
+    ],
+    "transcription_en": "aa-jaan",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "ครู",
+    "translation": [
+      "teacher; schoolteacher; instructor."
+    ],
+    "synonyms": [
+      "อาจารย์"
+    ],
+    "links": [
+      "teacher",
+      "schoolteacher",
+      "instructor"
+    ],
+    "transcription_en": "kruu",
+    "examples": [
+      {
+        "text": "ครูคนนี้ให้การบ้านเยอะจัง",
+        "translation": "This teacher gives a lot of homework.",
+        "roman": "kruu kon níi hâi gaan-bâan yə́ jang",
+        "english": "This teacher gives a lot of homework."
+      }
+    ],
+    "antonyms": []
+  },
+  {
+    "word_th": "๑๐",
+    "translation": [
+      "10 (ten)."
+    ],
+    "synonyms": [],
+    "links": [
+      "10",
+      "ten"
+    ],
+    "transcription_en": null,
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "เขมร",
+    "translation": [
+      "Khmer",
+      "Cambodia (a country in Southeast Asia); Cambodian",
+      "(sometimes derogatory or offensive) Cambodia (a country in Southeast Asia); Cambodian"
+    ],
+    "synonyms": [
+      "กัมพูชา"
+    ],
+    "links": [
+      "Khmer",
+      "derogatory",
+      "Cambodia#English:_Q424",
+      "country",
+      "Southeast Asia#English",
+      "Cambodian"
+    ],
+    "transcription_en": "kà-měen",
+    "examples": [
+      {
+        "text": "ชาวเขมร",
+        "translation": "Khmer (person)",
+        "roman": "chaao kà-měen",
+        "english": "Khmer (person)"
+      },
+      {
+        "text": "ภาษาเขมร",
+        "translation": "Khmer (language)",
+        "roman": "paa-sǎa kà-měen",
+        "english": "Khmer (language)"
+      }
+    ],
+    "antonyms": []
+  },
+  {
+    "word_th": "วัน",
+    "translation": [
+      "day.",
+      "daytime.",
+      "today."
+    ],
+    "synonyms": [],
+    "links": [
+      "day",
+      "daytime",
+      "today"
+    ],
+    "transcription_en": "wan",
+    "examples": [
+      {
+        "text": "สายาบัวบ่าวเกลี้ย จักมา สาวสั่งอย่ามาวัน สู่น้อง",
+        "translation": "The girl's man is about to come. The girl hath instructed him: \"come not unto me in daytime\".",
+        "roman": "sǎa-yaa buua-bàao glîia · jàk maa · sǎao sàng yàa maa wan · sùu nɔ́ɔng",
+        "ref": "2006, ล้อม เพ็งแก้ว, กำสรวลสมุทร หรือกำสรวลศรีปราชญ์ เป็นพระราชนิพนธ์ยุคต้นกรุงศรีอยุธยา, Bangkok: มติชน, →ISBN, page 60:",
+        "english": "The girl's man is about to come. The girl hath instructed him: \"come not unto me in daytime\"."
+      },
+      {
+        "text": "ตายวันตายพรุ่ง",
+        "translation": "[We can] die today [or] die tomorrow [= we can die at any time].",
+        "roman": "dtaai wan dtaai prûng",
+        "english": "[We can] die today [or] die tomorrow [= we can die at any time]."
+      }
+    ],
+    "antonyms": []
+  },
+  {
+    "word_th": "ฯ",
+    "translation": [
+      "an abbreviation marker (named ไปยาลน้อย or เปยยาลน้อย)."
+    ],
+    "synonyms": [],
+    "links": [
+      "abbreviation",
+      "marker",
+      "ไปยาลน้อย#Thai",
+      "เปยยาลน้อย#Thai"
+    ],
+    "transcription_en": null,
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "วันพฤหัส",
+    "translation": [
+      "misspelling of วันพฤหัสฯ (wan-prʉ́-hàt)"
+    ],
+    "synonyms": [],
+    "links": [
+      "วันพฤหัสฯ#Thai"
+    ],
+    "transcription_en": "wan-prʉ́-hàt",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "แกงเผ็ด",
+    "translation": [
+      "red curry, hot curry."
+    ],
+    "synonyms": [],
+    "links": [
+      "red curry"
+    ],
+    "transcription_en": "gɛɛng-pèt",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "เขียว",
+    "translation": [
+      "green.",
+      "blue; indigo.",
+      "(archaic) blue; indigo."
+    ],
+    "synonyms": [],
+    "links": [
+      "green",
+      "blue",
+      "indigo"
+    ],
+    "transcription_en": "kǐao",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "แกง",
+    "translation": [
+      "curry; soup; stew."
+    ],
+    "synonyms": [],
+    "links": [
+      "curry",
+      "soup",
+      "stew"
+    ],
+    "transcription_en": "gɛɛng",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "เผ็ด",
+    "translation": [
+      "spicy; hot; pungent; peppery.",
+      "producing a burning or tingling sensation on the tongue.",
+      "(of certain substances, as mouthwash, etc) producing a burning or tingling sensation on the tongue.",
+      "hot; sexy.",
+      "(neologism, figurative, slang) hot; sexy."
+    ],
+    "synonyms": [],
+    "links": [
+      "spicy",
+      "hot",
+      "pungent",
+      "peppery",
+      "certain",
+      "substance",
+      "mouthwash",
+      "produce",
+      "burn",
+      "tingling",
+      "sensation",
+      "tongue",
+      "sexy"
+    ],
+    "transcription_en": "pèt",
+    "examples": [
+      {
+        "text": "สถาบันภาษาไทย, กรมวิชาการ, กระทรวงศึกษาธิการ (2000), ประชุมโคลงโลกนิติ (in Thai), Bangkok: สถาบันภาษาไทย, กรมวิชาการ, กระทรวงศึกษาธิการ, →ISBN, page 103\nพริกเผ็ดใครให้เผ็ด ฉันใด หนามย่อมแหลมเองใคร เซี่ยมให้ จันทน์กฤษณาไฉน ใครอบ หอมฤๅ วงศ์แห่งนักปราชญ์ได้ เพราะด้วยฉลาดเอง\nprík pèt krai hâi pèt · chǎn dai · nǎam yɔ̂m lɛ̌ɛm eeng krai · sîiam hâi · jan grìt-sà-nǎa chà-nǎi · krai òp · hɔ̌ɔm rʉʉ · wong hɛ̀ng nák-bpràat dâai · prɔ́ dûai chà-làat eeng\nJust like chillies [that are] hot [by themselves] without anyone ordering them to be hot, thorns are sharp by themselves without having been sharpened by anyone. Has anybody scented sandalwood or lign aloes with perfume? The race of scholars is knowledgeable because of the intelligence [of these people] themselves."
+      }
+    ],
+    "antonyms": []
+  },
+  {
+    "word_th": "หวาน",
+    "translation": [
+      "sweet.",
+      "sexy.",
+      "(slang, humorous) sexy.",
+      "loose; keeping coming loose.",
+      "(of a screw, nut, etc) loose; keeping coming loose.",
+      "easy (to do, to deal with, etc).",
+      "(slang) easy (to do, to deal with, etc)."
+    ],
+    "synonyms": [],
+    "links": [
+      "sweet",
+      "humorous",
+      "sexy",
+      "loose",
+      "keep",
+      "come",
+      "easy",
+      "do",
+      "deal with"
+    ],
+    "transcription_en": "wǎan",
+    "examples": [
+      {
+        "text": "เอวหวาน",
+        "translation": "sexy waist",
+        "roman": "eeo wǎan",
+        "english": "sexy waist"
+      }
+    ],
+    "antonyms": []
+  },
+  {
+    "word_th": "สวัสดี",
+    "translation": [
+      "welfare, well-being; prosperity, success; security, safety; goodness, virtue, moral excellence",
+      "(elegant) welfare, well-being; prosperity, success; security, safety; goodness, virtue, moral excellence"
+    ],
+    "synonyms": [],
+    "links": [
+      "welfare",
+      "well-being",
+      "prosperity",
+      "success",
+      "security",
+      "safety",
+      "goodness",
+      "virtue",
+      "moral",
+      "excellence"
+    ],
+    "transcription_en": "sà-wàt-dii",
+    "examples": [
+      {
+        "text": "ตัดเล็บวันพุธจันทร์กันจังไร เรียนสิ่งใดวันพฤหัสสวัสดี",
+        "translation": "Cutting nails [on] Wednesday [or] Monday [would] prevent evil. Learning anything [on] Thursday [would result in] success.",
+        "roman": "dtàt lép wan pút jan gan jang-rai · riian sìng dai wan prʉ́-hàt sà-wàt-dii",
+        "ref": "Circa 1824, สุนทรภู่, “สวัสดิรักษา”, in สวัสดิรักษาคำกลอน เพลงยาวถวายโอวาท และสุภาษิตสอนสตรี, Bangkok: n.p., published 1967, retrieved 01 Jul 2019:",
+        "english": "Cutting nails [on] Wednesday [or] Monday [would] prevent evil. Learning anything [on] Thursday [would result in] success."
+      },
+      {
+        "text": "พระองค์จงอยู่สวัสดี หลานนี้ขอถวายบังคมลา",
+        "translation": "Mayest thou live [in] prosperity, farewell this grandchild hereby biddeth thee.",
+        "roman": "prá-ong jong yùu sà-wàt-dii · lǎan níi kɔ̌ɔ tà-wǎai-bang-kom-laa",
+        "ref": "19th century, พระบาทสมเด็จพระพุทธเลิศหล้านภาลัย, “เล่มที่ ๑๐”, in บทละคร เรื่อง อิเหนา ฉบับหอพระสมุดวชิรญาณ, Bangkok: หอพระสมุดวชิรญาณ, published 1921, retrieved 01 Jul 2019:",
+        "english": "Mayest thou live [in] prosperity, farewell this grandchild hereby biddeth thee."
+      },
+      {
+        "text": "เมื่อนั้น ฝ่ายพระอุณรุทเรืองศรี อยู่จำเริญสุขสวัสดี โรคภัยไม่มีแผ้วพาน",
+        "ref": "19th century, พระบาทสมเด็จพระพุทธยอดฟ้าจุฬาโลก, “ตอนที่ ๑๐ ท้าวอุทุมราชถวายนางศรีสุดาแก่พระอุณรุท”, in บทละคร เรื่อง อุณรุท, Bangkok: สำนักวรรณกรรมและประวัติศาสตร์ กรมศิลปากร, published 2002, →ISBN, retrieved 01 Jul 2019:"
+      },
+      {
+        "text": "ศุภมัสดุสวัสดีศรีสรินทรบวรวรสิทธิวิวิธเดโชชยาดิเรก ๑๔๓๑ ศกมะเส็งนักษัตรบูรณมีไพสาขพุธพาร",
+        "translation": "May there be virtue, prosperity, greatest glorious dignity, best, blessed success, manifold authority, [and] extraordinary victory. [Today is] Wednesday, the 15th day of the waxing moon of the Baisākha [month], the year 1431, [the year of] the Serpent Sign.",
+        "roman": "sùp-pá-mát-sà-dù sà-wàt-dii sǐi sǐn-tɔɔn bɔɔ-wɔɔn wɔɔ-rá sìt wí-wít dee-choo chá-yaa-dì-rèek · pan sìi-rɔ́ɔi sǎam-sìp èt · sòk má-sěng nák-sàt buu-rá-ná-mii pai-sǎa-kà pút-tá paan",
+        "ref": "1509, “จารึกวัดพระเสด็จ ด้านที่ ๑”, in ฐานข้อมูลจารึกในประเทศไทย, Bangkok: ศูนย์มานุษยวิทยาสิรินธร (องค์การมหาชน), published 2012-02-17, retrieved 01 Jul 2019:",
+        "english": "May there be virtue, prosperity, greatest glorious dignity, best, blessed success, manifold authority, [and] extraordinary victory. [Today is] Wednesday, the 15th day of the waxing moon of the Baisākha [month], the year 1431, [the year of] the Serpent Sign."
+      }
+    ],
+    "antonyms": []
+  },
+  {
+    "word_th": "อรุณสวัสดิ์",
+    "translation": [
+      "good morning."
+    ],
+    "synonyms": [],
+    "links": [
+      "good morning"
+    ],
+    "transcription_en": "à-run-sà-wàt",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "ไชโย",
+    "translation": [
+      "cheers!",
+      "hurray!"
+    ],
+    "synonyms": [],
+    "links": [
+      "cheers",
+      "hurray"
+    ],
+    "transcription_en": "chai-yoo",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "แพนด้า",
+    "translation": [
+      "panda bear.",
+      "(หมี~) panda bear."
+    ],
+    "synonyms": [],
+    "links": [
+      "หมี#Thai",
+      "panda bear"
+    ],
+    "transcription_en": "pɛn-dâa",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "จิงโจ้",
+    "translation": [
+      "a type of tiny bird that utters the cry 'jii-jôo'.",
+      "(archaic) a type of tiny bird that utters the cry 'jii-jôo'.",
+      "half-bird, half-man monster.",
+      "(mythology and archaic) half-bird, half-man monster.",
+      "kangaroo: marsupial of the family Macropodidae.",
+      "(zoology)",
+      "water strider: aquatic bug of the family Gerridae.",
+      "bracket.",
+      "(shipbuilding) bracket.",
+      "female guard in the palace, established by King Mongkut; member of this guard.",
+      "(slang and archaic) female guard in the palace, established by King Mongkut; member of this guard."
+    ],
+    "synonyms": [],
+    "links": [
+      "type",
+      "tiny",
+      "bird",
+      "utter",
+      "cry",
+      "mythology",
+      "half",
+      "man",
+      "monster",
+      "zoology",
+      "kangaroo",
+      "marsupial",
+      "family",
+      "Macropodidae#Translingual",
+      "water strider",
+      "aquatic",
+      "bug",
+      "Gerridae#Translingual",
+      "bracket",
+      "female",
+      "guard",
+      "palace",
+      "establish",
+      "king",
+      "member"
+    ],
+    "transcription_en": "jing-jôo",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "พจนานุกรม",
+    "translation": [
+      "dictionary."
+    ],
+    "synonyms": [
+      "ดิก",
+      "ดิกชันนารี",
+      "ปทานุกรม",
+      "ศัพทานุกรม",
+      "อภิธาน"
+    ],
+    "links": [
+      "dictionary"
+    ],
+    "transcription_en": "pót-jà-naa-nú-grom",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "สารานุกรม",
+    "translation": [
+      "encyclopedia."
+    ],
+    "synonyms": [],
+    "links": [
+      "encyclopedia"
+    ],
+    "transcription_en": "sǎa-raa-nú-grom",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "เป็ด",
+    "translation": [
+      "duck: bird of the family Anatidae.",
+      "(zoology) duck: bird of the family Anatidae.",
+      "the plant Alternanthera sessilis of the family Amaranthaceae.",
+      "(botany)",
+      "(ผัก~) the plant Alternanthera sessilis of the family Amaranthaceae.",
+      "the plant Alternanthera bettzickiana of the family Amaranthaceae.",
+      "(ผัก~) the plant Alternanthera bettzickiana of the family Amaranthaceae.",
+      "a type of traditional boat, of which the front and back are flat or pointed and the hull bulges out, making it look like a duck.",
+      "(เรือ~, เรืออี~, อี~) a type of traditional boat, of which the front and back are flat or pointed and the hull bulges out, making it look like a duck."
+    ],
+    "synonyms": [],
+    "links": [
+      "zoology",
+      "duck",
+      "bird",
+      "family",
+      "Anatidae#Translingual",
+      "botany",
+      "ผัก#Thai",
+      "plant",
+      "Amaranthaceae#Translingual",
+      "เรือ#Thai",
+      "อี#Thai",
+      "type",
+      "traditional",
+      "boat",
+      "front",
+      "back",
+      "flat",
+      "point",
+      "hull",
+      "bulge",
+      "make",
+      "look"
+    ],
+    "transcription_en": "bpèt",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "ควย",
+    "translation": [
+      "penis.",
+      "(vulgar) penis."
+    ],
+    "synonyms": [
+      "กระจู๋",
+      "กระเจี๊ยว",
+      "กระดอ",
+      "กระปู๋",
+      "ขลำ",
+      "ของลับ",
+      "คุยหฐาน",
+      "คุยหะ",
+      "งู",
+      "จู๋",
+      "เจ้าโลก",
+      "เจี๊ยว",
+      "ช้างน้อย",
+      "ดอ",
+      "ดุ้น",
+      "เดือย",
+      "แตง",
+      "เทียน",
+      "นกเขา",
+      "น้องชาย",
+      "ไฟฉาย",
+      "มะขาม",
+      "มังกร",
+      "ลึงค์",
+      "ไส้กรอก",
+      "หนอน",
+      "หนอนน้อย",
+      "หำ",
+      "แหนม",
+      "องค์กำเนิด",
+      "องคชาต",
+      "อวัยวะเพศชาย",
+      "ไอ้จู๋",
+      "ไอ้เจี๊ยว",
+      "ไอติมอุ่น"
+    ],
+    "links": [
+      "penis"
+    ],
+    "transcription_en": "kuai",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "ตุ๊ก ๆ",
+    "translation": [
+      "(classifier: คัน for the vehicle, คน for the driver) tuk-tuk; driver thereof.",
+      "(colloquial) (classifier: คัน for the vehicle, คน for the driver) tuk-tuk; driver thereof."
+    ],
+    "synonyms": [],
+    "links": [
+      "คัน#Thai",
+      "คน#Thai",
+      "tuk-tuk",
+      "driver"
+    ],
+    "transcription_en": "dtúk-dtúk",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "เมืองไทย",
+    "translation": [
+      "Thailand (a country in Southeast Asia)",
+      "(colloquial) Thailand (a country in Southeast Asia)"
+    ],
+    "synonyms": [
+      "synonyms at ประเทศไทย"
+    ],
+    "links": [
+      "Thailand#English:_Q869",
+      "country",
+      "Southeast Asia#English"
+    ],
+    "transcription_en": "mʉʉang-tai",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "นีออน",
+    "translation": [
+      "neon.",
+      "fluorescent lamp."
+    ],
+    "synonyms": [],
+    "links": [
+      "neon",
+      "fluorescent lamp"
+    ],
+    "transcription_en": "nii-ɔɔn",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "กระดอ",
+    "translation": [
+      "penis",
+      "(colloquial, vulgar) penis"
+    ],
+    "synonyms": [],
+    "links": [
+      "penis"
+    ],
+    "transcription_en": "grà-dɔɔ",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "นก",
+    "translation": [
+      "bird."
+    ],
+    "synonyms": [
+      "ทวิช",
+      "ทวิชชาติ",
+      "ทวิชาติ",
+      "ทิชากร",
+      "ทิชาชาติ",
+      "บุหรง",
+      "ปักษคม",
+      "ปักษธร",
+      "ปักษวาหน",
+      "ปักษา",
+      "ปักษิน",
+      "ปักษี",
+      "พิหค",
+      "วิหค",
+      "วิหงค์",
+      "เวหังค์",
+      "ศกุน",
+      "ศกุนต์",
+      "ศกุนิ",
+      "ศกุนี",
+      "สกุณ",
+      "สกุณา",
+      "สกุณี",
+      "สกุนต์",
+      "สรุโนก",
+      "สุโนก",
+      "อัณฑชะ"
+    ],
+    "links": [
+      "bird"
+    ],
+    "transcription_en": "nók",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "กงกาง",
+    "translation": [
+      "occupation; business; affair.",
+      "responsibility; duty."
+    ],
+    "synonyms": [],
+    "links": [
+      "occupation",
+      "business",
+      "affair",
+      "responsibility",
+      "duty"
+    ],
+    "transcription_en": "gong-gaang",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "ทาก",
+    "translation": [
+      "leech",
+      "(land) leech",
+      "slug",
+      "(garden) slug"
+    ],
+    "synonyms": [],
+    "links": [
+      "leech",
+      "slug"
+    ],
+    "transcription_en": "tâak",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "ผม",
+    "translation": [
+      "headhair."
+    ],
+    "synonyms": [],
+    "links": [
+      "headhair"
+    ],
+    "transcription_en": "pǒm",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "ฉัน",
+    "translation": [
+      "a first-person pronoun used by anyone when addressing a person of equal or lower status",
+      "(informal) a first-person pronoun used by anyone when addressing a person of equal or lower status"
+    ],
+    "synonyms": [],
+    "links": [],
+    "transcription_en": "chǎn",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "คุณ",
+    "translation": [
+      "attribute; characteristic; property.",
+      "benefit; interest; use.",
+      "magic; black magic; black art; occult; supernatural power.",
+      "excellence; goodness.",
+      "morality; virtue.",
+      "favour; kindness.",
+      "(พระ~) favour; kindness.",
+      "a noble title given to an unmarried woman who has been conferred with the royal decoration of Chula Chom Klao (second class to fourth class).",
+      "used as a title for or term of address to anyone out of respect.",
+      "(colloquial, polite) used as a title for or term of address to anyone out of respect."
+    ],
+    "synonyms": [],
+    "links": [
+      "attribute",
+      "characteristic",
+      "property",
+      "benefit",
+      "interest",
+      "use",
+      "magic",
+      "black magic",
+      "black art",
+      "occult",
+      "supernatural",
+      "power",
+      "excellence",
+      "goodness",
+      "morality",
+      "virtue",
+      "พระ#Thai",
+      "favour",
+      "kindness",
+      "w:Order of Chula Chom Klao"
+    ],
+    "transcription_en": "kun",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "ไป",
+    "translation": [
+      "to go; to move (away from the speaker); to leave; to depart."
+    ],
+    "synonyms": [],
+    "links": [
+      "go",
+      "move",
+      "away",
+      "speaker",
+      "leave",
+      "depart"
+    ],
+    "transcription_en": "bpai",
+    "examples": [],
+    "antonyms": []
+  },
+  {
+    "word_th": "มี",
+    "translation": [
+      "to have; to own; to possess.",
+      "to contain; to include; to consist (of); to be composed (of).",
+      "to exist, to be in existence; to happen, to occur.",
+      "to cause to exist; to bring into existence; to create; to produce; to make.",
+      "to write; to compose; to issue.",
+      "(of letters) to write; to compose; to issue.",
+      "to give; to issue; to deliver.",
+      "(of judgments, decisions, orders, etc) to give; to issue; to deliver."
+    ],
+    "synonyms": [],
+    "links": [
+      "have",
+      "own",
+      "possess",
+      "contain",
+      "include",
+      "consist",
+      "be",
+      "compose",
+      "exist",
+      "existence",
+      "happen",
+      "occur",
+      "cause",
+      "bring",
+      "create",
+      "produce",
+      "make",
+      "letter",
+      "write",
+      "issue",
+      "judgment",
+      "decision",
+      "order",
+      "give",
+      "deliver"
+    ],
+    "transcription_en": "mii",
+    "examples": [
+      {
+        "text": "คุณมียาไหม",
+        "translation": "Do you have medicine?",
+        "roman": "kun mii yaa mǎi",
+        "english": "Do you have medicine?"
+      },
+      {
+        "text": "สายหยุดพุดจีบจีน เจ้ามีสินพี่มีศักดิ์ คนทั้งวังเขาชังเจ้านัก แต่พี่รักเจ้าคนเดียว",
+        "translation": "[My] dwarf ylang-ylang flower, [my] Chinese crape jasmine, thou art of wealth, I am of worth. They, people throughout the palace, hate thee much, but I am the only one that loveth thee.",
+        "roman": "sǎai-yùt pút-jìip jiin · jâao mii sǐn pîi mii sàk · kon táng wang kǎo chang jâao nák · dtɛ̀ɛ pîi rák jâao kon diao",
+        "ref": "2019 March 15 (last accessed), สุจิตต์ วงษ์เทศ, “เจ้าจอมมารดาอำภาใน ร. ๒ เล่นตัวนางกาญจหนาในละครอิเหนา”, in มติชนออนไลน์, Bangkok: มติชน, published 2016-06-12:",
+        "english": "[My] dwarf ylang-ylang flower, [my] Chinese crape jasmine, thou art of wealth, I am of worth. They, people throughout the palace, hate thee much, but I am the only one that loveth thee."
+      },
+      {
+        "text": "ลาวมี ๒ ฤดู คือ ฤดูร้อน (พฤศจิกายนถึงเมษายน)...",
+        "translation": "Laos has two seasons, that is, the hot season (November–April)...",
+        "roman": "laao mii · sɔ̌ɔng · rʉ́-duu · kʉʉ · rʉ́-duu rɔ́ɔn · (prʉ́t-sà-jì-gaa-yon tʉ̌ng mee-sǎa-yon) ...",
+        "ref": "2013, สุภฤกษ์ บุญทอง, สะบายดี ลาว ฉบับการ์ตูน: หนังสือชุดอาเซียน, Bangkok: Skybook, →ISBN, page 21:",
+        "english": "Laos has two seasons, that is, the hot season (November–April)..."
+      },
+      {
+        "text": "เพื่อความมุ่งประสงค์ของอนุสัญญานี้ ให้ถ้อยคำต่อไปนี้มีความหมายตามที่ได้กำหนดไว้ข้างท้ายนี้",
+        "translation": "For the purposes of the present Convention, the following expressions shall have the meanings hereunder assigned to them:",
+        "roman": "pʉ̂ʉa kwaam-mûng-bprà-sǒng kɔ̌ɔng à-nú-sǎn-yaa níi · hâi tɔ̂i-kam dtɔ̀ɔ-bpai-níi mii kwaam-mǎai dtaam tîi dâai gam-nòt wái kâang táai níi",
+        "ref": "1998 December 26, “พระราชบัญญัติว่าด้วยเอกสิทธิและความคุ้มกันทางกงสุล พ.ศ. ๒๕๔๑”, in ห้องสมุดกฎหมาย, Bangkok: สำนักงานคณะกรรมการกฤษฎีกา, published 2015-03-06, retrieved 13 Sep 2018:",
+        "english": "For the purposes of the present Convention, the following expressions shall have the meanings hereunder assigned to them:"
+      },
+      {
+        "text": "มาตรา ๒๔๔ ถ้าศาลหรือพนักงานฝ่ายปกครองหรือตำรวจชั้นผู้ใหญ่เห็นจำเป็น...ที่จะต้องตรวจศพ แม้ว่าจะได้บรรจุหรือฝังแล้วก็ตาม ให้มีอำนาจสั่งให้เอาศพนั้นให้ผู้เชี่ยวชาญตรวจ",
+        "translation": "Section 244 If the court or high-ranking administrative or police officer deems it necessary...to examine a corpse, even though [the corpse] has already been coffined or buried, [the court or officer] shall have the power to order that the corpse be sent to an expert for examination.",
+        "roman": "mâat-dtraa · sɔ̌ɔng-rɔ́ɔi sìi-sìp sìi · tâa sǎan rʉ̌ʉ pá-nák-ngaan-fàai-bpòk-krɔɔng rʉ̌ʉ dtam-rùuat chán pûu-yài hěn jam-bpen ... tîi jà dtɔ̂ng dtrùuat sòp · mɛ́ɛ wâa jà dâai ban-jù rʉ̌ʉ fǎng lɛ́ɛo gɔ̂ɔ-dtaam · hâi mii am-nâat sàng hâi ao sòp nán hâi pûu-chîao-chaan dtrùuat",
+        "ref": "1935 June 10, “ประมวลกฎหมายวิธีพิจารณาความอาญา”, in ห้องสมุดกฎหมาย, Bangkok: สำนักงานคณะกรรมการกฤษฎีกา, published 2016-12-15, retrieved 06 Feb 2019:",
+        "english": "Section 244 If the court or high-ranking administrative or police officer deems it necessary...to examine a corpse, even though [the corpse] has already been coffined or buried, [the court or officer] shall have the power to order that the corpse be sent to an expert for examination."
+      },
+      {
+        "text": "นาคีมีพิษเพี้ยง สุริโย เลื้อยบ่ทำเดโช แช่มช้า พิษน้อยหยิ่งโยโส แมลงป่อง ชูแต่หางเองอ้า อวดอ้างฤทธี",
+        "translation": "A serpent possesses venom [so great] as the sun, [yet] it slithers slowly without making [known] its power. A scorpion, so proud of its little venom, raises its tail itself as if to show off its might.",
+        "roman": "naa-kii mii pít píiang · sù-rí-yoo · lʉ́ai bɔ̀ɔ tam dee-choo · chɛ̂m-cháa · pít nɔ́ɔi yìng-yoo-sǒo · má-lɛɛng bpɔ̀ng · chuu dtɛ̀ɛ hǎang eeng âa · ùuat âang rít-tii",
+        "ref": "1831, สถาบันภาษาไทย, กรมวิชาการ, กระทรวงศึกษาธิการ, ประชุมโคลงโลกนิติ, Bangkok: สถาบันภาษาไทย, กรมวิชาการ, กระทรวงศึกษาธิการ, published 2000, →ISBN, page 92:",
+        "english": "A serpent possesses venom [so great] as the sun, [yet] it slithers slowly without making [known] its power. A scorpion, so proud of its little venom, raises its tail itself as if to show off its might."
+      },
+      {
+        "text": "แม้จะมีคำยืนยันจากฝั่งกองทัพว่า การเคลื่อนย้ายยุทโธปกรณ์เมื่อสุดสัปดาห์ที่ผ่านมาเป็นไปเพื่อการฝึกซ้อมตามปกติ แต่ผู้ใช้ทวิตเตอร์ในไทยยังตั้งข้อสงสัยและแสดงความคิดเกี่ยวกับรัฐประหาร",
+        "translation": "Even though there has been a confirmation from the Army side that the movement of munition during the past weekends was for regular training, Twitter users in Thailand still raise doubts and express opinions about a coup.",
+        "roman": "mɛ́ɛ jà mii kam-yʉʉn-yan jàak fàng gɔɔng-táp wâa · gaan-klʉ̂ʉan-yáai yút-too-bpà-gɔɔn mʉ̂ʉa sùt-sàp-daa tîi pàan maa bpen-bpai pʉ̂ʉa gaan-fʉ̀k-sɔ́ɔm dtaam bpà-gà-dtì · dtɛ̀ɛ pûu-chái tá-wít-dtə̂ə nai tai yang dtâng kɔ̂ɔ-sǒng-sǎi lɛ́ sà-dɛɛng kwaam-kít gìao-gàp rát-tà-bprà-hǎan",
+        "ref": "2019 February 11, กองบรรณาธิการวอยซ์ออนไลน์, “รัฐประหารติดอันดับเทรนด์ในทวิตเตอร์ไทย”, in Voice, Bangkok: Voice TV, retrieved 28 Feb 2019:",
+        "english": "Even though there has been a confirmation from the Army side that the movement of munition during the past weekends was for regular training, Twitter users in Thailand still raise doubts and express opinions about a coup."
+      },
+      {
+        "text": "คืนหมาหอนมีเรื่องร้องเรียนซื้อเสียง ๑ รายในเขต ๒ ปัตตานี กกต. จังหวัดชงเรื่องให้ กกต. กลางพิจารณาแล้ว คาด ๓ วันรู้ผล",
+        "translation": "On the dog-howling night, there was one complaint [about] vote-buying in Pattani's Constituency 2. The provincial EC has referred the matter to the central EC for consideration. It is expected that the outcome will be known within three days.",
+        "roman": "kʉʉn-mǎa-hɔ̌ɔn mii rʉ̂ʉang rɔ́ɔng-riian sʉ́ʉ-sǐiang · nʉ̀ng · raai nai kèet · sɔ̌ɔng · bpàt-dtaa-nii · gɔɔ-gɔɔ-dtɔɔ · jang-wàt chong rʉ̂ʉang hâi · gɔɔ-gɔɔ-dtɔɔ · glaang pí-jaa-rá-naa lɛ́ɛo · kâat · sǎam · wan rúu pǒn",
+        "ref": "2005 February 7, “ปัตตานีมีร้องซื้อเสียงในคืนหมาหอน”, in ประชาไท, Bangkok: ประชาไท, retrieved 24 Jan 2019:",
+        "english": "On the dog-howling night, there was one complaint [about] vote-buying in Pattani's Constituency 2. The provincial EC has referred the matter to the central EC for consideration. It is expected that the outcome will be known within three days."
+      },
+      {
+        "text": "เมื่อไม่มีบุคคลใดเป็นผู้แทน ให้ศาลตั้งพนักงานฝ่ายปกครองเป็นผู้แทน",
+        "translation": "Should there be no one to serve as the representative, the court shall appoint an administrative officer as the representative.",
+        "roman": "mʉ̂ʉa mâi mii bùk-kon dai bpen pûu-tɛɛn · hâi sǎan dtâng pá-nák-ngaan-fàai-bpòk-krɔɔng bpen pûu-tɛɛn",
+        "ref": "1935 June 10, “ประมวลกฎหมายวิธีพิจารณาความอาญา”, in ห้องสมุดกฎหมาย, Bangkok: สำนักงานคณะกรรมการกฤษฎีกา, published 2019-03-26, retrieved 29 Mar 2019:",
+        "english": "Should there be no one to serve as the representative, the court shall appoint an administrative officer as the representative."
+      },
+      {
+        "text": "เรียนพ่อแม่พี่น้องชาวไทยทุกท่าน ยังมีเด็ก ๆ ที่ยากจนอยู่อีกมากในเมืองไทย",
+        "translation": "Dear our fellow Thais, there still are a lot of children in need in Thailand.",
+        "roman": "riian pɔ̂ɔ-mɛ̂ɛ-pîi-nɔ́ɔng chaao tai túk tâan · yang mii dèk dèk tîi yâak-jon yùu ìik mâak nai mʉʉang tai",
+        "ref": "2019 April 2 (last accessed), “เกิดมาใช่อื่น เพื่อแผ่นดินไทย ร่วมใจช่วยเหลือ ผู้ด้อยโอกาส”, in bandhit.com, Bangkok: องค์การ UNICEF ประเทศไทย:",
+        "english": "Dear our fellow Thais, there still are a lot of children in need in Thailand."
+      },
+      {
+        "text": "ความในวรรคหนึ่งให้ใช้บังคับกับการลงมติเพื่อมีความเห็น...ด้วยโดยอนุโลม",
+        "translation": "The provision of Paragraph 1 shall also apply mutatis mutandis to...the passage of a resolution in order to adopt an opinion...",
+        "roman": "kwaam nai wák nʉ̀ng hâi chái-bang-káp gàp gaan-long má-dtì pʉ̂ʉa mii kwaam-hěn ... dûai dooi à-nú-loom",
+        "ref": "2018 December 12, “พระราชบัญญัติประกอบรัฐธรรมนูญว่าด้วยการป้องกันและปราบปรามการทุจริต พ.ศ. ๒๕๖๑”, in ห้องสมุดกฎหมาย, Bangkok: สำนักงานคณะกรรมการกฤษฎีกา, retrieved 28 Mar 2019:",
+        "english": "The provision of Paragraph 1 shall also apply mutatis mutandis to...the passage of a resolution in order to adopt an opinion..."
+      },
+      {
+        "text": "คดีนี้อธิบดีศาลปกครองกลางมีคำสั่งให้ดำเนินกระบวนพิจารณาโดยเร่งด่วนตามข้อ ๔๙/๒...",
+        "translation": "[As for] this case, the President of the Central Administrative Court issued an order requiring the proceedings to be held urgently in accordance with Rule 49/2...",
+        "roman": "ká-dii níi à-típ-bɔɔ-dii sǎan-bpòk-krɔɔng glaang mii kam-sàng hâi dam-nəən grà-buuan-pí-jaa-rá-naa dooi rêng-dùuan dtaam kɔ̂ɔ · sìi-sìp gâao / 2 ...",
+        "ref": "2019 April 25, “คำพิพากษาศาลปกครองกลาง ในคดีหมายเลขดำที่ ๕๕๒/๒๕๖๒ หมายเลขแดงที่ ๔๔๐/๒๕๖๒ เรื่อง คดีพิพาทเกี่ยวกับการที่หน่วยงานทางปกครองหรือเจ้าหน้าที่ของรัฐกระทำการโดยไม่ชอบด้วยกฎหมาย ระหว่าง เด็กชายพีรภัทร์ พณิชสานนท์ โดยนางพรพีร์ พณิชสานนท์ หรือมกรกิจวิบูลย์ ผู้แทนโดยชอบธรรม ผู้ฟ้องคดี กับผู้อำนวยการโรงเรียนสวนกุหลาบวิทยาลัย ผู้ถูกฟ้องคดี ลงวันที่ ๒๕ เมษายน ๒๕๖๒”, in ศาลปกครองพิพากษาเพิกถอนคำสั่ง ร.ร. สวนกุหลาบปฏิเสธรับ นร. ๑๐ รายเข้า ม. ๑, Bangkok: Voice TV, retrieved 29 Apr 2019:",
+        "english": "[As for] this case, the President of the Central Administrative Court issued an order requiring the proceedings to be held urgently in accordance with Rule 49/2..."
+      }
+    ],
+    "antonyms": []
+  },
+  {
+    "word_th": "งู",
+    "translation": [
+      "snake. (Classifier: ตัว)",
+      "penis.",
+      "(LGBTQ slang) penis."
+    ],
+    "synonyms": [
+      "ควย"
+    ],
+    "links": [
+      "snake",
+      "ตัว#Thai",
+      "LGBTQ",
+      "penis"
+    ],
+    "transcription_en": "nguu",
+    "examples": [],
+    "antonyms": []
+  }
+]
