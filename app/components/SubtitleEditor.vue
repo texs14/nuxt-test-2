@@ -186,31 +186,10 @@ function normalizeThaiEditorValue(text: string): string {
   const cleaned = text
     .replace(/\r?\n/gu, ' ')
     .replace(/\u00A0/gu, ' ')
+    .replace(/\t+/gu, ' ')
+    .replace(/ {4,}/gu, '   ')
     .trim();
-  if (!cleaned) return '';
-
-  const rawSentences = cleaned
-    .split(/(?:\s{3,}|\.)\s*/gu)
-    .map((sentence) => sentence.trim())
-    .filter(Boolean);
-
-  const sentences = rawSentences.length ? rawSentences : [cleaned];
-
-  const prepared = sentences
-    .map((sentence) => {
-      if (!sentence) return '';
-      const words = sentence.includes(' ')
-        ? sentence
-            .split(/\s+/gu)
-            .map((word) => word.trim())
-            .filter(Boolean)
-        : segmentThaiWords(sentence);
-      return words.join(' ');
-    })
-    .filter(Boolean);
-
-  if (!prepared.length) return '';
-  return prepared.join('   ');
+  return cleaned;
 }
 
 function addRow() {
