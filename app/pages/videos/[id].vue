@@ -16,6 +16,8 @@
         class="video-page__player"
         :src="video.video_url"
         :subtitles="subs"
+        :restricted-range="exerciseRange"
+        :hide-timeline="showExercise"
       />
 
       <p v-if="descriptionText" class="video-page__description">{{ descriptionText }}</p>
@@ -28,13 +30,17 @@
           :disabled="!canStartExercise"
           @click="startExercise"
         >
-          Начать упражнение
+          {{ t('videos.exercise.start') }}
         </button>
 
-        <SubtitleSentenceExercise v-if="showExercise" :subtitles="subs" />
+        <SubtitleSentenceExercise
+          v-if="showExercise"
+          :subtitles="subs"
+          @range-change="handleExerciseRangeChange"
+        />
 
         <p v-if="!canStartExercise" class="video-page__exercise_hint">
-          Для упражнения нужны субтитры на тайском языке.
+          {{ t('videos.exercise.hintNoThai') }}
         </p>
       </section>
 
@@ -63,7 +69,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import SubtitleSentenceExercise from '~/components/SubtitleSentenceExercise.vue';
 const route = useRoute();
@@ -87,6 +93,11 @@ interface SubtitleItem {
   start: number;
   end: number;
   text?: SubtitleText | string;
+}
+
+interface PlaybackRange {
+  start: number;
+  end: number;
 }
 
 interface VideoItem {
@@ -165,6 +176,7 @@ const descriptionText = computed(() => {
 
 const subs = computed<SubtitleItem[]>(() => (video.value?.subtitles || []) as SubtitleItem[]);
 const showExercise = ref(false);
+const exerciseRange = ref<PlaybackRange | null>(null);
 const isThaiSentences = (value: any): value is ThaiSentences =>
   value && typeof value === 'object' && Array.isArray(value.sentences);
 
@@ -172,8 +184,9 @@ const hasThaiWords = (value: string | ThaiSentences | undefined): boolean => {
   if (!value) return false;
   if (typeof value === 'string') return value.trim().length > 0;
   if (isThaiSentences(value)) {
-    return value.sentences?.some((sentence) =>
-      Array.isArray(sentence) && sentence.some((word) => Boolean(word && word.trim?.().length))
+    return value.sentences?.some(
+      (sentence) =>
+        Array.isArray(sentence) && sentence.some((word) => Boolean(word && word.trim?.().length))
     );
   }
   return false;
@@ -185,9 +198,7 @@ const canStartExercise = computed(() =>
     if (typeof subtitle.text === 'string') return subtitle.text.trim().length > 0;
     const textObject = subtitle.text as SubtitleText | undefined;
     const thaiText = textObject?.th ?? textObject?.['th-TH'] ?? textObject?.th_th;
-    return hasThaiWords(
-      thaiText as string | ThaiSentences | undefined
-    );
+    return hasThaiWords(thaiText as string | ThaiSentences | undefined);
   })
 );
 
@@ -195,6 +206,14 @@ function startExercise() {
   if (!canStartExercise.value) return;
   showExercise.value = true;
 }
+
+function handleExerciseRangeChange(range: PlaybackRange | null) {
+  exerciseRange.value = range;
+}
+
+watch(showExercise, (value) => {
+  if (!value) exerciseRange.value = null;
+});
 </script>
 
 <style scoped lang="scss">

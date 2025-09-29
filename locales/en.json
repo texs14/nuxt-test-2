@@ -23,6 +23,10 @@
     "loading": "Loading…",
     "error": "Loading error",
     "edit": "Edit",
+    "exercise": {
+      "start": "Start exercise",
+      "hintNoThai": "Thai subtitles are required for the exercise."
+    },
     "addNew": {
       "titleEdit": "Editing video",
       "titleCreate": "Upload new video",
@@ -51,6 +55,18 @@
     "loading": "Loading comments…",
     "error": "Error",
     "anonymous": "Anonymous"
+  },
+  "subtitleExercise": {
+    "title": "Build the sentence",
+    "instruction": "Arrange the Thai words below to form the sentence.",
+    "allUsed": "All words are placed. Check the order.",
+    "check": "Check",
+    "next": "Next sentence",
+    "restart": "Start over",
+    "feedbackSuccess": "Correct! Great job.",
+    "feedbackError": "The order is incorrect. Try again.",
+    "empty": "No suitable subtitles for the exercise.",
+    "progress": "{current} / {total}"
   },
   "editor": {
     "title": "Subtitle editor",

@@ -1,14 +1,13 @@
-﻿<template>
+<template>
   <div class="sentence-exercise">
     <header class="sentence-exercise__header">
-      <h3 class="sentence-exercise__title">РЎРѕР±РµСЂРёС‚Рµ РїСЂРµРґР»РѕР¶РµРЅРёРµ</h3>
-      <span class="sentence-exercise__progress">{{ currentStepLabel }}</span>
+      <h3 class="sentence-exercise__title">{{ t('subtitleExercise.title') }}</h3>
+      <span class="sentence-exercise__progress">{{ progressLabel }}</span>
     </header>
 
     <div v-if="currentSentence" class="sentence-exercise__body">
       <p class="sentence-exercise__instruction">
-        РЎРѕСЃС‚Р°РІСЊС‚Рµ РїСЂРµРґР»РѕР¶РµРЅРёРµ РЅР° С‚Р°Р№СЃРєРѕРј СЏР·С‹РєРµ, РёСЃРїРѕР»СЊР·СѓСЏ
-        СЃР»РѕРІР° РЅРёР¶Рµ.
+        {{ t('subtitleExercise.instruction') }}
       </p>
 
       <div class="sentence-exercise__slots">
@@ -45,7 +44,7 @@
         </button>
       </div>
       <p v-else class="sentence-exercise__all_used">
-        Р’СЃРµ СЃР»РѕРІР° СЂР°Р·РјРµС‰РµРЅС‹. РџСЂРѕРІРµСЂСЊС‚Рµ РїРѕСЂСЏРґРѕРє.
+        {{ t('subtitleExercise.allUsed') }}
       </p>
 
       <footer class="sentence-exercise__controls">
@@ -55,7 +54,7 @@
           :disabled="!isReadyToCheck"
           @click="handleCheck"
         >
-          РџСЂРѕРІРµСЂРёС‚СЊ
+          {{ t('subtitleExercise.check') }}
         </button>
 
         <button
@@ -64,7 +63,7 @@
           type="button"
           @click="goToNext"
         >
-          РЎР»РµРґСѓСЋС‰РµРµ РїСЂРµРґР»РѕР¶РµРЅРёРµ
+          {{ t('subtitleExercise.next') }}
         </button>
         <button
           v-else-if="checkState === 'success' && !hasNextStep"
@@ -72,7 +71,7 @@
           type="button"
           @click="restartExercise"
         >
-          РќР°С‡Р°С‚СЊ Р·Р°РЅРѕРІРѕ
+          {{ t('subtitleExercise.restart') }}
         </button>
       </footer>
 
@@ -80,30 +79,37 @@
         v-if="checkState === 'success'"
         class="sentence-exercise__feedback sentence-exercise__feedback_success"
       >
-        Р’РµСЂРЅРѕ! РћС‚Р»РёС‡РЅР°СЏ СЂР°Р±РѕС‚Р°.
+        {{ t('subtitleExercise.feedbackSuccess') }}
       </p>
       <p
         v-else-if="checkState === 'error'"
         class="sentence-exercise__feedback sentence-exercise__feedback_error"
       >
-        РџРѕСЂСЏРґРѕРє СЃР»РѕРІ РЅРµРІРµСЂРЅС‹Р№, РїРѕРїСЂРѕР±СѓР№С‚Рµ РµС‰С‘ СЂР°Р·.
+        {{ t('subtitleExercise.feedbackError') }}
       </p>
     </div>
 
     <p v-else class="sentence-exercise__empty">
-      РќРµС‚ РїРѕРґС…РѕРґСЏС‰РёС… СЃСѓР±С‚РёС‚СЂРѕРІ РґР»СЏ СѓРїСЂР°Р¶РЅРµРЅРёСЏ.
+      {{ t('subtitleExercise.empty') }}
     </p>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 
-type SubtitleText = Record<string, string | null | undefined>;
+interface ThaiSentences {
+  sentences: (string | null | undefined)[][];
+}
+
+type SubtitleText = Record<string, string | ThaiSentences | null | undefined>;
 
 interface SubtitleItem {
   id?: number | string;
-  text?: string | SubtitleText | null;
+  start?: number | string | null;
+  end?: number | string | null;
+  text?: string | SubtitleText | ThaiSentences | null;
 }
 
 interface WordToken {
@@ -114,6 +120,8 @@ interface WordToken {
 interface SentenceStep {
   id: string;
   words: WordToken[];
+  start: number;
+  end: number;
 }
 
 interface WordSlot {
@@ -122,6 +130,12 @@ interface WordSlot {
 }
 
 const props = defineProps<{ subtitles?: SubtitleItem[] | null }>();
+
+const emit = defineEmits<{
+  (e: 'range-change', payload: { start: number; end: number } | null): void;
+}>();
+
+const { t } = useI18n();
 
 const activeTokenId = ref<string | null>(null);
 const draggedTokenId = ref<string | null>(null);
@@ -155,44 +169,95 @@ function segmentThaiText(text: string): string[] {
   return Array.from(normalized).filter((symbol) => symbol.trim().length > 0);
 }
 
+function isThaiSentences(value: unknown): value is ThaiSentences {
+  return !!value && typeof value === 'object' && Array.isArray((value as ThaiSentences).sentences);
+}
+
+function normalizeWordsFromString(text: string, baseId: string) {
+  const cleaned = text.replace(/\s+/g, ' ').trim();
+  if (!cleaned) return [] as WordToken[];
+  const segmented = segmentThaiText(cleaned);
+  return segmented.map((word, wordIndex) => ({
+    id: `${baseId}-${wordIndex}`,
+    text: word,
+  }));
+}
+
+function normalizeWordsFromThaiSentences(value: ThaiSentences, baseId: string) {
+  const tokens: WordToken[] = [];
+  value.sentences.forEach((sentence, sentenceIndex) => {
+    if (!Array.isArray(sentence)) return;
+    sentence
+      .map((word) => (typeof word === 'string' ? word.trim() : ''))
+      .filter((word): word is string => !!word)
+      .forEach((word, wordIndex) => {
+        tokens.push({
+          id: `${baseId}-${sentenceIndex}-${wordIndex}`,
+          text: word,
+        });
+      });
+  });
+  return tokens;
+}
+
+function extractThaiSource(text: SubtitleItem['text']): string | ThaiSentences | null {
+  if (!text) return null;
+  if (typeof text === 'string') return text;
+  if (isThaiSentences(text)) return text;
+  if (typeof text === 'object') {
+    const textObject = text as SubtitleText;
+    const candidate = textObject.th ?? textObject['th-TH'] ?? textObject.th_th ?? null;
+    if (typeof candidate === 'string') return candidate;
+    if (isThaiSentences(candidate)) return candidate;
+  }
+  return null;
+}
+
 const sentences = computed<SentenceStep[]>(() => {
   const source = props.subtitles ?? [];
-  return source
-    .map((item, index) => {
-      let rawText: string | null | undefined;
-      if (typeof item.text === 'string') {
-        rawText = item.text;
-      } else if (item.text && typeof item.text === 'object') {
-        const textObject = item.text as SubtitleText;
-        rawText = textObject.th ?? textObject['th-TH'] ?? textObject.th_th ?? null;
-      }
-      if (!rawText) return null;
-      const cleaned = rawText.replace(/\s+/g, ' ').trim();
-      if (!cleaned) return null;
-      const segmented = segmentThaiText(cleaned);
-      if (!segmented.length) return null;
-      const words = segmented
-        .map((word, wordIndex) => ({
-          id: `${item.id ?? index}-${wordIndex}`,
-          text: word,
-        }))
-        .filter((word) => !!word.text);
-      if (!words.length) return null;
-      return {
-        id: `${item.id ?? index}`,
-        words,
-      };
-    })
-    .filter((sentence): sentence is SentenceStep => sentence !== null);
+  const result: SentenceStep[] = [];
+
+  source.forEach((item, index) => {
+    const baseId = `${item.id ?? index}`;
+    const thaiSource = extractThaiSource(item.text);
+    if (!thaiSource) return;
+
+    const startValue = Number(item.start ?? 0);
+    const endValue = Number(item.end ?? 0);
+    const start = Number.isFinite(startValue) ? Math.max(startValue, 0) : 0;
+    const end = Number.isFinite(endValue) ? Math.max(endValue, 0) : 0;
+    const hasValidRange = end > start;
+
+    let words: WordToken[] = [];
+    if (typeof thaiSource === 'string') {
+      words = normalizeWordsFromString(thaiSource, baseId);
+    } else if (isThaiSentences(thaiSource)) {
+      words = normalizeWordsFromThaiSentences(thaiSource, baseId);
+    }
+
+    const filtered = words.filter((word) => !!word.text);
+    if (!filtered.length) return;
+
+    result.push({
+      id: baseId,
+      words: filtered,
+      start: hasValidRange ? start : 0,
+      end: hasValidRange ? end : Math.max(start + 0.1, start),
+    });
+  });
+
+  return result;
 });
 
 const currentSentence = computed(() => sentences.value[currentStepIndex.value] ?? null);
 const totalSteps = computed(() => sentences.value.length);
 const hasNextStep = computed(() => currentStepIndex.value < totalSteps.value - 1);
-const currentStepLabel = computed(() => {
-  if (!totalSteps.value) return '0 / 0';
-  return `${currentStepIndex.value + 1} / ${totalSteps.value}`;
-});
+const progressLabel = computed(() =>
+  t('subtitleExercise.progress', {
+    current: totalSteps.value ? currentStepIndex.value + 1 : 0,
+    total: totalSteps.value,
+  })
+);
 
 watch(
   currentSentence,
@@ -202,6 +267,7 @@ watch(
       availableTokens.value = [];
       activeTokenId.value = null;
       checkState.value = 'idle';
+      emit('range-change', null);
       return;
     }
     const tokens = sentence.words.map((word) => ({ ...word }));
@@ -209,6 +275,7 @@ watch(
     availableTokens.value = shuffle(tokens);
     activeTokenId.value = null;
     checkState.value = 'idle';
+    emit('range-change', { start: sentence.start, end: sentence.end });
   },
   { immediate: true }
 );

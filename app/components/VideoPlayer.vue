@@ -50,7 +50,6 @@
         @loadedmetadata="onLoadedMetadata"
         @durationchange="onDurationChange"
         @play="onPlay"
-        @pause="onPause"
         @click="onVideoToggle"
         @touchend.passive="onVideoToggle"
       />
@@ -65,6 +64,7 @@
             :current-time="currentTime"
             :duration="duration"
             :volume="volume"
+            :hide-timeline="controlsHideTimeline"
             @toggle-play="togglePlay"
             @seek="seekToTime"
             @toggle-fullscreen="toggleFullscreen"
@@ -74,6 +74,7 @@
       </div>
 
       <button
+        v-if="!restrictedRange"
         :class="[
           'video-player__btn',
           'video-player__btn_prev',
@@ -100,6 +101,7 @@
         </svg>
       </button>
       <button
+        v-if="!restrictedRange"
         :class="[
           'video-player__btn',
           'video-player__btn_next',
@@ -201,11 +203,18 @@ type Token =
       type: 'separator';
     };
 
+interface PlaybackRange {
+  start: number;
+  end: number;
+}
+
 const props = defineProps<{
   src: string;
   subtitles?: SubtitleItem[] | null;
   lang?: 'ru' | 'en' | 'th';
   showAllLangs?: boolean;
+  restrictedRange?: PlaybackRange | null;
+  hideTimeline?: boolean;
 }>();
 
 const { locale } = useI18n();
@@ -222,6 +231,22 @@ const duration = ref(0);
 const isPlaying = ref(false);
 const volume = ref(1);
 
+const restrictedRange = computed<PlaybackRange | null>(() => {
+  const range = props.restrictedRange;
+  if (!range) return null;
+  const start = Number(range.start);
+  const end = Number(range.end);
+  if (!Number.isFinite(start) || !Number.isFinite(end)) return null;
+  const normalizedStart = Math.max(0, start);
+  const normalizedEnd = Math.max(0, end);
+  if (normalizedEnd <= normalizedStart) return null;
+  return { start: normalizedStart, end: normalizedEnd };
+});
+
+const controlsHideTimeline = computed(() => props.hideTimeline ?? !!restrictedRange.value);
+
+const RANGE_EPSILON = 0.05;
+const rangeEnded = ref(false);
 const controlsVisible = ref(false);
 let hideTimer: number | null = null;
 
@@ -403,12 +428,22 @@ const playWithCatch = (element: HTMLVideoElement) => {
   promise?.catch(() => undefined);
 };
 
+const clampToRange = (time: number) => {
+  const range = restrictedRange.value;
+  if (!range) return time;
+  if (time < range.start) return range.start;
+  if (time > range.end) return range.end;
+  return time;
+};
+
 const seekTo = (index: number) => {
   const el = videoRef.value;
   const s = normalizedSubtitles.value[index];
   if (!el || !s) return;
   const wasPlaying = !el.paused;
-  el.currentTime = Math.max(s.start + 0.01, 0);
+  const target = clampToRange(Math.max(s.start + 0.01, 0));
+  el.currentTime = target;
+  if (restrictedRange.value) rangeEnded.value = false;
   if (wasPlaying) {
     playWithCatch(el);
   } else {
@@ -420,12 +455,13 @@ const seekToTime = (time: number) => {
   const el = videoRef.value;
   if (!el) return;
   const wasPlaying = !el.paused;
-  el.currentTime = Math.max(0, Math.min(time, el.duration || Number.MAX_SAFE_INTEGER));
-  if (wasPlaying) {
-    playWithCatch(el);
-  } else {
-    el.pause();
-  }
+  const durationLimit = el.duration || Number.MAX_SAFE_INTEGER;
+  const limited = Math.max(0, Math.min(time, durationLimit));
+  const target = clampToRange(limited);
+  el.currentTime = target;
+  if (restrictedRange.value) rangeEnded.value = false;
+  if (wasPlaying) playWithCatch(el);
+  else el.pause();
 };
 
 const goPrev = () => {
@@ -502,6 +538,22 @@ const goNext = () => {
 
 const onTimeUpdate = (e: Event) => {
   const el = e.target as HTMLVideoElement;
+  if (restrictedRange.value) {
+    const { start, end } = restrictedRange.value;
+    if (el.currentTime < start - RANGE_EPSILON) {
+      el.currentTime = start;
+      currentTime.value = start;
+      rangeEnded.value = false;
+      return;
+    }
+    if (el.currentTime >= end - RANGE_EPSILON) {
+      el.currentTime = end;
+      currentTime.value = end;
+      if (!el.paused) el.pause();
+      rangeEnded.value = true;
+      return;
+    }
+  }
   currentTime.value = el.currentTime;
 };
 
@@ -519,6 +571,14 @@ const onDurationChange = () => {
 };
 
 const onPlay = () => {
+  const el = videoRef.value;
+  if (el && restrictedRange.value) {
+    const { start, end } = restrictedRange.value;
+    if (rangeEnded.value || el.currentTime < start || el.currentTime >= end) {
+      el.currentTime = start;
+      rangeEnded.value = false;
+    }
+  }
   isPlaying.value = true;
 };
 const onPause = () => {
@@ -529,6 +589,13 @@ const togglePlay = () => {
   const el = videoRef.value;
   if (!el) return;
   if (el.paused) {
+    if (restrictedRange.value) {
+      const { start, end } = restrictedRange.value;
+      if (rangeEnded.value || el.currentTime < start || el.currentTime >= end) {
+        el.currentTime = start;
+        rangeEnded.value = false;
+      }
+    }
     playWithCatch(el);
   } else el.pause();
 };
@@ -629,6 +696,15 @@ watch(
     lastSubtitle.value = null;
   }
 );
+
+watch(restrictedRange, (range) => {
+  const el = videoRef.value;
+  rangeEnded.value = false;
+  if (!el || !range) return;
+  el.currentTime = range.start;
+  el.pause();
+  isPlaying.value = false;
+});
 </script>
 
 <style scoped lang="scss">
