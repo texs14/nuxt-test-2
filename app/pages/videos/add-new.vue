@@ -148,7 +148,8 @@ const errorMessage = ref('');
 const videoName = computed(() => videoFile.value?.name ?? '');
 const subsName = computed(() => subtitlesFile.value?.name ?? '');
 
-type SubtitleText = { th?: string; en?: string; ru?: string };
+type ThaiSentences = { sentences: string[][] };
+type SubtitleText = { th?: string | ThaiSentences; en?: string; ru?: string };
 type SubtitleItem = {
   id?: number | string;
   start: number;
@@ -172,6 +173,113 @@ const tgStatus = ref<string>('');
 const tgError = ref<string>('');
 
 const editorSubtitles = ref<SubtitleItem[]>([]);
+
+function segmentThaiWords(text: string): string[] {
+  const normalized = text.replace(/\s+/gu, ' ').trim();
+  if (!normalized) return [];
+  const bySpace = normalized.split(' ').filter(Boolean);
+  if (bySpace.length > 1) return bySpace;
+  return [normalized];
+}
+
+function flattenThaiSentences(value: ThaiSentences | undefined): string {
+  if (!value || !Array.isArray(value.sentences)) return '';
+  return value.sentences
+    .map((sentence) =>
+      sentence
+        .map((word) => word.trim())
+        .filter(Boolean)
+        .join(' ')
+    )
+    .filter((sentence) => sentence.length > 0)
+    .join('   ');
+}
+function prepareThaiEditorValue(value: string | ThaiSentences | undefined): string {
+  if (!value) return '';
+  if (typeof value === 'object') return flattenThaiSentences(value);
+  return segmentThaiWords(value).join(' ');
+}
+
+function normalizeEditorSubtitles(items: SubtitleItem[]): SubtitleItem[] {
+  return items.map((item, index) => {
+    const baseText = typeof item.text === 'string' ? { ru: item.text } : { ...(item.text ?? {}) };
+    const thaiSource =
+      typeof item.text === 'string'
+        ? item.text
+        : (() => {
+            const th = baseText.th;
+            if (!th) return undefined;
+            if (typeof th === 'string') return th;
+            if (typeof th === 'object') return th as ThaiSentences;
+            return undefined;
+          })();
+    return {
+      ...item,
+      id: item.id ?? index + 1,
+      start: Number(item.start ?? 0),
+      end: Number(item.end ?? 0),
+      text: {
+        ...baseText,
+        th: prepareThaiEditorValue(thaiSource),
+      },
+    };
+  });
+}
+
+function buildThaiSentencesPayload(value: string | ThaiSentences | undefined): ThaiSentences {
+  if (!value) return { sentences: [] };
+  if (typeof value === 'object') {
+    return {
+      sentences: (value.sentences ?? [])
+        .map((sentence) => sentence.map((word) => word.trim()).filter(Boolean))
+        .filter((sentence) => sentence.length > 0),
+    };
+  }
+  const normalized = value
+    .replace(/\r?\n/gu, ' ')
+    .replace(/\u00A0/gu, ' ')
+    .trim();
+  if (!normalized) return { sentences: [] };
+  const rawSentences = normalized
+    .split(/(?:\s{3,}|\.)\s*/gu)
+    .map((sentence) => sentence.trim())
+    .filter(Boolean);
+  const sentences = rawSentences
+    .map((sentence) => {
+      if (sentence.includes(' ')) {
+        return sentence
+          .split(/\s+/gu)
+          .map((word) => word.trim())
+          .filter(Boolean);
+      }
+      return [sentence];
+    })
+    .filter((words) => words.length > 0);
+  return { sentences };
+}
+
+function buildSubtitlesPayload(items: SubtitleItem[]): SubtitleItem[] {
+  return items.map((item, index) => {
+    const text = typeof item.text === 'string' ? { ru: item.text } : { ...(item.text ?? {}) };
+    const thaiSource = (() => {
+      const th = text.th;
+      if (!th) return undefined;
+      if (typeof th === 'string') return th;
+      if (typeof th === 'object') return th as ThaiSentences;
+      return undefined;
+    })();
+    const thai = buildThaiSentencesPayload(thaiSource);
+    return {
+      id: item.id ?? index + 1,
+      start: Number(item.start ?? 0),
+      end: Number(item.end ?? 0),
+      text: {
+        ...text,
+        th: thai,
+      },
+    };
+  });
+}
 
 const title = ref<SubtitleText>({ th: '', ru: '', en: '' });
 const description = ref<SubtitleText>({ th: '', ru: '', en: '' });
@@ -209,7 +317,7 @@ async function loadExisting() {
       uploadedPreviewUrl.value = String(data.preview_url || '');
       const d = data.duration as any;
       durationSeconds.value = Number(d?.seconds ?? 0);
-      editorSubtitles.value = (data.subtitles as any[]) || [];
+      editorSubtitles.value = normalizeEditorSubtitles((data.subtitles as any[]) || []);
       // заголовки/описания/уровень
       const t = data.title;
       title.value = typeof t === 'object' ? (t as any) : { ru: String(t || '') };
@@ -238,7 +346,6 @@ function onVideoChange(e: Event) {
   serverMessage.value = '';
   errorMessage.value = '';
   if (videoFile.value) {
-    // eslint-disable-next-line no-void
     void uploadNow();
   }
 }
@@ -325,7 +432,7 @@ async function uploadNow() {
 }
 
 function onTgCompleted(segments: SubtitleItem[]) {
-  editorSubtitles.value = segments;
+  editorSubtitles.value = normalizeEditorSubtitles(segments);
 }
 
 function onMeta(e: Event) {
@@ -361,7 +468,7 @@ async function saveVideo() {
       if (!newId.value) throw new Error(t('videos.addNew.missingId'));
       const payload = {
         // Разрешаем редактировать субтитры и мету при необходимости
-        subtitles: editorSubtitles.value,
+        subtitles: buildSubtitlesPayload(editorSubtitles.value),
         title: title.value,
         description: description.value,
         level: level.value,
@@ -387,7 +494,7 @@ async function saveVideo() {
         level: level.value,
         video_url: uploadedVideoUrl.value,
         duration: { seconds: durationSeconds.value },
-        subtitles: editorSubtitles.value,
+        subtitles: buildSubtitlesPayload(editorSubtitles.value),
       };
       const res = await fetch('/api/video-items', {
         method: 'POST',

@@ -66,18 +66,22 @@
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import SubtitleSentenceExercise from '~/components/SubtitleSentenceExercise.vue';
-
 const route = useRoute();
 const supabase = useSupabaseClient();
 
 type Json = Record<string, any> | null;
 
+interface ThaiSentences {
+  sentences: string[][];
+}
+
 interface SubtitleText {
-  th?: string;
+  th?: string | ThaiSentences;
   en?: string;
   ru?: string;
-  [key: string]: string | undefined;
+  [key: string]: string | ThaiSentences | undefined;
 }
+
 interface SubtitleItem {
   id?: number | string;
   start: number;
@@ -161,13 +165,29 @@ const descriptionText = computed(() => {
 
 const subs = computed<SubtitleItem[]>(() => (video.value?.subtitles || []) as SubtitleItem[]);
 const showExercise = ref(false);
+const isThaiSentences = (value: any): value is ThaiSentences =>
+  value && typeof value === 'object' && Array.isArray(value.sentences);
+
+const hasThaiWords = (value: string | ThaiSentences | undefined): boolean => {
+  if (!value) return false;
+  if (typeof value === 'string') return value.trim().length > 0;
+  if (isThaiSentences(value)) {
+    return value.sentences?.some((sentence) =>
+      Array.isArray(sentence) && sentence.some((word) => Boolean(word && word.trim?.().length))
+    );
+  }
+  return false;
+};
+
 const canStartExercise = computed(() =>
-  subs.value.some((subtitle) => {
+  subs.value.some((subtitle: SubtitleItem) => {
     if (!subtitle?.text) return false;
     if (typeof subtitle.text === 'string') return subtitle.text.trim().length > 0;
     const textObject = subtitle.text as SubtitleText | undefined;
     const thaiText = textObject?.th ?? textObject?.['th-TH'] ?? textObject?.th_th;
-    return !!thaiText && thaiText.trim().length > 0;
+    return hasThaiWords(
+      thaiText as string | ThaiSentences | undefined
+    );
   })
 );
 

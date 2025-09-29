@@ -50,8 +50,6 @@ export default defineEventHandler(async (event) => {
         if (!Array.isArray(arr)) return;
         for (const seg of arr) {
           if (typeof seg?.text === 'string') seg.text = sanitizeThaiSpacing(seg.text);
-          if (typeof seg?.corrected_text === 'string')
-            seg.corrected_text = sanitizeThaiSpacing(seg.corrected_text);
         }
       };
 

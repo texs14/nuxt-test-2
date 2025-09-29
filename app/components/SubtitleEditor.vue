@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <section class="subtitle-editor">
     <header class="subtitle-editor__head">
       <h2 class="subtitle-editor__title">{{ t('editor.title') }}</h2>
@@ -54,7 +54,7 @@
             <span
               class="subtitle-editor__toggle_icon"
               :class="{ 'subtitle-editor__toggle_icon_open': expandedMap[row.id ?? idx] }"
-              >в–ѕ</span
+              >&ndash;</span
             >
           </button>
 
@@ -171,6 +171,48 @@ function sanitizeThaiSpacing(text: string): string {
   return out;
 }
 
+function segmentThaiWords(text: string): string[] {
+  const normalized = text.replace(/\s+/gu, ' ').trim();
+  if (!normalized) return [];
+
+  const words = normalized.split(' ').filter(Boolean);
+  if (words.length > 1) return words;
+
+  return [normalized];
+}
+
+function normalizeThaiEditorValue(text: string): string {
+  if (!text) return '';
+  const cleaned = text
+    .replace(/\r?\n/gu, ' ')
+    .replace(/\u00A0/gu, ' ')
+    .trim();
+  if (!cleaned) return '';
+
+  const rawSentences = cleaned
+    .split(/(?:\s{3,}|\.)\s*/gu)
+    .map((sentence) => sentence.trim())
+    .filter(Boolean);
+
+  const sentences = rawSentences.length ? rawSentences : [cleaned];
+
+  const prepared = sentences
+    .map((sentence) => {
+      if (!sentence) return '';
+      const words = sentence.includes(' ')
+        ? sentence
+            .split(/\s+/gu)
+            .map((word) => word.trim())
+            .filter(Boolean)
+        : segmentThaiWords(sentence);
+      return words.join(' ');
+    })
+    .filter(Boolean);
+
+  if (!prepared.length) return '';
+  return prepared.join('   ');
+}
+
 function addRow() {
   rows.value = [
     ...rows.value,
@@ -199,7 +241,8 @@ function onUpdateText(index: number, lang: 'th' | 'ru' | 'en', value: string) {
   const next = [...rows.value];
   const item = { ...next[index] };
   const t = item.text || {};
-  next[index] = { ...item, text: { ...t, [lang]: value } } as RequiredSubtitleItem;
+  const formattedValue = lang === 'th' ? normalizeThaiEditorValue(value) : value;
+  next[index] = { ...item, text: { ...t, [lang]: formattedValue } } as RequiredSubtitleItem;
   rows.value = next;
   emit('update:modelValue', rows.value);
 }
@@ -220,6 +263,33 @@ function onStartBlur() {
   rows.value = sorted;
   emit('update:modelValue', rows.value);
 }
+
+const a = {
+  id: 1,
+  end: 15.16,
+  text: {
+    en: 'Hello, friends',
+    ru: 'Здравствуйте, друзья',
+    th: 'สวัสดีครับเพื่อนๆ ก็ต้องขอยินดีตอนรับเพื่อนๆ',
+  },
+  start: 7.06,
+};
+
+const b = {
+  id: 1,
+  end: 15.16,
+  text: {
+    en: 'Hello, friends',
+    ru: 'Здравствуйте, друзья',
+    th: {
+      sentences: [
+        ['สวัสดี', 'ครับ', 'เพื่อนๆ'],
+        ['ก็', 'ต้อง', 'ขอ', 'ยินดี', 'ต้อนรับ', 'เพื่อนๆ'],
+      ],
+    },
+  },
+  start: 7.06,
+};
 </script>
 
 <style lang="scss" scoped>

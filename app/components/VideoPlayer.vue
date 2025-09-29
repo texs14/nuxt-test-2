@@ -164,11 +164,13 @@ import { useI18n } from 'vue-i18n';
 import InteractiveWord from './ui/InteractiveWord.vue';
 import VideoControls from './VideoControls.vue';
 
+type ThaiSentences = { sentences: string[][] };
+
 interface SubtitleText {
-  th?: string;
+  th?: string | ThaiSentences;
   en?: string;
   ru?: string;
-  [key: string]: string | undefined;
+  [key: string]: string | ThaiSentences | undefined;
 }
 
 interface SubtitleItem {
@@ -187,11 +189,17 @@ interface NormalizedSubtitle {
 
 type SubtitleSource = SubtitleItem | NormalizedSubtitle;
 
-type Token = {
-  id: string;
-  value: string;
-  type: 'word' | 'separator';
-};
+type Token =
+  | {
+      id: string;
+      value: string;
+      type: 'word';
+    }
+  | {
+      id: string;
+      value: string;
+      type: 'separator';
+    };
 
 const props = defineProps<{
   src: string;
@@ -260,12 +268,33 @@ const activeIndex = computed(() => {
 const activeSubtitle = computed(() => normalizedSubtitles.value[activeIndex.value] || null);
 
 const getTextForLocale = (s: SubtitleSource, code: 'ru' | 'en' | 'th') => {
+  if (code === 'th') return getThaiText(s);
   if (typeof s.text === 'string') return s.text;
-  return s.text?.[code] || '';
+  const value = s.text?.[code];
+  return typeof value === 'string' ? value : '';
 };
+const isThaiSentences = (value: any): value is ThaiSentences =>
+  value && typeof value === 'object' && Array.isArray(value.sentences);
+
 const getThaiText = (s: SubtitleSource) => {
   if (typeof s.text === 'string') return s.text;
-  return s.text?.th || '';
+  const th = s.text?.th;
+  if (!th) return '';
+  if (isThaiSentences(th)) {
+    return th.sentences
+      .map((sentence) => sentence.filter(Boolean).join(' '))
+      .filter(Boolean)
+      .join(' ');
+  }
+  return th;
+};
+
+const getThaiSentences = (s: SubtitleSource): string[][] => {
+  if (typeof s.text === 'string') return [[s.text]];
+  const th = s.text?.th;
+  if (!th) return [];
+  if (isThaiSentences(th)) return th.sentences ?? [];
+  return [String(th).trim()].filter(Boolean).map((value) => value.split(/\s+/u).filter(Boolean));
 };
 
 const getSelectedText = (s: SubtitleSource) => {
@@ -275,6 +304,9 @@ const getSelectedText = (s: SubtitleSource) => {
 
 const activeThaiText = computed(() =>
   activeSubtitle.value ? getThaiText(activeSubtitle.value) : ''
+);
+const activeThaiSentences = computed(() =>
+  activeSubtitle.value ? getThaiSentences(activeSubtitle.value) : []
 );
 const activeSelectedText = computed(() =>
   activeSubtitle.value ? getTextForLocale(activeSubtitle.value, selectedLocale.value) : ''
@@ -287,11 +319,17 @@ watch(activeSubtitle, (val: any) => {
 });
 
 const lastThaiText = computed(() => (lastSubtitle.value ? getThaiText(lastSubtitle.value) : ''));
+const lastThaiSentences = computed(() =>
+  lastSubtitle.value ? getThaiSentences(lastSubtitle.value) : []
+);
 const lastSelectedText = computed(() =>
   lastSubtitle.value ? getTextForLocale(lastSubtitle.value, selectedLocale.value) : ''
 );
 
 const currentThaiText = computed(() => activeThaiText.value || lastThaiText.value);
+const currentThaiSentences = computed(() =>
+  activeThaiSentences.value.length ? activeThaiSentences.value : lastThaiSentences.value
+);
 const currentSelectedText = computed(() => {
   if (selectedLocale.value === 'th') return '';
   return activeSelectedText.value || lastSelectedText.value;
@@ -300,34 +338,34 @@ const currentSelectedText = computed(() => {
 const hasAnySubtitle = computed(() => Boolean(currentThaiText.value || currentSelectedText.value));
 const showSecondary = computed(() => selectedLocale.value !== 'th');
 
-const segmenter = computed<Intl.Segmenter | null>(() => {
-  if (
-    typeof Intl !== 'undefined' &&
-    typeof (Intl as typeof Intl & { Segmenter?: typeof Intl.Segmenter }).Segmenter === 'function'
-  ) {
-    return new Intl.Segmenter('th', { granularity: 'word' });
-  }
-  return null;
-});
-
 const thaiTokens = computed<Token[]>(() => {
+  const sentences = currentThaiSentences.value;
+  if (sentences.length) {
+    const tokens: Token[] = [];
+    sentences.forEach((sentence: string[], sentenceIndex: number) => {
+      const filtered = sentence.filter((word) => Boolean(word && word.trim().length));
+      filtered.forEach((word: string, wordIndex: number) => {
+        const trimmed = word.trim();
+        if (!trimmed) return;
+        tokens.push({
+          id: `sentence-${sentenceIndex}-word-${wordIndex}`,
+          value: trimmed,
+          type: 'word',
+        });
+      });
+      if (sentenceIndex < sentences.length - 1) {
+        tokens.push({
+          id: `sentence-separator-${sentenceIndex}`,
+          value: '',
+          type: 'separator',
+        });
+      }
+    });
+    if (tokens.length) return tokens;
+  }
+
   const text = currentThaiText.value;
   if (!text) return [];
-
-  const seg = segmenter.value;
-  if (seg) {
-    const tokens: Token[] = [];
-    let index = 0;
-    for (const part of seg.segment(text)) {
-      tokens.push({
-        id: `${part.isWordLike ? 'word' : 'separator'}-${index}-${part.index}`,
-        value: part.segment,
-        type: part.isWordLike ? 'word' : 'separator',
-      });
-      index += 1;
-    }
-    return tokens;
-  }
 
   const fallbackParts = text.match(/(\p{L}+|\p{N}+|\s+|[^\p{L}\p{N}\s]+)/gu) ?? [text];
   return fallbackParts.map((value: any, idx: any) => ({
@@ -604,6 +642,10 @@ watch(
     aspect-ratio: 16/9;
   }
 
+  &__word-wrapper_separator {
+    margin: 0 4px;
+  }
+
   &__video {
     width: 100%;
     height: 100%;
@@ -702,7 +744,6 @@ watch(
     opacity: 0.9;
     margin-top: 4px;
   }
-
   &__track {
     margin-top: 12px;
     display: grid;

@@ -379,7 +379,7 @@ watch(isOpen, (value) => {
   &__word {
     background: none;
     border: none;
-    padding: 0 3px;
+    padding: 0;
     margin: 0;
     cursor: pointer;
     color: inherit;
