@@ -1,18 +1,18 @@
-﻿<template>
+<template>
   <nav class="navigation">
     <ul class="navigation__list">
       <li class="navigation__item">
-        <NuxtLink :to="localePath({ name: 'index' })" class="navigation__link">{{
+        <NuxtLink :to="safeLocalePath({ name: 'index' })" class="navigation__link">{{
           t('nav.home')
         }}</NuxtLink>
       </li>
       <li class="navigation__item">
-        <NuxtLink :to="localePath({ name: 'about' })" class="navigation__link">{{
+        <NuxtLink :to="safeLocalePath({ name: 'about' })" class="navigation__link">{{
           t('nav.about')
         }}</NuxtLink>
       </li>
       <li class="navigation__item">
-        <NuxtLink :to="localePath({ name: 'videos' })" class="navigation__link">{{
+        <NuxtLink :to="safeLocalePath({ name: 'videos' })" class="navigation__link">{{
           t('nav.videos')
         }}</NuxtLink>
       </li>
@@ -35,7 +35,7 @@
 
       <NuxtLink
         v-if="!isAuthenticated"
-        :to="localePath({ name: 'login' })"
+        :to="safeLocalePath({ name: 'login' })"
         class="navigation__button navigation__button_login"
       >
         {{ t('nav.login') }}
@@ -52,7 +52,7 @@ import { useRouter } from '#imports';
 
 const { t, locale } = useI18n();
 const switchLocalePath = useSwitchLocalePath();
-const localePath = useLocalePath();
+const safeLocalePath = useSafeLocalePath();
 const router = useRouter();
 const langSelectId = 'lang-select';
 const { user } = useAuth();

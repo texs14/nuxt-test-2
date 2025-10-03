@@ -1,0 +1,63 @@
+/**
+ * CSS переменные и миксины для видео плеера
+ */
+
+:root {
+  // Цвета контролов
+  --video-control-bg: rgba(22, 22, 22, 0.75);
+  --video-control-btn-bg: rgba(40, 40, 40, 0.7);
+  --video-control-border: rgba(255, 255, 255, 0.25);
+  --video-control-text: #fff;
+  --video-control-progress: #3b82f6;
+
+  // Размеры
+  --video-control-radius: 8px;
+  --video-control-padding: 6px 10px;
+  --video-wrapper-radius: 12px;
+
+  // Субтитры
+  --video-subtitle-bg: rgba(0, 0, 0, 0.65);
+  --video-subtitle-color: #fff;
+
+  // Треки субтитров
+  --video-cue-bg: #f6f6f6;
+  --video-cue-active-bg: #e9f2ff;
+  --video-cue-text: #111;
+  --video-cue-time: #666;
+}
+
+// Миксин для кнопок
+@mixin control-button {
+  appearance: none;
+  border: 1px solid var(--video-control-border);
+  background: var(--video-control-btn-bg);
+  color: var(--video-control-text);
+  padding: var(--video-control-padding);
+  border-radius: var(--video-control-radius);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: opacity 0.2s ease, background 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: rgba(50, 50, 50, 0.8);
+  }
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.4;
+  }
+}
+
+// Миксин для overlay
+@mixin overlay-fade {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+
+  &_visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}

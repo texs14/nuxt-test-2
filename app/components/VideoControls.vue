@@ -1,89 +1,26 @@
 <template>
-  <div :class="rootClasses" role="group" aria-label="РџР°РЅРµР»СЊ СѓРїСЂР°РІР»РµРЅРёСЏ РІРёРґРµРѕ">
-    <button
-      class="video-controls__btn video-controls__btn_play"
-      type="button"
-      :aria-label="playing ? 'РџР°СѓР·Р°' : 'РЎС‚Р°СЂС‚'"
-      @click="$emit('toggle-play')"
-    >
-      <span v-if="!playing">в–¶</span>
-      <span v-else>вЏё</span>
-    </button>
+  <div :class="rootClasses" role="group" aria-label="Панель управления видео">
+    <PlayButton :playing="playing" @toggle="$emit('toggle-play')" />
 
-    <div v-if="!hideTimeline" class="video-controls__time">
-      <span class="video-controls__time_current">{{ formatTime(currentTime) }}</span>
-      <div
-        ref="trackRef"
-        class="video-controls__track"
-        role="slider"
-        :aria-valuemin="0"
-        :aria-valuemax="duration"
-        :aria-valuenow="clampedTime"
-        tabindex="0"
-        @click="onTrackClick"
-        @mousedown.prevent="onDragStart"
-        @touchstart.prevent="onDragStartTouch"
-      >
-        <div class="video-controls__track_bar">
-          <div class="video-controls__track_progress" :style="{ width: progress + '%' }" />
-          <div class="video-controls__track_thumb" :style="{ left: progress + '%' }" />
-        </div>
-      </div>
-      <span class="video-controls__time_total">{{ formatTime(duration) }}</span>
-    </div>
+    <VideoTimeline
+      v-if="!hideTimeline"
+      :current-time="currentTime"
+      :duration="duration"
+      @seek="$emit('seek', $event)"
+    />
 
-    <div
-      class="video-controls__volume"
-      @mouseenter="onVolumeMouseEnter"
-      @mouseleave="onVolumeMouseLeave"
-    >
-      <button
-        type="button"
-        class="video-controls__volume_btn"
-        aria-label="Р“СЂРѕРјРєРѕСЃС‚СЊ"
-        @click="onVolumeToggleTouch"
-      >
-        <svg
-          class="video-controls__volume_icon"
-          width="18"
-          height="18"
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path d="M4 9v6h4l5 5V4L8 9H4z" fill="currentColor" />
-        </svg>
-      </button>
-      <div
-        class="video-controls__volume_popup"
-        :class="{ 'video-controls__volume_popup_visible': showVolume }"
-      >
-        <input
-          class="video-controls__volume_slider"
-          type="range"
-          min="0"
-          max="1"
-          step="0.01"
-          :value="volume"
-          aria-label="Р“СЂРѕРјРєРѕСЃС‚СЊ"
-          @input="onVolumeInput"
-        />
-      </div>
-    </div>
+    <VolumeControl :volume="volume" @set-volume="$emit('set-volume', $event)" />
 
-    <button
-      class="video-controls__btn video-controls__btn_fullscreen"
-      type="button"
-      aria-label="РќР° РІРµСЃСЊ СЌРєСЂР°РЅ"
-      @click="$emit('toggle-fullscreen')"
-    >
-      в›¶
-    </button>
+    <FullscreenButton @toggle="$emit('toggle-fullscreen')" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onBeforeUnmount } from 'vue';
+import { computed } from 'vue';
+import PlayButton from './VideoControls/PlayButton.vue';
+import VideoTimeline from './VideoControls/VideoTimeline.vue';
+import VolumeControl from './VideoControls/VolumeControl.vue';
+import FullscreenButton from './VideoControls/FullscreenButton.vue';
 
 const props = defineProps<{
   playing: boolean;
@@ -93,140 +30,18 @@ const props = defineProps<{
   hideTimeline?: boolean;
 }>();
 
-const emit = defineEmits<{
+defineEmits<{
   (e: 'toggle-play'): void;
   (e: 'seek', time: number): void;
   (e: 'toggle-fullscreen'): void;
   (e: 'set-volume', value: number): void;
 }>();
 
-const trackRef = ref<HTMLDivElement | null>(null);
 const hideTimeline = computed(() => Boolean(props.hideTimeline));
 const rootClasses = computed(() => ({
   'video-controls': true,
   'video-controls_timeline-hidden': hideTimeline.value,
 }));
-const clampedTime = computed(() =>
-  Math.max(0, Math.min(props.currentTime || 0, props.duration || 0))
-);
-const progress = computed(() => {
-  if (!props.duration) return 0;
-  return Math.min(100, Math.max(0, (clampedTime.value / props.duration) * 100));
-});
-
-const formatTime = (sec: number) => {
-  const s = Math.max(0, Math.floor(sec || 0));
-  const m = Math.floor(s / 60);
-  const r = s % 60;
-  return `${m}:${r.toString().padStart(2, '0')}`;
-};
-
-let isDragging = false;
-const onTrackClick = (e: MouseEvent) => {
-  if (!trackRef.value || !props.duration) return;
-  const rect = trackRef.value.getBoundingClientRect();
-  const ratio = (e.clientX - rect.left) / rect.width;
-  const t = Math.max(0, Math.min(props.duration, ratio * props.duration));
-  emit('seek', t);
-};
-
-const onDragStart = (e: MouseEvent) => {
-  if (!trackRef.value || !props.duration) return;
-  isDragging = true;
-  window.addEventListener('mousemove', onDragMove);
-  window.addEventListener('mouseup', onDragEnd);
-  onDragMove(e);
-};
-
-const onDragMove = (e: MouseEvent) => {
-  if (!isDragging || !trackRef.value || !props.duration) return;
-  const rect = trackRef.value.getBoundingClientRect();
-  const x = Math.max(rect.left, Math.min(e.clientX, rect.right));
-  const ratio = (x - rect.left) / rect.width;
-  emit('seek', ratio * props.duration);
-};
-
-const onDragEnd = () => {
-  isDragging = false;
-  window.removeEventListener('mousemove', onDragMove);
-  window.removeEventListener('mouseup', onDragEnd);
-};
-
-let touchId: number | null = null;
-const onDragStartTouch = (e: TouchEvent) => {
-  if (!trackRef.value || !props.duration) return;
-  const first = e.changedTouches && e.changedTouches.length > 0 ? e.changedTouches[0] : null;
-  if (!first) return;
-  touchId = first.identifier;
-  window.addEventListener('touchmove', onTouchMove, { passive: false });
-  window.addEventListener('touchend', onTouchEnd);
-  onTouchMove(e);
-};
-
-const onTouchMove = (e: TouchEvent) => {
-  if (touchId === null || !trackRef.value || !props.duration) return;
-  const t = Array.from(e.changedTouches).find((x) => x.identifier === touchId);
-  if (!t) return;
-  const rect = trackRef.value.getBoundingClientRect();
-  const x = Math.max(rect.left, Math.min(t.clientX, rect.right));
-  const ratio = (x - rect.left) / rect.width;
-  emit('seek', ratio * props.duration);
-};
-
-const onTouchEnd = () => {
-  touchId = null;
-  window.removeEventListener('touchmove', onTouchMove);
-  window.removeEventListener('touchend', onTouchEnd);
-};
-
-// Volume popup logic
-const showVolume = ref(false);
-let volumeHideTimer: number | null = null;
-
-const clearVolumeTimer = () => {
-  if (volumeHideTimer) {
-    window.clearTimeout(volumeHideTimer);
-    volumeHideTimer = null;
-  }
-};
-
-const onVolumeMouseEnter = () => {
-  showVolume.value = true;
-  clearVolumeTimer();
-};
-
-const onVolumeMouseLeave = () => {
-  clearVolumeTimer();
-  volumeHideTimer = window.setTimeout(() => {
-    showVolume.value = false;
-    volumeHideTimer = null;
-  }, 1000);
-};
-
-const onVolumeToggleTouch = () => {
-  // Toggle for touch devices; also works as click fallback
-  showVolume.value = !showVolume.value;
-  clearVolumeTimer();
-  if (showVolume.value) {
-    volumeHideTimer = window.setTimeout(() => {
-      showVolume.value = false;
-      volumeHideTimer = null;
-    }, 6000);
-  }
-};
-
-const onVolumeInput = (e: Event) => {
-  const target = e.target as HTMLInputElement | null;
-  if (!target) return;
-  const v = Number(target.value);
-  emit('set-volume', isNaN(v) ? 0 : v);
-};
-
-onBeforeUnmount(() => {
-  onDragEnd();
-  onTouchEnd();
-  clearVolumeTimer();
-});
 </script>
 
 <style scoped lang="scss">
@@ -360,7 +175,7 @@ onBeforeUnmount(() => {
   }
 
   &__root_timeline-hidden {
-    grid-template-columns: 1fr auto auto;
+    grid-template-columns: 3fr auto auto;
 
     .video-controls__btn_play {
       width: 100%;

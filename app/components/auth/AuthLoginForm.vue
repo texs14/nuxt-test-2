@@ -1,4 +1,4 @@
-﻿<!-- eslint-disable prettier/prettier -->
+<!-- eslint-disable prettier/prettier -->
 <template>
   <form class="auth-login" @submit.prevent="onSubmit">
     <div class="auth-login__field">
@@ -35,7 +35,7 @@
       >
         {{ t('auth.login.google') }}
       </button>
-      <NuxtLink class="auth-login__link" :to="localePath('/register')">{{
+      <NuxtLink v-if="registerLink !== '#'" class="auth-login__link" :to="registerLink">{{
         t('auth.login.register')
       }}</NuxtLink>
     </div>
@@ -49,7 +49,9 @@
 
 <script setup lang="ts">
 const { t } = useI18n();
-const localePath = useLocalePath();
+const safeLocalePath = useSafeLocalePath();
+
+const registerLink = computed(() => safeLocalePath('/register'));
 
 const email = ref('');
 const password = ref('');

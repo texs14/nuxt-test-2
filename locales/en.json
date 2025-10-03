@@ -117,5 +117,29 @@
     "save": "Save",
     "saving": "Saving...",
     "saved": "Saved (ID: {id})"
+  },
+  "dictionary": {
+    "empty": "Word not found",
+    "loading": "Loading...",
+    "error": "Loading error",
+    "translation": "Translation",
+    "synonyms": "Synonyms",
+    "antonyms": "Antonyms",
+    "examples": "Examples",
+    "links": "Links",
+    "addWord": "Add word",
+    "addWordForm": "Add word to dictionary",
+    "wordTh": "Word (Thai)",
+    "translationField": "Translation (comma separated)",
+    "transcriptionEn": "Transcription",
+    "synonymsField": "Synonyms (comma separated)",
+    "antonymsField": "Antonyms (comma separated)",
+    "examplesField": "Examples (JSON)",
+    "linksField": "Links (comma separated)",
+    "save": "Save",
+    "cancel": "Cancel",
+    "saving": "Saving...",
+    "saved": "Word successfully added",
+    "saveError": "Error saving word"
   }
 }

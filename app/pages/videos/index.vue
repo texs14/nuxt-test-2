@@ -2,7 +2,7 @@
   <section class="videos">
     <header class="videos__header">
       <h1 class="videos__title">{{ t('videos.title') }}</h1>
-      <NuxtLink :to="localePath({ name: 'videos-add-new' })" class="videos__add">{{
+      <NuxtLink v-if="addNewLink !== '#'" :to="addNewLink" class="videos__add">{{
         t('videos.add')
       }}</NuxtLink>
     </header>
@@ -38,7 +38,9 @@ interface VideoItem {
 
 const supabase = useSupabaseClient();
 const { t } = useI18n();
-const localePath = useLocalePath();
+const safeLocalePath = useSafeLocalePath();
+
+const addNewLink = computed(() => safeLocalePath({ name: 'videos-add-new' }));
 
 const {
   data: items,

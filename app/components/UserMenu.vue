@@ -1,19 +1,14 @@
-﻿<template>
+<template>
   <div ref="menuRef" class="user-menu">
     <button
       type="button"
       class="user-menu__trigger"
       :class="{ 'user-menu__trigger_state_open': isOpen }"
-      @click="toggleMenu"
       :aria-expanded="isOpen"
+      @click="toggleMenu"
     >
       <span class="user-menu__avatar">
-        <img
-          v-if="avatarUrl"
-          :src="avatarUrl"
-          :alt="displayName"
-          class="user-menu__avatar_image"
-        />
+        <img v-if="avatarUrl" :src="avatarUrl" :alt="displayName" class="user-menu__avatar_image" />
         <span v-else class="user-menu__avatar_placeholder">{{ initials }}</span>
       </span>
       <span class="user-menu__info">
@@ -25,7 +20,7 @@
 
     <div v-if="isOpen" class="user-menu__dropdown">
       <NuxtLink
-        :to="localePath({ name: 'profile' })"
+        :to="safeLocalePath({ name: 'profile' })"
         class="user-menu__item user-menu__item_type_link"
         @click="closeMenu"
       >
@@ -34,8 +29,8 @@
       <button
         type="button"
         class="user-menu__item user-menu__item_type_button"
-        @click="onLogout"
         :disabled="logoutLoading"
+        @click="onLogout"
       >
         {{ t('nav.logout') }}
       </button>
@@ -44,105 +39,109 @@
 </template>
 
 <script setup lang="ts">
-const { t } = useI18n()
-const router = useRouter()
-const route = useRoute()
-const localePath = useLocalePath()
-const { user, signOut } = useAuth()
-const { profile, fetchProfile } = useProfile()
+const { t } = useI18n();
+const router = useRouter();
+const route = useRoute();
+const safeLocalePath = useSafeLocalePath();
+const { user, signOut } = useAuth();
+const { profile, fetchProfile } = useProfile();
 
-const menuRef = ref<HTMLElement | null>(null)
-const isOpen = ref(false)
-const logoutLoading = ref(false)
+const menuRef = ref<HTMLElement | null>(null);
+const isOpen = ref(false);
+const logoutLoading = ref(false);
 
-const userEmail = computed(() => user.value?.email ?? null)
+const userEmail = computed(() => user.value?.email ?? null);
 
-const userMetadata = computed<Record<string, any>>(() => (user.value?.user_metadata as Record<string, any> | undefined) ?? {})
+const userMetadata = computed<Record<string, any>>(
+  () => (user.value?.user_metadata as Record<string, any> | undefined) ?? {}
+);
 
-const firstName = computed(() => profile.value?.first_name ?? userMetadata.value?.first_name ?? '')
-const lastName = computed(() => profile.value?.last_name ?? userMetadata.value?.last_name ?? '')
+const firstName = computed(() => profile.value?.first_name ?? userMetadata.value?.first_name ?? '');
+const lastName = computed(() => profile.value?.last_name ?? userMetadata.value?.last_name ?? '');
 
 const displayName = computed(() => {
-  const parts = [firstName.value, lastName.value].filter(Boolean)
+  const parts = [firstName.value, lastName.value].filter(Boolean);
   if (parts.length) {
-    return parts.join(' ')
+    return parts.join(' ');
   }
-  return user.value?.email ?? t('nav.user')
-})
+  return user.value?.email ?? t('nav.user');
+});
 
-const avatarUrl = computed(() => profile.value?.avatar_url ?? userMetadata.value?.avatar_url ?? null)
+const avatarUrl = computed(
+  () => profile.value?.avatar_url ?? userMetadata.value?.avatar_url ?? null
+);
 
 const initials = computed(() => {
-  const source = displayName.value
+  const source = displayName.value;
   if (!source) {
-    return '?'
+    return '?';
   }
-  const words = source.split(' ').filter(Boolean)
+  const words = source.split(' ').filter(Boolean);
   if (!words.length) {
-    return source.charAt(0).toUpperCase()
+    return source.charAt(0).toUpperCase();
   }
-  const first = words[0]
-  const second = words[1]
+  const first = words[0];
+  const second = words[1];
   if (!first) {
-    return '?'
+    return '?';
   }
   if (second) {
-    return `${first.charAt(0)}${second.charAt(0)}`.toUpperCase()
+    return `${first.charAt(0)}${second.charAt(0)}`.toUpperCase();
   }
-  return first.charAt(0).toUpperCase()
-})
+  return first.charAt(0).toUpperCase();
+});
 
 function toggleMenu() {
-  isOpen.value = !isOpen.value
+  isOpen.value = !isOpen.value;
 }
 
 function closeMenu() {
-  isOpen.value = false
+  isOpen.value = false;
 }
 
 async function onLogout() {
-  if (logoutLoading.value) return
-  logoutLoading.value = true
+  if (logoutLoading.value) return;
+  logoutLoading.value = true;
   try {
-    await signOut()
-    closeMenu()
-    await router.push(localePath({ name: 'index' }))
+    await signOut();
+    closeMenu();
+    await router.push(safeLocalePath({ name: 'index' }));
   } catch (error) {
-    console.error('Logout failed', error)
+    console.error('Logout failed', error);
   } finally {
-    logoutLoading.value = false
+    logoutLoading.value = false;
   }
 }
 
 function onDocumentClick(event: MouseEvent) {
-  const target = event.target as Node | null
-  if (!menuRef.value || !target) return
+  const target = event.target as Node | null;
+  if (!menuRef.value || !target) return;
   if (!menuRef.value.contains(target)) {
-    closeMenu()
+    closeMenu();
   }
 }
 
 onMounted(async () => {
   if (!profile.value) {
     try {
-      await fetchProfile()
+      await fetchProfile();
     } catch (error) {
-      console.error('Profile fetch failed', error)
+      console.error('Profile fetch failed', error);
     }
   }
-  document.addEventListener('click', onDocumentClick)
-})
+  document.addEventListener('click', onDocumentClick);
+});
 
 onBeforeUnmount(() => {
-  document.removeEventListener('click', onDocumentClick)
-})
+  document.removeEventListener('click', onDocumentClick);
+});
 
 watch(
   () => route.fullPath,
   () => {
-    closeMenu()
+    closeMenu();
   }
-)
+);
 </script>
 
 <style scoped lang="scss">
@@ -158,7 +157,9 @@ watch(
     border-radius: 9999px;
     background-color: #ffffff;
     cursor: pointer;
-    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    transition:
+      background-color 0.2s ease,
+      box-shadow 0.2s ease;
 
     &:hover {
       background-color: #f3f4f6;

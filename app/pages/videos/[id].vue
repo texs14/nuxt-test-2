@@ -1,8 +1,10 @@
 <template>
   <section class="video-page">
-    <div v-if="pendingVideo" class="video-page__state">Загрузка видео…</div>
+    <div v-if="pendingVideo || (!video && !loadingTimedOut)" class="video-page__state">
+      <div class="video-page__loader">Загрузка видео…</div>
+    </div>
     <div v-else-if="errorVideo" class="video-page__state">Ошибка: {{ errorVideo.message }}</div>
-    <div v-else-if="!video" class="video-page__state">Видео не найдено</div>
+    <div v-else-if="!video && loadingTimedOut" class="video-page__state">Видео не найдено</div>
 
     <template v-else>
       <header class="video-page__header">
@@ -69,7 +71,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, ref, watch, onBeforeUnmount } from 'vue';
 import { useI18n } from 'vue-i18n';
 import SubtitleSentenceExercise from '~/components/SubtitleSentenceExercise.vue';
 const route = useRoute();
@@ -177,6 +179,45 @@ const descriptionText = computed(() => {
 const subs = computed<SubtitleItem[]>(() => (video.value?.subtitles || []) as SubtitleItem[]);
 const showExercise = ref(false);
 const exerciseRange = ref<PlaybackRange | null>(null);
+
+const loadingTimedOut = ref(false);
+let loadingTimeout: ReturnType<typeof setTimeout> | null = null;
+
+function startLoadingTimeout() {
+  loadingTimedOut.value = false;
+  if (loadingTimeout) clearTimeout(loadingTimeout);
+  loadingTimeout = setTimeout(() => {
+    loadingTimedOut.value = true;
+  }, 30000);
+}
+
+function clearLoadingTimeout() {
+  if (loadingTimeout) {
+    clearTimeout(loadingTimeout);
+    loadingTimeout = null;
+  }
+  loadingTimedOut.value = false;
+}
+
+startLoadingTimeout();
+
+watch(pendingVideo, (isPending) => {
+  if (isPending) {
+    startLoadingTimeout();
+  } else {
+    clearLoadingTimeout();
+  }
+});
+
+watch(video, (newVideo) => {
+  if (newVideo) {
+    clearLoadingTimeout();
+  }
+});
+
+onBeforeUnmount(() => {
+  clearLoadingTimeout();
+});
 const isThaiSentences = (value: any): value is ThaiSentences =>
   value && typeof value === 'object' && Array.isArray(value.sentences);
 

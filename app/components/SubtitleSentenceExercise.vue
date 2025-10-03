@@ -2,7 +2,10 @@
   <div class="sentence-exercise">
     <header class="sentence-exercise__header">
       <h3 class="sentence-exercise__title">{{ t('subtitleExercise.title') }}</h3>
-      <span class="sentence-exercise__progress">{{ progressLabel }}</span>
+      <div class="sentence-exercise__progress-wrapper">
+        <span class="sentence-exercise__progress">{{ progressLabel }}</span>
+        <span class="sentence-exercise__completion">{{ completionLabel }}</span>
+      </div>
     </header>
 
     <div v-if="currentSentence" class="sentence-exercise__body">
@@ -10,13 +13,17 @@
         {{ t('subtitleExercise.instruction') }}
       </p>
 
-      <div class="sentence-exercise__slots">
+      <div v-if="isMounted" class="sentence-exercise__slots">
         <button
           v-for="slot in slots"
           :key="slot.index"
           class="sentence-exercise__slot"
-          :class="{ 'sentence-exercise__slot_filled': !!slot.token }"
-          :draggable="!!slot.token"
+          :class="{
+            'sentence-exercise__slot_filled': !!slot.token,
+            'sentence-exercise__slot_error': incorrectSlots.has(slot.index),
+          }"
+          :draggable="!!slot.token && !isInteractionBlocked"
+          :disabled="isInteractionBlocked"
           type="button"
           @click="handleSlotClick(slot.index)"
           @dragover.prevent
@@ -28,14 +35,15 @@
         </button>
       </div>
 
-      <div v-if="availableTokens.length" class="sentence-exercise__words">
+      <div v-if="isMounted && availableTokens.length" class="sentence-exercise__words">
         <button
           v-for="token in availableTokens"
           :key="token.id"
           class="sentence-exercise__word"
           :class="{ 'sentence-exercise__word_active': activeTokenId === token.id }"
           type="button"
-          draggable="true"
+          :draggable="!isInteractionBlocked"
+          :disabled="isInteractionBlocked"
           @dragstart="handleWordDragStart($event, token.id)"
           @dragend="handleWordDragEnd"
           @click="handleWordClick(token.id)"
@@ -43,12 +51,13 @@
           {{ token.text }}
         </button>
       </div>
-      <p v-else class="sentence-exercise__all_used">
+      <p v-else-if="isMounted" class="sentence-exercise__all_used">
         {{ t('subtitleExercise.allUsed') }}
       </p>
 
       <footer class="sentence-exercise__controls">
         <button
+          v-if="checkState === 'idle'"
           class="sentence-exercise__check"
           type="button"
           :disabled="!isReadyToCheck"
@@ -57,22 +66,25 @@
           {{ t('subtitleExercise.check') }}
         </button>
 
+        <!-- Упражнение завершено -->
         <button
-          v-if="checkState === 'success' && hasNextStep"
-          class="sentence-exercise__next"
-          type="button"
-          @click="goToNext"
-        >
-          {{ t('subtitleExercise.next') }}
-        </button>
-        <button
-          v-else-if="checkState === 'success' && !hasNextStep"
+          v-if="checkState === 'success' && !hasNextStep"
           class="sentence-exercise__finish"
           type="button"
           @click="restartExercise"
         >
           {{ t('subtitleExercise.restart') }}
         </button>
+
+        <!-- Первая неудачная попытка -->
+        <template v-if="checkState === 'error' && currentAttempt === 1">
+          <button class="sentence-exercise__retry" type="button" @click="handleRetry">
+            Попробовать ещё раз
+          </button>
+          <button class="sentence-exercise__continue" type="button" @click="handleContinue">
+            Продолжить
+          </button>
+        </template>
       </footer>
 
       <p
@@ -92,11 +104,40 @@
     <p v-else class="sentence-exercise__empty">
       {{ t('subtitleExercise.empty') }}
     </p>
+
+    <!-- История собранных предложений -->
+    <div v-if="history.length" class="sentence-exercise__history">
+      <h4 class="sentence-exercise__history-title">История собранных предложений</h4>
+      <div class="sentence-exercise__history-list">
+        <div
+          v-for="item in historyWithTranslation"
+          :key="item.sentenceId"
+          class="sentence-exercise__history-item"
+        >
+          <button
+            v-for="(word, idx) in item.userWords"
+            :key="idx"
+            class="sentence-exercise__history-word"
+            :class="{
+              'sentence-exercise__history-word_correct': word.isCorrect,
+              'sentence-exercise__history-word_error': !word.isCorrect,
+            }"
+            type="button"
+            disabled
+          >
+            {{ word.text }}
+          </button>
+          <p v-if="item.translation" class="sentence-exercise__history-translation">
+            {{ item.translation }}
+          </p>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, ref, watch, onMounted, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 interface ThaiSentences {
@@ -129,13 +170,86 @@ interface WordSlot {
   token: WordToken | null;
 }
 
-const props = defineProps<{ subtitles?: SubtitleItem[] | null }>();
+interface HistoryWord {
+  text: string;
+  isCorrect: boolean;
+}
+
+interface HistoryItem {
+  sentenceId: string;
+  userWords: HistoryWord[];
+  isCorrect: boolean;
+}
+
+const props = defineProps<{
+  subtitles?: SubtitleItem[] | null;
+  videoId?: string | number;
+}>();
 
 const emit = defineEmits<{
   (e: 'range-change', payload: { start: number; end: number } | null): void;
 }>();
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
+const STORAGE_KEY = computed(() => {
+  const videoId = props.videoId || 'default';
+  return `sentence-exercise-progress-${videoId}`;
+});
+
+const history = ref<HistoryItem[]>([]);
+
+const subtitleMap = computed(() => {
+  const result = new Map<string, SubtitleItem>();
+  (props.subtitles ?? []).forEach((item, index) => {
+    if (!item) return;
+    const key = `${item.id ?? index}`;
+    result.set(key, item);
+  });
+  return result;
+});
+
+function thaiSentencesToString(value: ThaiSentences | null): string {
+  if (!value) return '';
+  return value.sentences
+    .map((sentence) => (Array.isArray(sentence) ? sentence.filter(Boolean).join(' ') : ''))
+    .filter(Boolean)
+    .join(' ');
+}
+
+function extractTranslation(text: SubtitleItem['text'], localeCode: string): string {
+  if (!text) return '';
+  if (typeof text === 'string') {
+    return localeCode === 'th' ? text : '';
+  }
+
+  const textObject = text as SubtitleText;
+  const candidate = textObject[localeCode];
+
+  if (typeof candidate === 'string') {
+    return candidate;
+  }
+
+  if (localeCode === 'th' && isThaiSentences(candidate)) {
+    return thaiSentencesToString(candidate);
+  }
+
+  return '';
+}
+
+function getHistoryTranslation(sentenceId: string): string {
+  const subtitle = subtitleMap.value.get(sentenceId);
+  if (!subtitle) return '';
+  const localeCode = locale.value;
+  if (!localeCode) return '';
+  return extractTranslation(subtitle.text, localeCode);
+}
+
+const historyWithTranslation = computed(() =>
+  history.value.map((historyItem) => ({
+    ...historyItem,
+    translation: getHistoryTranslation(historyItem.sentenceId),
+  }))
+);
 
 const activeTokenId = ref<string | null>(null);
 const draggedTokenId = ref<string | null>(null);
@@ -144,6 +258,11 @@ const checkState = ref<'idle' | 'success' | 'error'>('idle');
 const currentStepIndex = ref(0);
 const slots = ref<WordSlot[]>([]);
 const availableTokens = ref<WordToken[]>([]);
+const currentAttempt = ref(1);
+const incorrectSlots = ref<Set<number>>(new Set());
+const completedSentences = ref<Set<string>>(new Set());
+const isInitialized = ref(false);
+const isMounted = ref(false);
 const thaiWordSegmenter =
   typeof Intl !== 'undefined' && typeof Intl.Segmenter === 'function'
     ? new Intl.Segmenter('th', { granularity: 'word' })
@@ -259,9 +378,76 @@ const progressLabel = computed(() =>
   })
 );
 
+const completionLabel = computed(() => {
+  const completed = completedSentences.value.size;
+  const remaining = totalSteps.value - completed;
+  return `Выполнено: ${completed} | Осталось: ${remaining}`;
+});
+
+const isInteractionBlocked = computed(
+  () => checkState.value === 'error' && currentAttempt.value === 1
+);
+
+// Загрузка прогресса из localStorage
+function loadProgress() {
+  if (typeof window === 'undefined') return;
+
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY.value);
+    if (saved) {
+      const data = JSON.parse(saved);
+      if (data.completedSentences) {
+        completedSentences.value = new Set(data.completedSentences);
+      }
+      if (data.history) {
+        history.value = data.history;
+      }
+      if (typeof data.currentStepIndex === 'number') {
+        currentStepIndex.value = data.currentStepIndex;
+      }
+    }
+  } catch {
+    // Игнорируем ошибки загрузки
+  }
+}
+
+// Сохранение прогресса в localStorage
+function saveProgress() {
+  if (typeof window === 'undefined') return;
+
+  try {
+    const data = {
+      completedSentences: Array.from(completedSentences.value),
+      history: history.value,
+      currentStepIndex: currentStepIndex.value,
+    };
+    localStorage.setItem(STORAGE_KEY.value, JSON.stringify(data));
+  } catch {
+    // Игнорируем ошибки сохранения
+  }
+}
+
+onMounted(async () => {
+  loadProgress();
+  isInitialized.value = true;
+  isMounted.value = true;
+  await nextTick();
+});
+
+// Перезагружаем прогресс при смене видео
+watch(
+  () => props.videoId,
+  () => {
+    if (isInitialized.value) {
+      loadProgress();
+    }
+  }
+);
+
 watch(
   currentSentence,
-  (sentence) => {
+  (sentence, oldSentence) => {
+    // Не сбрасываем состояние если просто изменился язык
     if (!sentence) {
       slots.value = [];
       availableTokens.value = [];
@@ -270,14 +456,33 @@ watch(
       emit('range-change', null);
       return;
     }
-    const tokens = sentence.words.map((word) => ({ ...word }));
-    slots.value = sentence.words.map((_, index) => ({ index, token: null }));
-    availableTokens.value = shuffle(tokens);
-    activeTokenId.value = null;
-    checkState.value = 'idle';
-    emit('range-change', { start: sentence.start, end: sentence.end });
+
+    // Проверяем, изменилось ли предложение
+    const sentenceChanged = !oldSentence || oldSentence.id !== sentence.id;
+
+    if (sentenceChanged) {
+      const tokens = sentence.words.map((word) => ({ ...word }));
+      slots.value = sentence.words.map((_, index) => ({ index, token: null }));
+      availableTokens.value = shuffle(tokens);
+      activeTokenId.value = null;
+      checkState.value = 'idle';
+      currentAttempt.value = 1;
+      incorrectSlots.value.clear();
+      emit('range-change', { start: sentence.start, end: sentence.end });
+    }
   },
   { immediate: true }
+);
+
+// Сохраняем прогресс при изменениях
+watch(
+  [completedSentences, history, currentStepIndex],
+  () => {
+    if (isInitialized.value) {
+      saveProgress();
+    }
+  },
+  { deep: true }
 );
 
 function shuffle(tokens: WordToken[]) {
@@ -410,7 +615,93 @@ function handleCheck() {
   const currentOrder = slots.value.map((slot) => slot.token?.text ?? '');
   const targetOrder = currentSentence.value.words.map((word) => word.text);
   const isCorrect = currentOrder.every((word, index) => word === targetOrder[index]);
+
+  // Отмечаем неправильные слоты
+  incorrectSlots.value.clear();
+  if (!isCorrect) {
+    slots.value.forEach((slot, index) => {
+      if (slot.token?.text !== targetOrder[index]) {
+        incorrectSlots.value.add(index);
+      }
+    });
+  }
+
   checkState.value = isCorrect ? 'success' : 'error';
+
+  // Добавляем в историю только если это успех
+  if (isCorrect) {
+    addToHistory(currentOrder, targetOrder, isCorrect);
+    completedSentences.value.add(currentSentence.value.id);
+
+    // Автоматически переходим к следующему предложению
+    setTimeout(() => {
+      if (hasNextStep.value) {
+        goToNext();
+      }
+    }, 1500);
+  }
+
+  // Если вторая попытка и ошибка - добавляем в историю и автоматически переходим к следующему
+  if (!isCorrect && currentAttempt.value === 2) {
+    addToHistory(currentOrder, targetOrder, isCorrect);
+    completedSentences.value.add(currentSentence.value.id);
+    setTimeout(() => {
+      if (hasNextStep.value) {
+        goToNext();
+      }
+    }, 1500);
+  }
+}
+
+function addToHistory(currentOrder: string[], targetOrder: string[], isCorrect: boolean) {
+  if (!currentSentence.value) return;
+
+  const userWords: HistoryWord[] = currentOrder.map((text, index) => ({
+    text,
+    isCorrect: text === targetOrder[index],
+  }));
+
+  // Удаляем предыдущую запись для этого предложения, если есть
+  const existingIndex = history.value.findIndex(
+    (item) => item.sentenceId === currentSentence.value!.id
+  );
+  if (existingIndex !== -1) {
+    history.value.splice(existingIndex, 1);
+  }
+
+  history.value.unshift({
+    sentenceId: currentSentence.value.id,
+    userWords,
+    isCorrect,
+  });
+}
+
+function handleRetry() {
+  // Сбрасываем предложение для повторной попытки
+  if (!currentSentence.value) return;
+
+  const tokens = currentSentence.value.words.map((word) => ({ ...word }));
+  slots.value = currentSentence.value.words.map((_, index) => ({ index, token: null }));
+  availableTokens.value = shuffle(tokens);
+  activeTokenId.value = null;
+  checkState.value = 'idle';
+  currentAttempt.value = 2;
+  incorrectSlots.value.clear();
+}
+
+function handleContinue() {
+  // Добавляем предложение с ошибкой в историю перед переходом к следующему
+  if (currentSentence.value && checkState.value === 'error') {
+    const currentOrder = slots.value.map((slot) => slot.token?.text ?? '');
+    const targetOrder = currentSentence.value.words.map((word) => word.text);
+    addToHistory(currentOrder, targetOrder, false);
+    completedSentences.value.add(currentSentence.value.id);
+  }
+
+  // Переходим к следующему предложению
+  if (hasNextStep.value) {
+    goToNext();
+  }
 }
 
 function goToNext() {
@@ -420,6 +711,30 @@ function goToNext() {
 
 function restartExercise() {
   currentStepIndex.value = 0;
+  completedSentences.value = new Set();
+  history.value = [];
+  activeTokenId.value = null;
+  draggedTokenId.value = null;
+  draggedFromSlotIndex.value = null;
+  checkState.value = 'idle';
+  currentAttempt.value = 1;
+  incorrectSlots.value.clear();
+
+  const firstSentence = sentences.value[0];
+  if (firstSentence) {
+    const tokens = firstSentence.words.map((word) => ({ ...word }));
+    slots.value = firstSentence.words.map((_, index) => ({ index, token: null }));
+    availableTokens.value = shuffle(tokens);
+    emit('range-change', { start: firstSentence.start, end: firstSentence.end });
+  } else {
+    slots.value = [];
+    availableTokens.value = [];
+    emit('range-change', null);
+  }
+
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem(STORAGE_KEY.value);
+  }
 }
 </script>
 
@@ -435,6 +750,13 @@ function restartExercise() {
     align-items: center;
   }
 
+  &__progress-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+  }
+
   &__title {
     margin: 0;
     font-size: 20px;
@@ -443,6 +765,12 @@ function restartExercise() {
   &__progress {
     font-size: 14px;
     color: #555;
+  }
+
+  &__completion {
+    font-size: 13px;
+    color: #2563eb;
+    font-weight: 600;
   }
 
   &__instruction {
@@ -476,6 +804,17 @@ function restartExercise() {
       border-style: solid;
       background: #e0f2fe;
     }
+
+    &_error {
+      background: #fee;
+      border-color: #dc2626;
+      color: #dc2626;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
   }
 
   &__slot_text {
@@ -508,6 +847,11 @@ function restartExercise() {
       border-color: #2563eb;
       background: #e0e7ff;
     }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
   }
 
   &__all_used {
@@ -522,7 +866,9 @@ function restartExercise() {
 
   &__check,
   &__next,
-  &__finish {
+  &__finish,
+  &__retry,
+  &__continue {
     padding: 8px 16px;
     border: none;
     border-radius: 10px;
@@ -540,6 +886,75 @@ function restartExercise() {
   &__next,
   &__finish {
     background: #0ea5e9;
+  }
+
+  &__retry {
+    background: #f59e0b;
+  }
+
+  &__continue {
+    background: #10b981;
+  }
+
+  &__history {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 20px;
+  }
+
+  &__history-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+  }
+
+  &__history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  &__history-item {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  &__history-word {
+    min-width: 60px;
+    min-height: 44px;
+    padding: 6px 12px;
+    border: 2px solid #cbd5f5;
+    border-radius: 10px;
+    background: #f8fbff;
+    font-size: 18px;
+    cursor: not-allowed;
+    opacity: 0.7;
+
+    &_correct {
+      border-color: #16a34a;
+      background: #dcfce7;
+      color: #000;
+    }
+
+    &_error {
+      border-color: #dc2626;
+      background: #fee;
+      color: #dc2626;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+    }
+  }
+
+  &__history-translation {
+    width: 100%;
+    margin: 4px 0 0;
+    font-size: 16px;
+    color: #1f2937;
   }
 
   &__feedback {
