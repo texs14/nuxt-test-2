@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <span ref="triggerRef" class="interactive-word">
     <button
       class="interactive-word__word"
@@ -14,10 +14,19 @@
         <div v-if="isOpen" ref="popupRef" class="interactive-word__popup" :style="popupStyle">
           <div v-if="state === 'loaded' && entry" class="interactive-word__popup_content">
             <header class="interactive-word__popup_header">
-              <h3 class="interactive-word__popup_title">{{ entry.word_th }}</h3>
-              <p v-if="entry.transcription_en" class="interactive-word__popup_transcription">
-                {{ entry.transcription_en }}
-              </p>
+              <div class="interactive-word__popup_header-content">
+                <h3 class="interactive-word__popup_title">{{ entry.word_th }}</h3>
+                <p v-if="entry.transcription_en" class="interactive-word__popup_transcription">
+                  {{ entry.transcription_en }}
+                </p>
+              </div>
+              <button
+                class="interactive-word__popup_edit-btn"
+                type="button"
+                @click.stop="onOpenEditDialog"
+              >
+                {{ t('dictionary.editWord') }}
+              </button>
             </header>
 
             <section class="interactive-word__popup_section">
@@ -82,11 +91,26 @@
           </div>
 
           <div v-else class="interactive-word__popup_state">
-            {{ t('dictionary.empty') }}
+            <p class="interactive-word__popup_empty">{{ t('dictionary.empty') }}</p>
+            <button
+              class="interactive-word__popup_add-btn"
+              type="button"
+              @click.stop="onOpenAddDialog"
+            >
+              {{ t('dictionary.addWord') }}
+            </button>
           </div>
         </div>
       </Transition>
     </Teleport>
+
+    <AddWordDialog
+      :is-open="isAddDialogOpen"
+      :word="props.word"
+      :edit-id="editId"
+      @close="onCloseAddDialog"
+      @saved="onWordSaved"
+    />
   </span>
 </template>
 
@@ -95,6 +119,7 @@ import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useSupabaseClient } from '#imports';
 import type { Database, Json } from '~~/types/supabase';
+import AddWordDialog from '~/components/ui/AddWordDialog.vue';
 
 const props = defineProps<{ word: string }>();
 
@@ -172,6 +197,8 @@ const positionKey = ref(0);
 const isOpen = ref(false);
 const state = ref<'idle' | 'loading' | 'loaded' | 'not-found' | 'error'>('idle');
 const entry = ref<DictionaryEntry | null>(null);
+const isAddDialogOpen = ref(false);
+const editId = ref<number | null>(null);
 
 const { t } = useI18n();
 
@@ -353,6 +380,34 @@ const formatExample = (value: DictionaryExample | Json) => {
   return uniqueParts.join(' — ');
 };
 
+const onOpenAddDialog = () => {
+  editId.value = null;
+  isAddDialogOpen.value = true;
+};
+
+const onOpenEditDialog = () => {
+  if (entry.value?.id) {
+    editId.value = entry.value.id;
+    isAddDialogOpen.value = true;
+  }
+};
+
+const onCloseAddDialog = () => {
+  isAddDialogOpen.value = false;
+  editId.value = null;
+};
+
+const onWordSaved = async () => {
+  const normalizedWord = props.word.trim();
+  delete cache.value[normalizedWord];
+
+  isAddDialogOpen.value = false;
+  closePopup();
+
+  await nextTick();
+  await onToggle();
+};
+
 onBeforeUnmount(() => {
   if (!process.client) return;
   document.removeEventListener('click', onClickOutside);
@@ -444,8 +499,16 @@ watch(isOpen, (value) => {
   }
 
   &__popup_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  &__popup_header-content {
     display: grid;
     gap: 4px;
+    flex: 1;
   }
 
   &__popup_title {
@@ -458,6 +521,23 @@ watch(isOpen, (value) => {
     margin: 0;
     opacity: 0.8;
     font-size: 14px;
+  }
+
+  &__popup_edit-btn {
+    padding: 6px 12px;
+    background-color: #5bb5ff;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    white-space: nowrap;
+
+    &:hover {
+      background-color: #3b9ae1;
+    }
   }
 
   &__popup_section {
@@ -490,6 +570,30 @@ watch(isOpen, (value) => {
     font-size: 14px;
     text-align: center;
     opacity: 0.85;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+  }
+
+  &__popup_empty {
+    margin: 0;
+  }
+
+  &__popup_add-btn {
+    padding: 8px 16px;
+    background-color: #5bb5ff;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: #3b9ae1;
+    }
   }
 }
 </style>

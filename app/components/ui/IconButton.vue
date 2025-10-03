@@ -35,7 +35,9 @@ defineEmits<{
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: opacity 0.2s ease, background 0.2s ease;
+  transition:
+    opacity 0.2s ease,
+    background 0.2s ease;
 
   &:hover:not(:disabled) {
     background: rgba(50, 50, 50, 0.8);

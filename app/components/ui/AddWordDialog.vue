@@ -4,7 +4,9 @@
       <div v-if="isOpen" class="dialog-overlay" @click.self="onClose">
         <div class="dialog">
           <header class="dialog__header">
-            <h2 class="dialog__title">{{ t('dictionary.addWordForm') }}</h2>
+            <h2 class="dialog__title">
+              {{ editId ? t('dictionary.editWordForm') : t('dictionary.addWordForm') }}
+            </h2>
             <button class="dialog__close" type="button" @click="onClose">×</button>
           </header>
 
@@ -120,7 +122,11 @@
               >
                 {{ t('dictionary.cancel') }}
               </button>
-              <button class="dialog__button dialog__button_primary" type="submit" :disabled="isSaving">
+              <button
+                class="dialog__button dialog__button_primary"
+                type="submit"
+                :disabled="isSaving"
+              >
                 {{ isSaving ? t('dictionary.saving') : t('dictionary.save') }}
               </button>
             </div>
@@ -140,6 +146,7 @@ import type { Database } from '~~/types/supabase';
 const props = defineProps<{
   isOpen: boolean;
   word?: string;
+  editId?: number | null;
 }>();
 
 const emit = defineEmits<{
@@ -161,7 +168,21 @@ const form = ref({
 });
 
 const isSaving = ref(false);
+const isLoading = ref(false);
 const error = ref('');
+
+const formatArrayToString = (arr: string[] | null | undefined): string => {
+  return Array.isArray(arr) ? arr.join(', ') : '';
+};
+
+const formatExamplesToString = (examples: unknown): string => {
+  if (!examples) return '';
+  try {
+    return JSON.stringify(examples, null, 2);
+  } catch {
+    return '';
+  }
+};
 
 const resetForm = () => {
   form.value = {
@@ -176,11 +197,48 @@ const resetForm = () => {
   error.value = '';
 };
 
+const loadWordData = async () => {
+  if (!props.editId) return;
+
+  isLoading.value = true;
+  error.value = '';
+
+  try {
+    const { data, error: loadError } = await client
+      .from('dictionary')
+      .select('*')
+      .eq('id', props.editId)
+      .single();
+
+    if (loadError) throw loadError;
+
+    if (data) {
+      form.value = {
+        word_th: (data as { word_th?: string | null }).word_th || '',
+        translation: formatArrayToString((data as { translation?: string[] | null }).translation),
+        transcription_en: (data as { transcription_en?: string | null }).transcription_en || '',
+        synonyms: formatArrayToString((data as { synonyms?: string[] | null }).synonyms),
+        antonyms: formatArrayToString((data as { antonyms?: string[] | null }).antonyms),
+        links: formatArrayToString((data as { links?: string[] | null }).links),
+        examples: formatExamplesToString((data as { examples?: unknown }).examples),
+      };
+    }
+  } catch (err) {
+    error.value = err instanceof Error ? err.message : t('dictionary.error');
+  } finally {
+    isLoading.value = false;
+  }
+};
+
 watch(
   () => props.isOpen,
-  (value) => {
+  async (value) => {
     if (value) {
-      resetForm();
+      if (props.editId) {
+        await loadWordData();
+      } else {
+        resetForm();
+      }
     }
   }
 );
@@ -188,8 +246,17 @@ watch(
 watch(
   () => props.word,
   (value) => {
-    if (props.isOpen && value) {
+    if (props.isOpen && value && !props.editId) {
       form.value.word_th = value;
+    }
+  }
+);
+
+watch(
+  () => props.editId,
+  async (value) => {
+    if (props.isOpen && value) {
+      await loadWordData();
     }
   }
 );
@@ -216,8 +283,7 @@ const onSubmit = async () => {
 
   try {
     const examples = parseExamples(form.value.examples);
-
-    const { error: saveError } = await client.from('dictionary').insert({
+    const payload = {
       word_th: form.value.word_th.trim(),
       translation: parseArray(form.value.translation),
       transcription_en: form.value.transcription_en.trim() || null,
@@ -225,7 +291,17 @@ const onSubmit = async () => {
       antonyms: parseArray(form.value.antonyms),
       links: parseArray(form.value.links),
       examples: examples as never,
-    });
+    };
+
+    let saveError;
+
+    if (props.editId) {
+      const result = await client.from('dictionary').update(payload).eq('id', props.editId);
+      saveError = result.error;
+    } else {
+      const result = await client.from('dictionary').insert(payload);
+      saveError = result.error;
+    }
 
     if (saveError) {
       throw saveError;
