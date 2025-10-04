@@ -14,9 +14,14 @@
       </p>
 
       <div v-if="isMounted" class="click-exercise__result">
-        <div v-for="slot in collectedSlots" :key="slot.index" class="click-exercise__result-slot">
-          {{ slot.text }}
-        </div>
+        <template v-if="collectedSlots.length > 0">
+          <div v-for="slot in collectedSlots" :key="slot.index" class="click-exercise__result-slot">
+            {{ slot.text }}
+          </div>
+        </template>
+        <template v-else>
+          {{ t('clickExercise.resultEmpty') }}
+        </template>
       </div>
 
       <div v-if="isMounted && availableWords.length" class="click-exercise__words">

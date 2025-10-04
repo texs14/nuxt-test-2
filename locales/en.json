@@ -26,6 +26,7 @@
     "edit": "Edit",
     "exercise": {
       "start": "Start exercise",
+      "startPage": "Go to exercise page",
       "hintNoThai": "Thai subtitles are required for the exercise."
     },
     "addNew": {
@@ -75,7 +76,10 @@
     "feedbackSuccess": "Excellent! Sentence completed correctly!",
     "empty": "No available sentences for the exercise",
     "progress": "Sentence: {current} of {total}",
-    "completion": "Completed: {completed} | Remaining: {remaining}"
+    "completion": "Completed: {completed} | Remaining: {remaining}",
+    "playAgain": "Play again",
+    "playSlowly": "Play slowly",
+    "resultEmpty": "Click on the word to select it"
   },
   "editor": {
     "title": "Subtitle editor",

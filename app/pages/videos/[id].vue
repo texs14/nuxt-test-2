@@ -10,6 +10,9 @@
       <header class="video-page__header">
         <h1 class="video-page__title">{{ titleText }}</h1>
         <span v-if="video?.level" class="video-page__level">{{ video.level }}</span>
+        <NuxtLink v-if="canStartExercise" :to="exerciseLink" class="video-page__exercise-link">
+          {{ t('videos.exercise.startPage') }}
+        </NuxtLink>
         <NuxtLink :to="editLink" class="video-page__edit">{{ t('videos.edit') }}</NuxtLink>
       </header>
 
@@ -23,28 +26,6 @@
       />
 
       <p v-if="descriptionText" class="video-page__description">{{ descriptionText }}</p>
-
-      <section class="video-page__exercise">
-        <button
-          v-if="!showExercise"
-          class="video-page__exercise_button"
-          type="button"
-          :disabled="!canStartExercise"
-          @click="startExercise"
-        >
-          {{ t('videos.exercise.start') }}
-        </button>
-
-        <SubtitleClickExercise
-          v-if="showExercise"
-          :subtitles="subs"
-          @range-change="handleExerciseRangeChange"
-        />
-
-        <p v-if="!canStartExercise" class="video-page__exercise_hint">
-          {{ t('videos.exercise.hintNoThai') }}
-        </p>
-      </section>
 
       <section class="video-page__comments">
         <h2 class="video-page__comments_title">{{ t('comments.title') }}</h2>
@@ -115,6 +96,9 @@ const idParam = computed(() => route.params.id as string);
 const localePath = useLocalePath();
 const editLink = computed(() =>
   localePath({ name: 'videos-add-new', query: { editId: idParam.value } })
+);
+const exerciseLink = computed(() =>
+  localePath({ name: 'videos-exercise-id', params: { id: idParam.value } })
 );
 
 const {
@@ -282,8 +266,23 @@ watch(showExercise, (value) => {
     font-size: 12px;
   }
 
-  &__edit {
+  &__exercise-link {
     margin-left: auto;
+    padding: 8px 16px;
+    border-radius: 8px;
+    background: #16a34a;
+    color: #fff;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    transition: background 0.2s ease;
+
+    &:hover {
+      background: #15803d;
+    }
+  }
+
+  &__edit {
     padding: 6px 10px;
     border-radius: 8px;
     background: #2563eb;
