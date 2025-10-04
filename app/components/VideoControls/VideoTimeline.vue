@@ -13,7 +13,7 @@
       tabindex="0"
       @click="onTrackClick"
       @mousedown.prevent="onDragStart"
-      @touchstart.prevent="onDragStartTouch"
+      @touchstart.passive="onDragStartTouch"
     >
       <div class="video-timeline__track_bar">
         <div class="video-timeline__track_progress" :style="{ width: progress + '%' }" />

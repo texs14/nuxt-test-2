@@ -47,6 +47,7 @@
       </div>
 
       <SubtitleNavigationButtons
+        v-if="showNavigationButtons"
         :has-prev="navigation.hasPrev.value"
         :has-next="navigation.hasNext.value"
         :visible="controlsAutoHide.visible.value"
@@ -93,6 +94,7 @@ const props = defineProps<{
   showAllLangs?: boolean;
   restrictedRange?: PlaybackRange | null;
   hideTimeline?: boolean;
+  hideNavigationButtons?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -112,6 +114,10 @@ const selectedLocale = computed<Locale>(() => {
   return 'ru';
 });
 const showAllLangs = computed(() => !!props.showAllLangs);
+const showNavigationButtons = computed(() => {
+  if (props.hideNavigationButtons) return false;
+  return normalization.normalizedSubtitles.value.length > 0;
+});
 
 // Composables
 const playback = useVideoPlayback(videoRef);

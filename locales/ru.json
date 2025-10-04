@@ -6,11 +6,13 @@
     "home": "Главная",
     "about": "О проекте",
     "videos": "Видео",
+    "lessons": "Уроки",
     "vocabulary": "Мой словарь",
     "login": "Войти",
     "logout": "Выйти",
     "profile": "Профиль",
-    "user": "Пользователь"
+    "user": "Пользователь",
+    "lessons": "Уроки"
   },
   "lang": {
     "english": "Английский",
@@ -183,5 +185,64 @@
     "ageRequired": "Укажите возраст",
     "checkEmail": "Проверьте почту и перейдите по ссылке для входа",
     "error": "Ошибка регистрации"
+  },
+  "lessons": {
+    "title": "Уроки",
+    "addNew": "Добавить урок",
+    "empty": "Список уроков пуст",
+    "loading": "Загрузка уроков...",
+    "error": "Ошибка загрузки уроков",
+    "addNewPage": {
+      "titleEdit": "Редактировать урок",
+      "titleCreate": "Создать новый урок",
+      "headEdit": "Редактировать урок",
+      "headCreate": "Создать урок",
+      "videoLabel": "Видео файл",
+      "subtitlesLabel": "Субтитры (опционально)",
+      "selected": "Выбрано: {name}",
+      "autoHint": "Видео будет автоматически обработано после загрузки",
+      "uploadButton": "Загрузить",
+      "uploadingButton": "Загрузка...",
+      "uploadAgain": "Загрузить ещё раз",
+      "loadError": "Ошибка загрузки",
+      "uploadError": "Ошибка загрузки",
+      "networkError": "Сетевая ошибка",
+      "emptyResponse": "Пустой ответ",
+      "missingId": "Отсутствует ID",
+      "missingVideoUrl": "Отсутствует URL видео",
+      "saveError": "Ошибка сохранения",
+      "updateFailed": "Не удалось обновить",
+      "saveFailed": "Не удалось сохранить"
+    },
+    "detail": {
+      "loading": "Загрузка урока…",
+      "error": "Ошибка: {message}",
+      "notFound": "Урок не найден",
+      "backToList": "Назад к урокам",
+      "description": "Описание",
+      "startExercise": "Начать упражнение",
+      "commentsTitle": "Комментарии",
+      "commentPlaceholder": "Напишите комментарий...",
+      "submitting": "Отправка...",
+      "submit": "Отправить",
+      "loginPrompt": "Войдите",
+      "loginPromptSuffix": ", чтобы оставить комментарий",
+      "commentsLoading": "Загрузка комментариев...",
+      "commentsError": "Ошибка загрузки комментариев",
+      "commentsEmpty": "Пока нет комментариев",
+      "anonymous": "Аноним",
+      "commentError": "Ошибка отправки комментария: {error}",
+      "title": "Урок"
+    },
+    "exercise": {
+      "loading": "Загрузка урока…",
+      "error": "Ошибка: {message}",
+      "notFound": "Урок не найден",
+      "backToLesson": "Назад к уроку",
+      "title": "Упражнение"
+    }
+  },
+  "common": {
+    "loading": "Загрузка..."
   }
 }

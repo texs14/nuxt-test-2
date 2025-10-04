@@ -44,6 +44,7 @@ export const useTimelineDrag = (
 
   const onTouchMove = (e: TouchEvent) => {
     if (touchId === null || !trackRef.value || !duration.value) return;
+    e.preventDefault(); // Предотвращаем скролл во время перетаскивания
     const t = Array.from(e.changedTouches).find((x) => x.identifier === touchId);
     if (!t) return;
     const rect = trackRef.value.getBoundingClientRect();
@@ -63,9 +64,14 @@ export const useTimelineDrag = (
     const first = e.changedTouches && e.changedTouches.length > 0 ? e.changedTouches[0] : null;
     if (!first) return;
     touchId = first.identifier;
+    // touchmove с passive: false позволяет вызывать preventDefault
     window.addEventListener('touchmove', onTouchMove, { passive: false });
     window.addEventListener('touchend', onTouchEnd);
-    onTouchMove(e);
+    // Сразу обновляем позицию
+    const rect = trackRef.value.getBoundingClientRect();
+    const x = Math.max(rect.left, Math.min(first.clientX, rect.right));
+    const ratio = (x - rect.left) / rect.width;
+    onSeek(ratio * duration.value);
   };
 
   onBeforeUnmount(() => {

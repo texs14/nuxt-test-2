@@ -10,7 +10,8 @@
     "login": "Sign in",
     "logout": "Log out",
     "profile": "Profile",
-    "user": "User"
+    "user": "User",
+    "lessons": "Lessons"
   },
   "lang": {
     "english": "English",
@@ -183,5 +184,61 @@
     "ageRequired": "Please specify your age",
     "checkEmail": "Check your email and follow the link to sign in",
     "error": "Registration error"
+  },
+  "lessons": {
+    "title": "Lessons",
+    "addNew": "Add lesson",
+    "empty": "No lessons found",
+    "loading": "Loading lessons...",
+    "error": "Error loading lessons",
+    "addNewPage": {
+      "titleEdit": "Edit lesson",
+      "titleCreate": "Create new lesson",
+      "headEdit": "Edit lesson",
+      "headCreate": "Create lesson",
+      "videoLabel": "Video file",
+      "subtitlesLabel": "Subtitles (optional)",
+      "selected": "Selected: {name}",
+      "autoHint": "Video will be automatically processed after upload",
+      "uploadButton": "Upload",
+      "uploadingButton": "Uploading...",
+      "uploadAgain": "Upload again",
+      "loadError": "Loading error",
+      "uploadError": "Upload error",
+      "networkError": "Network error",
+      "emptyResponse": "Empty response",
+      "missingId": "Missing ID",
+      "missingVideoUrl": "Missing video URL",
+      "saveError": "Save error",
+      "updateFailed": "Update failed",
+      "saveFailed": "Save failed"
+    },
+    "detail": {
+      "loading": "Loading lesson…",
+      "error": "Error: {message}",
+      "notFound": "Lesson not found",
+      "backToList": "Back to lessons",
+      "description": "Description",
+      "startExercise": "Start exercise",
+      "commentsTitle": "Comments",
+      "commentPlaceholder": "Write a comment...",
+      "submitting": "Submitting...",
+      "submit": "Submit",
+      "loginPrompt": "Sign in",
+      "loginPromptSuffix": " to leave a comment",
+      "commentsLoading": "Loading comments...",
+      "commentsError": "Error loading comments",
+      "commentsEmpty": "No comments yet",
+      "anonymous": "Anonymous",
+      "commentError": "Comment submission error: {error}",
+      "title": "Lesson"
+    },
+    "exercise": {
+      "loading": "Loading lesson…",
+      "error": "Error: {message}",
+      "notFound": "Lesson not found",
+      "backToLesson": "Back to lesson",
+      "title": "Exercise"
+    }
   }
 }

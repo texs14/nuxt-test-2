@@ -1,17 +1,17 @@
 <template>
-  <section class="video-upload-form">
-    <h1 class="video-upload-form__title">
-      {{ isEditMode ? t('videos.addNew.titleEdit') : t('videos.addNew.titleCreate') }}
+  <section class="lesson-upload-form">
+    <h1 class="lesson-upload-form__title">
+      {{ isEditMode ? t('lessons.addNewPage.titleEdit') : t('lessons.addNewPage.titleCreate') }}
     </h1>
 
-    <form v-if="!isEditMode" class="video-upload-form__form" @submit.prevent="handleSubmit">
-      <div class="video-upload-form__field">
-        <label class="video-upload-form__label" for="video">
-          {{ t('videos.addNew.videoLabel') }}
-        </label>
+    <form v-if="!isEditMode" class="lesson-upload-form__form" @submit.prevent="handleSubmit">
+      <div class="lesson-upload-form__field">
+        <label class="lesson-upload-form__label" for="video">{{
+          t('lessons.addNewPage.videoLabel')
+        }}</label>
         <input
           id="video"
-          class="video-upload-form__input"
+          class="lesson-upload-form__input"
           type="file"
           name="video"
           accept="video/*"
@@ -19,35 +19,33 @@
           required
           @change="onVideoChange"
         />
-        <p v-if="videoName" class="video-upload-form__hint">
-          {{ t('videos.addNew.selected', { name: videoName }) }}
+        <p v-if="videoName" class="lesson-upload-form__hint">
+          {{ t('lessons.addNewPage.selected', { name: videoName }) }}
         </p>
-        <p class="video-upload-form__hint">
-          {{ t('videos.addNew.autoHint') }}
-        </p>
+        <p class="lesson-upload-form__hint">{{ t('lessons.addNewPage.autoHint') }}</p>
       </div>
 
-      <div class="video-upload-form__field">
-        <label class="video-upload-form__label" for="subtitles">
-          {{ t('videos.addNew.subtitlesLabel') }}
+      <div class="lesson-upload-form__field">
+        <label class="lesson-upload-form__label" for="subtitles">
+          {{ t('lessons.addNewPage.subtitlesLabel') }}
         </label>
         <input
           id="subtitles"
-          class="video-upload-form__input"
+          class="lesson-upload-form__input"
           type="file"
           name="subtitles"
           accept=".srt,.vtt"
           :disabled="isUploading"
           @change="onSubtitlesChange"
         />
-        <p v-if="subsName" class="video-upload-form__hint">
-          {{ t('videos.addNew.selected', { name: subsName }) }}
+        <p v-if="subsName" class="lesson-upload-form__hint">
+          {{ t('lessons.addNewPage.selected', { name: subsName }) }}
         </p>
       </div>
 
-      <div class="video-upload-form__actions">
+      <div class="lesson-upload-form__actions">
         <button
-          class="video-upload-form__button"
+          class="lesson-upload-form__button"
           type="submit"
           :disabled="!videoFile || isUploading"
         >
@@ -55,34 +53,21 @@
         </button>
       </div>
 
-      <div v-if="isUploading" class="video-upload-form__progress">
-        <div class="video-upload-form__progress-bar" :style="{ width: uploadProgress + '%' }"></div>
-        <span class="video-upload-form__progress-text">{{ Math.floor(uploadProgress) }}%</span>
+      <div v-if="isUploading" class="lesson-upload-form__progress">
+        <div
+          class="lesson-upload-form__progress-bar"
+          :style="{ width: uploadProgress + '%' }"
+        ></div>
+        <span class="lesson-upload-form__progress-text">{{ Math.floor(uploadProgress) }}%</span>
       </div>
 
-      <div v-if="serverMessage" class="video-upload-form__status">
-        <h2 class="video-upload-form__status-title">{{ t('videos.addNew.serverResponse') }}</h2>
-        <pre class="video-upload-form__status-body">{{ serverMessage }}</pre>
-      </div>
-
-      <p v-if="errorMessage" class="video-upload-form__error">{{ errorMessage }}</p>
+      <p v-if="errorMessage" class="lesson-upload-form__error">{{ errorMessage }}</p>
     </form>
 
-    <section v-if="uploadedVideoUrl" class="video-upload-form__preview">
-      <h2 class="video-upload-form__subtitle">{{ t('videos.addNew.preview') }}</h2>
-
-      <div class="video-upload-form__lang">
-        <label class="video-upload-form__label">{{ t('videos.addNew.subtitleLang') }}</label>
-        <select v-model="selectedLang" class="video-upload-form__input">
-          <option value="th">{{ t('lang.thai') }}</option>
-          <option value="ru">{{ t('lang.russian') }}</option>
-          <option value="en">{{ t('lang.english') }}</option>
-        </select>
-      </div>
-
+    <section v-if="uploadedVideoUrl" class="lesson-upload-form__preview">
       <VideoPlayer
         :key="uploadedVideoUrl"
-        class="video-upload-form__player"
+        class="lesson-upload-form__player"
         :src="uploadedVideoUrl"
         :subtitles="editorSubtitles"
         :lang="selectedLang"
@@ -90,7 +75,6 @@
       />
     </section>
 
-    <!-- скрытый видеотег для вычисления длительности -->
     <video
       v-if="uploadedVideoUrl"
       :key="uploadedVideoUrl + '-meta'"
@@ -99,21 +83,12 @@
       @loadedmetadata="onMeta"
     />
 
-    <TranscriptionLoader
-      v-if="transgateJobId"
-      class="video-upload-form__tg"
-      :job-id="transgateJobId"
-      @completed="onTgCompleted"
-      @status="(val: string) => (tgStatus = val)"
-      @error="(val: string) => (tgError = val)"
-    />
-
-    <section class="video-upload-form__editor">
-      <SubtitleEditor v-model="editorSubtitles" />
+    <section class="lesson-upload-form__editor">
+      <LessonExerciseEditor v-model="exercises" />
     </section>
 
     <VideoMetaForm
-      class="video-upload-form__meta"
+      class="lesson-upload-form__meta"
       :title="title"
       :description="description"
       :level="level"
@@ -125,23 +100,19 @@
       @update:title="onUpdateTitle"
       @update:description="onUpdateDescription"
       @update:level="onUpdateLevel"
-      @save="saveVideo"
+      @save="saveLesson"
     />
   </section>
 </template>
+
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
 import { useHead, useRoute, useSupabaseClient } from '#imports';
 import { useI18n } from 'vue-i18n';
-import type {
-  SubtitleItem as RawSubtitleItem,
-  SubtitleText as RawSubtitleText,
-  ThaiSentences,
-} from '@/types/video.types';
-
-const WEBHOOK_URL = '/api/webhook-upload';
 
 const { t } = useI18n();
+
+const WEBHOOK_URL = '/api/webhook-upload';
 
 const videoFile = ref<File | null>(null);
 const subtitlesFile = ref<File | null>(null);
@@ -153,13 +124,14 @@ const errorMessage = ref('');
 const videoName = computed(() => videoFile.value?.name ?? '');
 const subsName = computed(() => subtitlesFile.value?.name ?? '');
 
-type EditorSubtitleText = { th?: string; en?: string; ru?: string };
-type LocaleText = { th?: string; ru?: string; en?: string };
-type EditorSubtitleItem = {
+type ThaiSentences = { sentences: string[][] };
+type SubtitleText = { th?: string | ThaiSentences; en?: string; ru?: string };
+type LocaleText = { th?: string; en?: string; ru?: string };
+type SubtitleItem = {
   id?: number | string;
   start: number;
   end: number;
-  text?: EditorSubtitleText | string;
+  text?: SubtitleText | string;
 };
 
 const selectedLang = ref<'ru' | 'en' | 'th'>('th');
@@ -167,17 +139,23 @@ const route = useRoute();
 const supabase = useSupabaseClient();
 const editId = computed(() => (route.query.editId ? String(route.query.editId) : ''));
 const isEditMode = computed(() => !!editId.value);
+
 useHead(() => ({
-  title: isEditMode.value ? t('videos.addNew.headEdit') : t('videos.addNew.headCreate'),
+  title: isEditMode.value ? t('lessons.addNewPage.headEdit') : t('lessons.addNewPage.headCreate'),
 }));
+
 const uploadedVideoUrl = ref<string>('');
 const uploadedAudioUrl = ref<string>('');
 const uploadedPreviewUrl = ref<string>('');
-const transgateJobId = ref<string>('');
-const tgStatus = ref<string>('');
-const tgError = ref<string>('');
+const editorSubtitles = ref<SubtitleItem[]>([]);
 
-const editorSubtitles = ref<EditorSubtitleItem[]>([]);
+interface ExerciseItem {
+  th: string;
+  ru: string;
+  en: string;
+}
+
+const exercises = ref<ExerciseItem[]>([]);
 
 function segmentThaiWords(text: string): string[] {
   const normalized = text.replace(/\s+/gu, ' ').trim();
@@ -199,35 +177,34 @@ function flattenThaiSentences(value: ThaiSentences | undefined): string {
     .filter((sentence) => sentence.length > 0)
     .join('   ');
 }
+
 function prepareThaiEditorValue(value: string | ThaiSentences | undefined): string {
   if (!value) return '';
   if (typeof value === 'object') return flattenThaiSentences(value);
   return segmentThaiWords(value).join(' ');
 }
 
-function normalizeEditorSubtitles(items: RawSubtitleItem[]): EditorSubtitleItem[] {
+function normalizeEditorSubtitles(items: SubtitleItem[]): SubtitleItem[] {
   return items.map((item, index) => {
-    const baseText =
+    const baseText = typeof item.text === 'string' ? { ru: item.text } : { ...(item.text ?? {}) };
+    const thaiSource =
       typeof item.text === 'string'
-        ? ({ ru: item.text } as RawSubtitleText)
-        : ({ ...(item.text ?? {}) } as RawSubtitleText);
-
-    const thaiSource = (() => {
-      const th = baseText.th;
-      if (!th) return undefined;
-      if (typeof th === 'string') return th;
-      if (typeof th === 'object') return th as ThaiSentences;
-      return undefined;
-    })();
-
+        ? item.text
+        : (() => {
+            const th = baseText.th;
+            if (!th) return undefined;
+            if (typeof th === 'string') return th;
+            if (typeof th === 'object') return th as ThaiSentences;
+            return undefined;
+          })();
     return {
+      ...item,
       id: item.id ?? index + 1,
       start: Number(item.start ?? 0),
       end: Number(item.end ?? 0),
       text: {
+        ...baseText,
         th: prepareThaiEditorValue(thaiSource),
-        ru: baseText.ru ? normalizeLocaleField(baseText.ru) : '',
-        en: baseText.en ? normalizeLocaleField(baseText.en) : '',
       },
     };
   });
@@ -265,10 +242,9 @@ function buildThaiSentencesPayload(value: string | ThaiSentences | undefined): T
   return { sentences };
 }
 
-function buildSubtitlesPayload(items: EditorSubtitleItem[]): RawSubtitleItem[] {
+function buildSubtitlesPayload(items: SubtitleItem[]): SubtitleItem[] {
   return items.map((item, index) => {
-    const text: EditorSubtitleText =
-      typeof item.text === 'string' ? { ru: item.text } : { ...(item.text ?? {}) };
+    const text = typeof item.text === 'string' ? { ru: item.text } : { ...(item.text ?? {}) };
     const thaiSource = (() => {
       const th = text.th;
       if (!th) return undefined;
@@ -276,15 +252,15 @@ function buildSubtitlesPayload(items: EditorSubtitleItem[]): RawSubtitleItem[] {
       if (typeof th === 'object') return th as ThaiSentences;
       return undefined;
     })();
-
+    const thai = buildThaiSentencesPayload(thaiSource);
     return {
       id: item.id ?? index + 1,
       start: Number(item.start ?? 0),
       end: Number(item.end ?? 0),
       text: {
         ...text,
-        th: buildThaiSentencesPayload(thaiSource),
-      } as RawSubtitleText,
+        th: thai,
+      },
     };
   });
 }
@@ -292,8 +268,8 @@ function buildSubtitlesPayload(items: EditorSubtitleItem[]): RawSubtitleItem[] {
 function normalizeLocaleField(value: unknown): string {
   if (!value) return '';
   if (typeof value === 'string') return value;
-  if (typeof value === 'object' && value !== null && 'sentences' in value) {
-    return prepareThaiEditorValue(value as ThaiSentences);
+  if (typeof value === 'object' && 'sentences' in (value as Record<string, unknown>)) {
+    return flattenThaiSentences(value as ThaiSentences);
   }
   return String(value ?? '');
 }
@@ -304,7 +280,7 @@ function normalizeLocaleText(value: unknown): LocaleText {
     const str = String(value);
     return { th: '', ru: str, en: '' };
   }
-  if (typeof value === 'object' && value !== null) {
+  if (typeof value === 'object') {
     const obj = value as Record<'th' | 'ru' | 'en', unknown>;
     return {
       th: obj.th ? normalizeLocaleField(obj.th) : '',
@@ -330,7 +306,7 @@ const loadingExisting = ref(false);
 const loadError = ref('');
 
 const uploadButtonText = computed(() =>
-  isUploading.value ? t('videos.addNew.submitUploading') : t('videos.addNew.submitAgain')
+  isUploading.value ? t('lessons.addNewPage.uploadingButton') : t('lessons.addNewPage.uploadAgain')
 );
 
 async function loadExisting() {
@@ -339,8 +315,10 @@ async function loadExisting() {
   loadError.value = '';
   try {
     const res = await supabase
-      .from('video_items')
-      .select('id, title, description, level, video_url, preview_url, duration, subtitles')
+      .from('lesson_items')
+      .select(
+        'id, title, description, level, video_url, preview_url, duration, subtitles, exercises'
+      )
       .eq('id', editId.value)
       .maybeSingle();
     if (res.error) throw res.error;
@@ -352,15 +330,15 @@ async function loadExisting() {
       const d = data.duration as any;
       durationSeconds.value = Number(d?.seconds ?? 0);
       editorSubtitles.value = normalizeEditorSubtitles((data.subtitles as any[]) || []);
-      // заголовки/описания/уровень
-      const t = data.title;
-      title.value = normalizeLocaleText(t);
+      exercises.value = (data.exercises as ExerciseItem[]) || [];
+      const titleData = data.title;
+      title.value = normalizeLocaleText(titleData);
       const desc = data.description;
       description.value = normalizeLocaleText(desc);
       level.value = String(data.level || 'A1');
     }
   } catch (e: any) {
-    loadError.value = e?.message || t('videos.addNew.loadError');
+    loadError.value = e?.message || t('lessons.addNewPage.loadError');
   } finally {
     loadingExisting.value = false;
   }
@@ -432,7 +410,7 @@ function uploadWithProgress(formData: FormData): Promise<string> {
 
     xhr.onerror = () => {
       isUploading.value = false;
-      reject(new Error(t('videos.addNew.networkError')));
+      reject(new Error(t('lessons.addNewPage.networkError')));
     };
 
     isUploading.value = true;
@@ -447,26 +425,19 @@ async function uploadNow() {
   try {
     const fd = buildFormData();
     const respText = await uploadWithProgress(fd);
-    serverMessage.value = respText || t('videos.addNew.emptyResponse');
+    serverMessage.value = respText || t('lessons.addNewPage.emptyResponse');
     try {
       const data = JSON.parse(respText);
       if (data?.video?.url) uploadedVideoUrl.value = data.video.url;
       if (data?.audio?.url) uploadedAudioUrl.value = data.audio.url;
       if (data?.preview?.url) uploadedPreviewUrl.value = data.preview.url;
-      if (data?.transgate?.job_id) {
-        transgateJobId.value = String(data.transgate.job_id);
-      }
       if (!newId.value) newId.value = genId();
     } catch {}
   } catch (e: any) {
-    errorMessage.value = e?.message || t('videos.addNew.uploadError');
+    errorMessage.value = e?.message || t('lessons.addNewPage.uploadError');
   } finally {
     isUploading.value = false;
   }
-}
-
-function onTgCompleted(segments: RawSubtitleItem[]) {
-  editorSubtitles.value = normalizeEditorSubtitles(segments);
 }
 
 function onMeta(e: Event) {
@@ -478,7 +449,7 @@ function genId(): string {
   try {
     return crypto.randomUUID();
   } catch {
-    return 'vid_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+    return 'lesson_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
   }
 }
 
@@ -492,33 +463,32 @@ function onUpdateLevel(v: string) {
   level.value = v;
 }
 
-async function saveVideo() {
+async function saveLesson() {
   saveError.value = '';
   saveOk.value = false;
   saving.value = true;
   try {
     if (isEditMode.value) {
-      if (!newId.value) throw new Error(t('videos.addNew.missingId'));
+      if (!newId.value) throw new Error(t('lessons.addNewPage.missingId'));
       const payload = {
-        // Разрешаем редактировать субтитры и мету при необходимости
         subtitles: buildSubtitlesPayload(editorSubtitles.value),
+        exercises: exercises.value,
         title: title.value,
         description: description.value,
         level: level.value,
       };
-      const res = await fetch(`/api/video-items/${encodeURIComponent(String(newId.value))}`, {
+      const res = await fetch(`/api/lesson-items/${encodeURIComponent(String(newId.value))}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
       const json = await res.json();
-      if (!res.ok) throw new Error(json?.error || `Update failed (${res.status})`);
+      if (!res.ok) throw new Error(json?.error || t('lessons.addNewPage.updateFailed'));
       saveOk.value = true;
       saveId.value = json?.id || newId.value;
-      // Обновляем локальное состояние из БД, чтобы сразу отобразить нормализованные данные
       await loadExisting();
     } else {
-      if (!uploadedVideoUrl.value) throw new Error(t('videos.addNew.missingVideoUrl'));
+      if (!uploadedVideoUrl.value) throw new Error(t('lessons.addNewPage.missingVideoUrl'));
       const payload = {
         id: newId.value || genId(),
         preview_url: uploadedPreviewUrl.value,
@@ -528,19 +498,20 @@ async function saveVideo() {
         video_url: uploadedVideoUrl.value,
         duration: { seconds: durationSeconds.value },
         subtitles: buildSubtitlesPayload(editorSubtitles.value),
+        exercises: exercises.value,
       };
-      const res = await fetch('/api/video-items', {
+      const res = await fetch('/api/lesson-items', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
       const json = await res.json();
-      if (!res.ok) throw new Error(json?.error || `Save failed (${res.status})`);
+      if (!res.ok) throw new Error(json?.error || t('lessons.addNewPage.saveFailed'));
       saveOk.value = true;
       saveId.value = json?.id;
     }
   } catch (e: any) {
-    saveError.value = e?.message || t('videos.addNew.saveError');
+    saveError.value = e?.message || t('lessons.addNewPage.saveError');
   } finally {
     saving.value = false;
   }
@@ -548,7 +519,7 @@ async function saveVideo() {
 </script>
 
 <style scoped>
-.video-upload-form {
+.lesson-upload-form {
   max-width: 1024px;
   margin: 24px auto;
   background: #ffffff;
@@ -557,46 +528,46 @@ async function saveVideo() {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
 }
 
-.video-upload-form__title {
+.lesson-upload-form__title {
   font-size: 24px;
   font-weight: 700;
   margin: 0 0 16px;
 }
 
-.video-upload-form__form {
+.lesson-upload-form__form {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-.video-upload-form__field {
+.lesson-upload-form__field {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.video-upload-form__label {
+.lesson-upload-form__label {
   font-weight: 600;
 }
 
-.video-upload-form__input[type='file'] {
+.lesson-upload-form__input[type='file'] {
   padding: 10px;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
   background: #fafafa;
 }
 
-.video-upload-form__hint {
+.lesson-upload-form__hint {
   color: #6b7280;
   font-size: 12px;
 }
 
-.video-upload-form__actions {
+.lesson-upload-form__actions {
   display: flex;
   gap: 12px;
 }
 
-.video-upload-form__button {
+.lesson-upload-form__button {
   appearance: none;
   border: none;
   background: #2563eb;
@@ -606,12 +577,12 @@ async function saveVideo() {
   cursor: pointer;
 }
 
-.video-upload-form__button:disabled {
+.lesson-upload-form__button:disabled {
   background: #93c5fd;
   cursor: not-allowed;
 }
 
-.video-upload-form__progress {
+.lesson-upload-form__progress {
   position: relative;
   height: 12px;
   background: #e5e7eb;
@@ -619,7 +590,7 @@ async function saveVideo() {
   overflow: hidden;
 }
 
-.video-upload-form__progress-bar {
+.lesson-upload-form__progress-bar {
   position: absolute;
   left: 0;
   top: 0;
@@ -629,27 +600,27 @@ async function saveVideo() {
   transition: width 0.2s ease;
 }
 
-.video-upload-form__progress-text {
+.lesson-upload-form__progress-text {
   display: block;
   margin-top: 6px;
   font-size: 12px;
   color: #374151;
 }
 
-.video-upload-form__status {
+.lesson-upload-form__status {
   background: #f9fafb;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
   padding: 12px;
 }
 
-.video-upload-form__status-title {
+.lesson-upload-form__status-title {
   margin: 0 0 8px;
   font-size: 16px;
   font-weight: 600;
 }
 
-.video-upload-form__status-body {
+.lesson-upload-form__status-body {
   margin: 0;
   white-space: pre-wrap;
   font-family:
@@ -658,7 +629,7 @@ async function saveVideo() {
   font-size: 12px;
 }
 
-.video-upload-form__error {
+.lesson-upload-form__error {
   color: #b91c1c;
   background: #fef2f2;
   border: 1px solid #fecaca;
@@ -666,46 +637,30 @@ async function saveVideo() {
   border-radius: 8px;
 }
 
-.video-upload-form__subtitle {
+.lesson-upload-form__subtitle {
   font-size: 18px;
   margin: 16px 0 8px;
 }
-.video-upload-form__preview {
+
+.lesson-upload-form__preview {
   margin-top: 12px;
 }
-.video-upload-form__player {
+
+.lesson-upload-form__player {
   margin-top: 8px;
 }
-.video-upload-form__tg {
+
+.lesson-upload-form__editor {
   margin-top: 16px;
 }
-.video-upload-form__editor {
+
+.lesson-upload-form__meta {
   margin-top: 16px;
 }
-.video-upload-form__meta {
-  margin-top: 16px;
-}
-.video-upload-form__grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-.video-upload-form__textarea {
-  padding: 10px;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  background: #fafafa;
-}
-.video-upload-form__lang {
+
+.lesson-upload-form__lang {
   display: flex;
   gap: 8px;
   align-items: center;
-}
-.video-upload-form__error {
-  color: #b91c1c;
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  padding: 10px;
-  border-radius: 8px;
 }
 </style>

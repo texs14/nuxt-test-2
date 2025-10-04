@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <section class="tg-loader">
     <div class="tg-loader__spinner" aria-hidden="true"></div>
     <div class="tg-loader__info">
@@ -11,6 +11,7 @@
 
 <script setup lang="ts">
 import { onMounted, onBeforeUnmount, ref, watch, computed } from 'vue';
+import type { SubtitleItem } from '@/types/video.types';
 
 interface RawSegment {
   start_time?: string;
@@ -19,18 +20,6 @@ interface RawSegment {
   end?: string;
   text?: string;
   corrected_text?: string;
-}
-
-interface SubtitleText {
-  th?: string;
-  ru?: string;
-  en?: string;
-}
-interface SubtitleItem {
-  id?: number | string;
-  start: number;
-  end: number;
-  text?: SubtitleText | string;
 }
 
 const props = defineProps<{ jobId: string; intervalMs?: number }>();
@@ -70,7 +59,6 @@ function normalizeSegments(arr: RawSegment[]): SubtitleItem[] {
 }
 
 async function poll() {
-  if (!props.jobId) return;
   try {
     const res = await fetch(`/api/transgate/${encodeURIComponent(props.jobId)}`);
     const json = await res.json();
