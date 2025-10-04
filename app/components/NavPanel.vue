@@ -16,6 +16,11 @@
           t('nav.videos')
         }}</NuxtLink>
       </li>
+      <li v-if="isAuthenticated" class="navigation__item">
+        <NuxtLink :to="safeLocalePath({ name: 'vocabulary' })" class="navigation__link">{{
+          t('nav.vocabulary')
+        }}</NuxtLink>
+      </li>
     </ul>
 
     <div class="navigation__actions">

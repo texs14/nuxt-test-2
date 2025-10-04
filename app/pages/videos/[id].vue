@@ -9,12 +9,12 @@
     <template v-else>
       <header class="video-page__header">
         <h1 class="video-page__title">{{ titleText }}</h1>
-        <span v-if="video.level" class="video-page__level">{{ video.level }}</span>
+        <span v-if="video?.level" class="video-page__level">{{ video.level }}</span>
         <NuxtLink :to="editLink" class="video-page__edit">{{ t('videos.edit') }}</NuxtLink>
       </header>
 
       <VideoPlayer
-        v-if="video.video_url"
+        v-if="video?.video_url"
         class="video-page__player"
         :src="video.video_url"
         :subtitles="subs"
@@ -35,7 +35,7 @@
           {{ t('videos.exercise.start') }}
         </button>
 
-        <SubtitleSentenceExercise
+        <SubtitleClickExercise
           v-if="showExercise"
           :subtitles="subs"
           @range-change="handleExerciseRangeChange"
@@ -73,7 +73,7 @@
 <script setup lang="ts">
 import { computed, ref, watch, onBeforeUnmount } from 'vue';
 import { useI18n } from 'vue-i18n';
-import SubtitleSentenceExercise from '~/components/SubtitleSentenceExercise.vue';
+import SubtitleClickExercise from '~/components/SubtitleClickExercise.vue';
 const route = useRoute();
 const supabase = useSupabaseClient();
 

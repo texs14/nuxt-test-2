@@ -20,13 +20,28 @@
                   {{ entry.transcription_en }}
                 </p>
               </div>
-              <button
-                class="interactive-word__popup_edit-btn"
-                type="button"
-                @click.stop="onOpenEditDialog"
-              >
-                {{ t('dictionary.editWord') }}
-              </button>
+              <div class="interactive-word__popup_actions">
+                <button
+                  class="interactive-word__popup_vocabulary-btn"
+                  :class="{ 'interactive-word__popup_vocabulary-btn_active': inVocabulary }"
+                  type="button"
+                  :disabled="vocabularyLoading"
+                  @click.stop="onToggleVocabulary"
+                >
+                  {{
+                    inVocabulary
+                      ? t('vocabulary.removeFromVocabulary')
+                      : t('vocabulary.addToVocabulary')
+                  }}
+                </button>
+                <button
+                  class="interactive-word__popup_edit-btn"
+                  type="button"
+                  @click.stop="onOpenEditDialog"
+                >
+                  {{ t('dictionary.editWord') }}
+                </button>
+              </div>
             </header>
 
             <section class="interactive-word__popup_section">
@@ -131,7 +146,7 @@ interface DictionaryExample {
   th?: string;
   ru?: string;
   en?: string;
-  [key: string]: Json | undefined;
+  [key: string]: string | undefined;
 }
 
 type DictionaryRow = Database['public']['Tables']['dictionary']['Row'];
@@ -175,16 +190,12 @@ const mergeExampleArrays = (sources: (DictionaryExample[] | null | undefined)[])
   return result.length ? result : null;
 };
 
-const extractStrings = (value: Json | DictionaryExample | null | undefined): string[] => {
+const extractStrings = (value: DictionaryExample | null | undefined): string[] => {
   if (value === null || value === undefined) return [];
   if (typeof value === 'string') return [value];
-  if (typeof value === 'number' || typeof value === 'boolean') return [String(value)];
-  if (Array.isArray(value)) {
-    return value.flatMap((item) => extractStrings(item as Json));
-  }
-  if (typeof value === 'object') {
-    return Object.values(value as Record<string, Json | DictionaryExample | undefined>).flatMap(
-      (entry) => extractStrings(entry as Json)
+  if (typeof value === 'object' && !Array.isArray(value)) {
+    return Object.values(value).filter(
+      (v): v is string => typeof v === 'string' && v.trim().length > 0
     );
   }
   return [];
@@ -199,6 +210,8 @@ const state = ref<'idle' | 'loading' | 'loaded' | 'not-found' | 'error'>('idle')
 const entry = ref<DictionaryEntry | null>(null);
 const isAddDialogOpen = ref(false);
 const editId = ref<number | null>(null);
+const inVocabulary = ref(false);
+const vocabularyLoading = ref(false);
 
 const { t } = useI18n();
 
@@ -268,6 +281,7 @@ const onToggle = async () => {
   if (cached !== undefined) {
     entry.value = cached;
     state.value = cached ? 'loaded' : 'not-found';
+    await checkVocabulary();
     await nextTick();
     updatePosition();
     return;
@@ -336,6 +350,7 @@ const onToggle = async () => {
     cache.value[normalizedWord] = aggregated;
     entry.value = aggregated;
     state.value = 'loaded';
+    await checkVocabulary();
     await nextTick();
     updatePosition();
   } catch {
@@ -372,7 +387,7 @@ watch(activeInstance, (value) => {
   }
 });
 
-const formatExample = (value: DictionaryExample | Json) => {
+const formatExample = (value: DictionaryExample) => {
   const parts = extractStrings(value)
     .map((item) => item.trim())
     .filter(Boolean);
@@ -406,6 +421,40 @@ const onWordSaved = async () => {
 
   await nextTick();
   await onToggle();
+};
+
+const checkVocabulary = async () => {
+  if (!entry.value?.id) return;
+  try {
+    const data = await $fetch('/api/vocabulary/check', {
+      params: { dictionary_id: entry.value.id },
+    });
+    inVocabulary.value = data?.inVocabulary || false;
+  } catch {
+    inVocabulary.value = false;
+  }
+};
+
+const onToggleVocabulary = async () => {
+  if (!entry.value?.id || vocabularyLoading.value) return;
+
+  vocabularyLoading.value = true;
+  try {
+    if (inVocabulary.value) {
+      await $fetch(`/api/vocabulary/${entry.value.id}`, { method: 'DELETE' });
+      inVocabulary.value = false;
+    } else {
+      await $fetch('/api/vocabulary', {
+        method: 'POST',
+        body: { dictionary_id: entry.value.id },
+      });
+      inVocabulary.value = true;
+    }
+  } catch {
+    // Ignore errors silently
+  } finally {
+    vocabularyLoading.value = false;
+  }
 };
 
 onBeforeUnmount(() => {
@@ -521,6 +570,42 @@ watch(isOpen, (value) => {
     margin: 0;
     opacity: 0.8;
     font-size: 14px;
+  }
+
+  &__popup_actions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  &__popup_vocabulary-btn {
+    padding: 6px 12px;
+    background-color: #4caf50;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    white-space: nowrap;
+
+    &:hover:not(:disabled) {
+      background-color: #45a049;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    &_active {
+      background-color: #f44336;
+
+      &:hover:not(:disabled) {
+        background-color: #da190b;
+      }
+    }
   }
 
   &__popup_edit-btn {

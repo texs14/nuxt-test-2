@@ -49,6 +49,7 @@ export interface Database {
           last_name: string | null;
           avatar_url: string | null;
           city: string | null;
+          vocabulary: number[];
           created_at: string | null;
           updated_at: string | null;
         };
@@ -61,6 +62,7 @@ export interface Database {
           last_name?: string | null;
           avatar_url?: string | null;
           city?: string | null;
+          vocabulary?: number[];
           created_at?: string | null;
           updated_at?: string | null;
         };
@@ -73,6 +75,7 @@ export interface Database {
           last_name?: string | null;
           avatar_url?: string | null;
           city?: string | null;
+          vocabulary?: number[];
           created_at?: string | null;
           updated_at?: string | null;
         };

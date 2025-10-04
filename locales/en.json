@@ -6,6 +6,7 @@
     "home": "Home",
     "about": "About",
     "videos": "Videos",
+    "vocabulary": "My Vocabulary",
     "login": "Sign in",
     "logout": "Log out",
     "profile": "Profile",
@@ -67,6 +68,14 @@
     "feedbackError": "The order is incorrect. Try again.",
     "empty": "No suitable subtitles for the exercise.",
     "progress": "{current} / {total}"
+  },
+  "clickExercise": {
+    "title": "Exercise: Build the sentence",
+    "instruction": "Click on the words in the correct order to build the sentence",
+    "feedbackSuccess": "Excellent! Sentence completed correctly!",
+    "empty": "No available sentences for the exercise",
+    "progress": "Sentence: {current} of {total}",
+    "completion": "Completed: {completed} | Remaining: {remaining}"
   },
   "editor": {
     "title": "Subtitle editor",
@@ -143,5 +152,32 @@
     "saving": "Saving...",
     "saved": "Word successfully added",
     "saveError": "Error saving word"
+  },
+  "vocabulary": {
+    "title": "My Vocabulary",
+    "addToVocabulary": "Add to vocabulary",
+    "removeFromVocabulary": "Remove from vocabulary",
+    "empty": "Your vocabulary is empty",
+    "emptyHint": "Add words through interactive translations in videos",
+    "loading": "Loading vocabulary...",
+    "error": "Error loading vocabulary",
+    "wordCount": "{count} words",
+    "remove": "Remove"
+  },
+  "register": {
+    "firstName": "First Name*",
+    "age": "Age*",
+    "email": "E-mail*",
+    "password": "Password*",
+    "lastName": "Last Name",
+    "username": "Username",
+    "avatarUrl": "Avatar URL",
+    "city": "City",
+    "submit": "Register",
+    "usernameAvailable": "Username is available",
+    "usernameTaken": "Username is taken",
+    "ageRequired": "Please specify your age",
+    "checkEmail": "Check your email and follow the link to sign in",
+    "error": "Registration error"
   }
 }
