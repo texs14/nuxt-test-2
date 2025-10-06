@@ -23,6 +23,7 @@
           v-if="subs.length > 0"
           :subtitles="subs"
           :video-id="idParam"
+          :show-translation="true"
           @range-change="handleExerciseRangeChange"
         />
         <div v-else class="exercise-page__empty">

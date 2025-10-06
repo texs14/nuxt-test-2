@@ -11,12 +11,11 @@
     </div>
 
     <template v-else>
-      <header class="lesson-detail__header">
-        <h1 class="lesson-detail__title">{{ titleText }}</h1>
-        <NuxtLink :to="localePath('/lessons')" class="lesson-detail__back">
+      <PageHeader :title="titleText">
+        <NuxtLink :to="localePath('/lessons')" class="btn btn_secondary">
           {{ t('lessons.detail.backToList') }}
         </NuxtLink>
-      </header>
+      </PageHeader>
 
       <div class="lesson-detail__content">
         <VideoPlayer
@@ -28,8 +27,8 @@
         />
 
         <div class="lesson-detail__meta">
-          <span class="lesson-detail__level">{{ lesson?.level }}</span>
-          <span class="lesson-detail__duration">{{ getDuration }}</span>
+          <span class="badge badge_level">{{ lesson?.level }}</span>
+          <span class="badge badge_duration">{{ getDuration }}</span>
         </div>
 
         <div v-if="descriptionText" class="lesson-detail__description">
@@ -38,10 +37,7 @@
         </div>
 
         <div class="lesson-detail__actions">
-          <NuxtLink
-            :to="localePath(`/lessons/exercise/${lesson?.id}`)"
-            class="lesson-detail__start-btn"
-          >
+          <NuxtLink :to="localePath(`/lessons/exercise/${lesson?.id}`)" class="btn btn_success">
             {{ t('lessons.detail.startExercise') }}
           </NuxtLink>
         </div>
@@ -279,198 +275,139 @@ useHead(() => ({
 }));
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .lesson-detail {
   max-width: 900px;
   margin: 0 auto;
   padding: 24px;
-}
 
-.lesson-detail__loader,
-.lesson-detail__error {
-  text-align: center;
-  padding: 40px;
-  color: #6b7280;
-}
+  &__loader,
+  &__error {
+    text-align: center;
+    padding: 40px;
+    color: #6b7280;
+  }
 
-.lesson-detail__error {
-  color: #dc2626;
-}
+  &__error {
+    color: #dc2626;
+  }
 
-.lesson-detail__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  margin-bottom: 24px;
-  padding-bottom: 16px;
-  border-bottom: 2px solid #e5e7eb;
-}
+  &__content {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
 
-.lesson-detail__title {
-  margin: 0;
-  font-size: 32px;
-  font-weight: 700;
-}
+  &__player {
+    margin: 0 auto;
+    max-width: 100%;
+  }
 
-.lesson-detail__back {
-  padding: 8px 16px;
-  background: #64748b;
-  color: white;
-  border-radius: 8px;
-  text-decoration: none;
-  font-size: 14px;
-  transition: background 0.2s ease;
-}
+  &__meta {
+    display: flex;
+    gap: 12px;
+    font-size: 14px;
+  }
 
-.lesson-detail__back:hover {
-  background: #475569;
-}
+  &__description {
+    background: #f9fafb;
+    padding: 20px;
+    border-radius: 12px;
+  }
 
-.lesson-detail__content {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
+  &__subtitle {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0 0 12px;
+  }
 
-.lesson-detail__player {
-  margin: 0 auto;
-  max-width: 100%;
-}
+  &__description-text {
+    margin: 0;
+    line-height: 1.6;
+    color: #374151;
+  }
 
-.lesson-detail__meta {
-  display: flex;
-  gap: 12px;
-  font-size: 14px;
-}
+  &__actions {
+    display: flex;
+    gap: 12px;
+  }
 
-.lesson-detail__level {
-  padding: 6px 12px;
-  background: #dbeafe;
-  color: #1e40af;
-  border-radius: 6px;
-  font-weight: 600;
-}
+  &__comments {
+    margin-top: 32px;
+  }
 
-.lesson-detail__duration {
-  padding: 6px 12px;
-  background: #f3f4f6;
-  color: #374151;
-  border-radius: 6px;
-}
+  &__comment-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
 
-.lesson-detail__description {
-  background: #f9fafb;
-  padding: 20px;
-  border-radius: 12px;
-}
+  &__comment-input {
+    padding: 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    resize: vertical;
+  }
 
-.lesson-detail__subtitle {
-  font-size: 20px;
-  font-weight: 600;
-  margin: 0 0 12px;
-}
+  &__comment-submit {
+    align-self: flex-start;
+    padding: 10px 20px;
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
 
-.lesson-detail__description-text {
-  margin: 0;
-  line-height: 1.6;
-  color: #374151;
-}
+    &:hover:not(:disabled) {
+      background: #1d4ed8;
+    }
 
-.lesson-detail__actions {
-  display: flex;
-  gap: 12px;
-}
+    &:disabled {
+      background: #93c5fd;
+      cursor: not-allowed;
+    }
+  }
 
-.lesson-detail__start-btn {
-  padding: 14px 28px;
-  background: #10b981;
-  color: white;
-  border-radius: 8px;
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 16px;
-  transition: background 0.2s ease;
-}
+  &__comment-auth {
+    padding: 16px;
+    background: #f3f4f6;
+    border-radius: 8px;
+    text-align: center;
+    margin-bottom: 24px;
+  }
 
-.lesson-detail__start-btn:hover {
-  background: #059669;
-}
+  &__comment-auth-link {
+    color: #2563eb;
+    font-weight: 600;
+    text-decoration: none;
 
-.lesson-detail__comments {
-  margin-top: 32px;
-}
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 
-.lesson-detail__comment-form {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 24px;
-}
+  &__comments-loader,
+  &__comments-error,
+  &__comments-empty {
+    text-align: center;
+    padding: 20px;
+    color: #6b7280;
+  }
 
-.lesson-detail__comment-input {
-  padding: 12px;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  font-size: 14px;
-  font-family: inherit;
-  resize: vertical;
-}
+  &__comments-error {
+    color: #dc2626;
+  }
 
-.lesson-detail__comment-submit {
-  align-self: flex-start;
-  padding: 10px 20px;
-  background: #2563eb;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-
-.lesson-detail__comment-submit:hover:not(:disabled) {
-  background: #1d4ed8;
-}
-
-.lesson-detail__comment-submit:disabled {
-  background: #93c5fd;
-  cursor: not-allowed;
-}
-
-.lesson-detail__comment-auth {
-  padding: 16px;
-  background: #f3f4f6;
-  border-radius: 8px;
-  text-align: center;
-  margin-bottom: 24px;
-}
-
-.lesson-detail__comment-auth-link {
-  color: #2563eb;
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.lesson-detail__comment-auth-link:hover {
-  text-decoration: underline;
-}
-
-.lesson-detail__comments-loader,
-.lesson-detail__comments-error,
-.lesson-detail__comments-empty {
-  text-align: center;
-  padding: 20px;
-  color: #6b7280;
-}
-
-.lesson-detail__comments-error {
-  color: #dc2626;
-}
-
-.lesson-detail__comments-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  &__comments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
 }
 
 .lesson-comment {
@@ -478,28 +415,81 @@ useHead(() => ({
   background: white;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  &__author {
+    font-weight: 600;
+    color: #111827;
+  }
+
+  &__date {
+    font-size: 12px;
+    color: #9ca3af;
+  }
+
+  &__content {
+    margin: 0;
+    line-height: 1.5;
+    color: #374151;
+  }
 }
 
-.lesson-comment__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.lesson-comment__author {
+.btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  text-decoration: none;
   font-weight: 600;
-  color: #111827;
+  font-size: 14px;
+  transition: background 0.2s ease;
+  display: inline-block;
+
+  &_primary {
+    background: #2563eb;
+    color: white;
+
+    &:hover {
+      background: #1d4ed8;
+    }
+  }
+
+  &_secondary {
+    background: #64748b;
+    color: white;
+
+    &:hover {
+      background: #475569;
+    }
+  }
+
+  &_success {
+    background: #16a34a;
+    color: white;
+
+    &:hover {
+      background: #15803d;
+    }
+  }
 }
 
-.lesson-comment__date {
-  font-size: 12px;
-  color: #9ca3af;
-}
+.badge {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-weight: 600;
 
-.lesson-comment__content {
-  margin: 0;
-  line-height: 1.5;
-  color: #374151;
+  &_level {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+
+  &_duration {
+    background: #f3f4f6;
+    color: #374151;
+  }
 }
 </style>

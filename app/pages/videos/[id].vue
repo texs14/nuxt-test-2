@@ -7,14 +7,13 @@
     <div v-else-if="!video && loadingTimedOut" class="video-page__state">Видео не найдено</div>
 
     <template v-else>
-      <header class="video-page__header">
-        <h1 class="video-page__title">{{ titleText }}</h1>
-        <span v-if="video?.level" class="video-page__level">{{ video.level }}</span>
-        <NuxtLink v-if="canStartExercise" :to="exerciseLink" class="video-page__exercise-link">
+      <PageHeader :title="titleText">
+        <span v-if="video?.level" class="badge badge_level">{{ video.level }}</span>
+        <NuxtLink v-if="canStartExercise" :to="exerciseLink" class="btn btn_success">
           {{ t('videos.exercise.startPage') }}
         </NuxtLink>
-        <NuxtLink :to="editLink" class="video-page__edit">{{ t('videos.edit') }}</NuxtLink>
-      </header>
+        <NuxtLink :to="editLink" class="btn btn_primary">{{ t('videos.edit') }}</NuxtLink>
+      </PageHeader>
 
       <VideoPlayer
         v-if="video?.video_url"
@@ -27,26 +26,16 @@
 
       <p v-if="descriptionText" class="video-page__description">{{ descriptionText }}</p>
 
-      <section class="video-page__comments">
-        <h2 class="video-page__comments_title">{{ t('comments.title') }}</h2>
-        <div v-if="pendingComments" class="video-page__state">{{ t('comments.loading') }}</div>
-        <div v-else-if="errorComments" class="video-page__state">
-          {{ t('comments.error') }}: {{ errorComments.message }}
-        </div>
-        <ul v-else class="video-page__comments_list">
-          <li v-for="c in comments" :key="c.id" class="video-page__comments_item">
-            <div class="video-page__comments_head">
-              <strong class="video-page__comments_author">{{
-                c.author || t('comments.anonymous')
-              }}</strong>
-              <time v-if="c.created_at" class="video-page__comments_time">{{
-                new Date(c.created_at).toLocaleString()
-              }}</time>
-            </div>
-            <p class="video-page__comments_text">{{ c.text }}</p>
-          </li>
-        </ul>
-      </section>
+      <CommentsList
+        :title="t('comments.title')"
+        :comments="comments"
+        :loading="pendingComments"
+        :error="!!errorComments"
+        :loading-text="t('comments.loading')"
+        :error-text="t('comments.error')"
+        :empty-text="t('comments.empty')"
+        :anonymous-text="t('comments.anonymous')"
+      />
     </template>
   </section>
 </template>
@@ -243,125 +232,68 @@ watch(showExercise, (value) => {
 
 <style scoped lang="scss">
 .video-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px;
+
   &__state {
-    color: #666;
+    text-align: center;
+    padding: 40px;
+    color: #6b7280;
   }
 
-  &__header {
-    display: flex;
-    gap: 12px;
-    align-items: baseline;
-    margin-bottom: 12px;
+  &__player {
+    margin: 0 auto 24px;
+    max-width: 100%;
   }
 
-  &__title {
-    margin: 0;
+  &__description {
+    padding: 20px;
+    background: #f9fafb;
+    border-radius: 12px;
+    color: #374151;
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+}
+
+.btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  transition: background 0.2s ease;
+  display: inline-block;
+
+  &_primary {
+    background: #2563eb;
+    color: white;
+
+    &:hover {
+      background: #1d4ed8;
+    }
   }
 
-  &__level {
-    padding: 4px 8px;
-    background: #111;
-    color: #fff;
-    border-radius: 8px;
-    font-size: 12px;
-  }
-
-  &__exercise-link {
-    margin-left: auto;
-    padding: 8px 16px;
-    border-radius: 8px;
+  &_success {
     background: #16a34a;
-    color: #fff;
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: 600;
-    transition: background 0.2s ease;
+    color: white;
 
     &:hover {
       background: #15803d;
     }
   }
+}
 
-  &__edit {
-    padding: 6px 10px;
-    border-radius: 8px;
-    background: #2563eb;
-    color: #fff;
-    text-decoration: none;
-    font-size: 14px;
-  }
+.badge {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
 
-  &__player {
-    margin: auto;
-    width: 50%;
-  }
-
-  &__description {
-    color: #222;
-  }
-
-  &__exercise {
-    margin: 24px 0;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  &__exercise_button {
-    align-self: flex-start;
-    padding: 10px 18px;
-    border-radius: 10px;
-    border: none;
-    background: #2563eb;
-    color: #fff;
-    cursor: pointer;
-    transition: background 0.2s ease;
-
-    &:disabled {
-      background: #94a3b8;
-      cursor: not-allowed;
-    }
-  }
-
-  &__exercise_hint {
-    margin: 0;
-    color: #777;
-  }
-
-  &__comments {
-    margin-top: 20px;
-  }
-  &__comments_title {
-    font-size: 18px;
-    margin: 0 0 8px;
-  }
-  &__comments_list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: grid;
-    gap: 12px;
-  }
-  &__comments_item {
-    padding: 10px;
-    border: 1px solid #eee;
-    border-radius: 8px;
-    background: #fafafa;
-  }
-  &__comments_head {
-    display: flex;
-    gap: 8px;
-    align-items: baseline;
-  }
-  &__comments_author {
-    font-weight: 600;
-  }
-  &__comments_time {
-    color: #777;
-    font-size: 12px;
-  }
-  &__comments_text {
-    margin: 6px 0 0;
+  &_level {
+    background: #dbeafe;
+    color: #1e40af;
   }
 }
 </style>

@@ -13,6 +13,10 @@
         {{ t('clickExercise.instruction') }}
       </p>
 
+      <p v-if="showTranslation && currentTranslation" class="click-exercise__translation">
+        {{ currentTranslation }}
+      </p>
+
       <div v-if="isMounted" class="click-exercise__result">
         <template v-if="collectedSlots.length > 0">
           <div v-for="slot in collectedSlots" :key="slot.index" class="click-exercise__result-slot">
@@ -101,6 +105,7 @@ interface HistoryItem {
 const props = defineProps<{
   subtitles?: SubtitleItem[] | null;
   videoId?: string | number;
+  showTranslation?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -287,6 +292,14 @@ const sentences = computed<SentenceStep[]>(() => {
 const currentSentence = computed(() => sentences.value[currentStepIndex.value] ?? null);
 const totalSteps = computed(() => sentences.value.length);
 const hasNextStep = computed(() => currentStepIndex.value < totalSteps.value - 1);
+
+const currentTranslation = computed(() => {
+  if (!currentSentence.value || !props.showTranslation) return '';
+  const subtitle = subtitleMap.value.get(currentSentence.value.id);
+  if (!subtitle) return '';
+  const localeCode = locale.value === 'ru' || locale.value === 'en' ? locale.value : 'en';
+  return extractTranslation(subtitle.text, localeCode);
+});
 
 const progressLabel = computed(() => {
   const current = totalSteps.value ? currentStepIndex.value + 1 : 0;
@@ -546,6 +559,17 @@ function addToHistory(isCorrect: boolean) {
   &__instruction {
     margin: 0;
     color: #333;
+  }
+
+  &__translation {
+    margin: 0;
+    padding: 12px 16px;
+    background: #f0f9ff;
+    border-left: 4px solid #3b82f6;
+    border-radius: 6px;
+    color: #1e40af;
+    font-size: 16px;
+    font-weight: 500;
   }
 
   &__body {
