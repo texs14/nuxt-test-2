@@ -9,10 +9,10 @@
     <template v-else>
       <PageHeader :title="titleText">
         <span v-if="video?.level" class="badge badge_level">{{ video.level }}</span>
-        <NuxtLink v-if="canStartExercise" :to="exerciseLink" class="btn btn_success">
-          {{ t('videos.exercise.startPage') }}
-        </NuxtLink>
-        <NuxtLink :to="editLink" class="btn btn_primary">{{ t('videos.edit') }}</NuxtLink>
+
+        <button class="btn btn_primary" type="button" @click="toggleEditMode">
+          {{ isEditMode ? t('videos.detail.cancelEdit') : t('videos.detail.edit') }}
+        </button>
       </PageHeader>
 
       <VideoPlayer
@@ -24,7 +24,34 @@
         :hide-timeline="showExercise"
       />
 
+      <section v-if="isEditMode" class="video-page__editor">
+        <h2 class="video-page__subtitle">{{ t('videos.detail.editVideo') }}</h2>
+
+        <div class="video-page__editor-form">
+          <SubtitleEditor v-model="editorSubtitles" />
+
+          <VideoMetaForm
+            :title="editTitle"
+            :description="editDescription"
+            :level="editLevel"
+            :saving="savingChanges"
+            :save-error="saveError"
+            :save-ok="saveSuccess"
+            :save-id="idParam"
+            :can-save="true"
+            @update:title="onUpdateEditTitle"
+            @update:description="onUpdateEditDescription"
+            @update:level="onUpdateEditLevel"
+            @save="saveChanges"
+          />
+        </div>
+      </section>
+
       <p v-if="descriptionText" class="video-page__description">{{ descriptionText }}</p>
+
+      <NuxtLink v-if="canStartExercise" :to="exerciseLink" class="btn btn_success">
+        {{ t('videos.exercise.startPage') }}
+      </NuxtLink>
 
       <CommentsList
         :title="t('comments.title')"
@@ -43,34 +70,25 @@
 <script setup lang="ts">
 import { computed, ref, watch, onBeforeUnmount } from 'vue';
 import { useI18n } from 'vue-i18n';
+import type {
+  PlaybackRange,
+  SubtitleItem as RawSubtitleItem,
+  SubtitleText as RawSubtitleText,
+  ThaiSentences,
+} from '@/types/video.types';
 import SubtitleClickExercise from '~/components/SubtitleClickExercise.vue';
 const route = useRoute();
 const supabase = useSupabaseClient();
 
 type Json = Record<string, any> | null;
 
-interface ThaiSentences {
-  sentences: string[][];
-}
-
-interface SubtitleText {
-  th?: string | ThaiSentences;
-  en?: string;
-  ru?: string;
-  [key: string]: string | ThaiSentences | undefined;
-}
-
-interface SubtitleItem {
+type LocaleText = { th?: string; ru?: string; en?: string };
+type EditorSubtitleItem = {
   id?: number | string;
   start: number;
   end: number;
-  text?: SubtitleText | string;
-}
-
-interface PlaybackRange {
-  start: number;
-  end: number;
-}
+  text?: { th?: string; ru?: string; en?: string } | string;
+};
 
 interface VideoItem {
   id: string | number;
@@ -78,14 +96,11 @@ interface VideoItem {
   description?: Json | string | null;
   level?: string | null;
   video_url?: string | null;
-  subtitles?: SubtitleItem[] | null;
+  subtitles?: RawSubtitleItem[] | null;
 }
 
 const idParam = computed(() => route.params.id as string);
 const localePath = useLocalePath();
-const editLink = computed(() =>
-  localePath({ name: 'videos-add-new', query: { editId: idParam.value } })
-);
 const exerciseLink = computed(() =>
   localePath({ name: 'videos-exercise-id', params: { id: idParam.value } })
 );
@@ -149,12 +164,22 @@ const descriptionText = computed(() => {
   return val[currentLocale.value] ?? val.en ?? val.ru ?? val.th ?? '';
 });
 
-const subs = computed<SubtitleItem[]>(() => (video.value?.subtitles || []) as SubtitleItem[]);
+const subs = computed<RawSubtitleItem[]>(() => (video.value?.subtitles || []) as RawSubtitleItem[]);
 const showExercise = ref(false);
 const exerciseRange = ref<PlaybackRange | null>(null);
 
 const loadingTimedOut = ref(false);
 let loadingTimeout: ReturnType<typeof setTimeout> | null = null;
+
+const isEditMode = ref(false);
+const editorSubtitles = ref<EditorSubtitleItem[]>([]);
+const editTitle = ref<LocaleText>({ th: '', ru: '', en: '' });
+const editDescription = ref<LocaleText>({ th: '', ru: '', en: '' });
+const editLevel = ref<string>('A1');
+const savingChanges = ref(false);
+const saveSuccess = ref(false);
+const saveError = ref('');
+const saveId = ref<string | number>('');
 
 function startLoadingTimeout() {
   loadingTimedOut.value = false;
@@ -207,10 +232,10 @@ const hasThaiWords = (value: string | ThaiSentences | undefined): boolean => {
 };
 
 const canStartExercise = computed(() =>
-  subs.value.some((subtitle: SubtitleItem) => {
+  subs.value.some((subtitle: RawSubtitleItem) => {
     if (!subtitle?.text) return false;
     if (typeof subtitle.text === 'string') return subtitle.text.trim().length > 0;
-    const textObject = subtitle.text as SubtitleText | undefined;
+    const textObject = subtitle.text as RawSubtitleText | undefined;
     const thaiText = textObject?.th ?? textObject?.['th-TH'] ?? textObject?.th_th;
     return hasThaiWords(thaiText as string | ThaiSentences | undefined);
   })
@@ -228,6 +253,197 @@ function handleExerciseRangeChange(range: PlaybackRange | null) {
 watch(showExercise, (value) => {
   if (!value) exerciseRange.value = null;
 });
+
+function prepareThaiEditorValue(value: string | ThaiSentences | undefined): string {
+  if (!value) return '';
+  if (typeof value === 'object') {
+    return (value.sentences || [])
+      .map((sentence) =>
+        (sentence || [])
+          .map((word) => word.trim())
+          .filter(Boolean)
+          .join(' ')
+      )
+      .filter((sentence) => sentence.length > 0)
+      .join('   ');
+  }
+  return value
+    .replace(/\r?\n/gu, ' ')
+    .replace(/\u00A0/gu, ' ')
+    .trim();
+}
+
+function normalizeLocaleField(value: unknown): string {
+  if (!value) return '';
+  if (typeof value === 'string') return value;
+  if (typeof value === 'object' && value !== null && 'sentences' in value) {
+    return prepareThaiEditorValue(value as ThaiSentences);
+  }
+  return String(value ?? '');
+}
+
+function normalizeLocaleText(value: unknown): LocaleText {
+  if (!value) return { th: '', ru: '', en: '' };
+  if (typeof value === 'string') {
+    const str = String(value);
+    return { th: '', ru: str, en: '' };
+  }
+  if (typeof value === 'object' && value !== null) {
+    const obj = value as Record<'th' | 'ru' | 'en', unknown>;
+    return {
+      th: obj.th ? normalizeLocaleField(obj.th) : '',
+      ru: obj.ru ? normalizeLocaleField(obj.ru) : '',
+      en: obj.en ? normalizeLocaleField(obj.en) : '',
+    };
+  }
+  return { th: '', ru: String(value ?? ''), en: '' };
+}
+
+function normalizeEditorSubtitles(items: RawSubtitleItem[]): EditorSubtitleItem[] {
+  return items.map((item, index) => {
+    const baseText =
+      typeof item.text === 'string'
+        ? ({ ru: item.text } as RawSubtitleText)
+        : ({ ...(item.text ?? {}) } as RawSubtitleText);
+
+    const thaiSource = (() => {
+      const th = baseText.th;
+      if (!th) return undefined;
+      if (typeof th === 'string') return th;
+      if (typeof th === 'object') return th as ThaiSentences;
+      return undefined;
+    })();
+
+    return {
+      id: item.id ?? index + 1,
+      start: Number(item.start ?? 0),
+      end: Number(item.end ?? 0),
+      text: {
+        th: prepareThaiEditorValue(thaiSource),
+        ru: baseText.ru ? normalizeLocaleField(baseText.ru) : '',
+        en: baseText.en ? normalizeLocaleField(baseText.en) : '',
+      },
+    };
+  });
+}
+
+function buildThaiSentencesPayload(value: string | ThaiSentences | undefined): ThaiSentences {
+  if (!value) return { sentences: [] };
+  if (typeof value === 'object') {
+    return {
+      sentences: (value.sentences ?? [])
+        .map((sentence) => sentence.map((word) => word.trim()).filter(Boolean))
+        .filter((sentence) => sentence.length > 0),
+    };
+  }
+  const normalized = value
+    .replace(/\r?\n/gu, ' ')
+    .replace(/\u00A0/gu, ' ')
+    .trim();
+  if (!normalized) return { sentences: [] };
+  const rawSentences = normalized
+    .split(/(?:\s{3,}|\.\s*)/gu)
+    .map((sentence) => sentence.trim())
+    .filter(Boolean);
+  const sentences = rawSentences
+    .map((sentence) => {
+      if (sentence.includes(' ')) {
+        return sentence
+          .split(/\s+/gu)
+          .map((word) => word.trim())
+          .filter(Boolean);
+      }
+      return [sentence];
+    })
+    .filter((words) => words.length > 0);
+  return { sentences };
+}
+
+function buildSubtitlesPayload(items: EditorSubtitleItem[]): RawSubtitleItem[] {
+  return items.map((item, index) => {
+    const text = typeof item.text === 'string' ? { ru: item.text } : { ...(item.text ?? {}) };
+    const thaiSource = (() => {
+      const th = text.th;
+      if (!th) return undefined;
+      if (typeof th === 'string') return th;
+      if (typeof th === 'object') return th as ThaiSentences;
+      return undefined;
+    })();
+
+    return {
+      id: item.id ?? index + 1,
+      start: Number(item.start ?? 0),
+      end: Number(item.end ?? 0),
+      text: {
+        ...text,
+        th: buildThaiSentencesPayload(thaiSource),
+      } as RawSubtitleText,
+    };
+  });
+}
+
+function toggleEditMode() {
+  isEditMode.value = !isEditMode.value;
+  if (isEditMode.value && video.value) {
+    editTitle.value = normalizeLocaleText(video.value.title);
+    editDescription.value = normalizeLocaleText(video.value.description);
+    editLevel.value = String(video.value.level || 'A1');
+    editorSubtitles.value = normalizeEditorSubtitles(
+      (video.value.subtitles as RawSubtitleItem[]) || []
+    );
+    saveSuccess.value = false;
+    saveError.value = '';
+    saveId.value = idParam.value;
+  }
+}
+
+function onUpdateEditTitle(v: LocaleText) {
+  editTitle.value = v;
+}
+
+function onUpdateEditDescription(v: LocaleText) {
+  editDescription.value = v;
+}
+
+function onUpdateEditLevel(v: string) {
+  editLevel.value = v;
+}
+
+async function saveChanges() {
+  saveError.value = '';
+  saveSuccess.value = false;
+  savingChanges.value = true;
+  try {
+    const payload = {
+      subtitles: buildSubtitlesPayload(editorSubtitles.value),
+      title: editTitle.value,
+      description: editDescription.value,
+      level: editLevel.value,
+    };
+    const res = await fetch(`/api/video-items/${encodeURIComponent(idParam.value)}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json?.error || 'unknown');
+    saveSuccess.value = true;
+    saveId.value = json?.id || idParam.value;
+    if (video.value) {
+      video.value = {
+        ...video.value,
+        title: editTitle.value,
+        description: editDescription.value,
+        level: editLevel.value,
+        subtitles: payload.subtitles,
+      } as VideoItem;
+    }
+  } catch (e: any) {
+    saveError.value = t('videos.detail.saveError', { error: e?.message || 'unknown' });
+  } finally {
+    savingChanges.value = false;
+  }
+}
 </script>
 
 <style scoped lang="scss">
@@ -245,6 +461,26 @@ watch(showExercise, (value) => {
   &__player {
     margin: 0 auto 24px;
     max-width: 100%;
+  }
+
+  &__editor {
+    margin-top: 24px;
+    padding: 24px;
+    background: #f9fafb;
+    border-radius: 12px;
+  }
+
+  &__subtitle {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  &__editor-form {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
   }
 
   &__description {

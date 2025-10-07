@@ -11,8 +11,7 @@
     "login": "Войти",
     "logout": "Выйти",
     "profile": "Профиль",
-    "user": "Пользователь",
-    "lessons": "Уроки"
+    "user": "Пользователь"
   },
   "lang": {
     "english": "Английский",
@@ -221,6 +220,13 @@
       "backToList": "Назад к урокам",
       "description": "Описание",
       "startExercise": "Начать упражнение",
+      "edit": "Редактировать",
+      "editLesson": "Редактировать урок",
+      "cancelEdit": "Отмена",
+      "saveChanges": "Сохранить изменения",
+      "savingChanges": "Сохранение...",
+      "saveSuccess": "Изменения успешно сохранены",
+      "saveError": "Ошибка при сохранении: {error}",
       "commentsTitle": "Комментарии",
       "commentPlaceholder": "Напишите комментарий...",
       "submitting": "Отправка...",

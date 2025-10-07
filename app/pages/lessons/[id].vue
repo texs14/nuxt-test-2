@@ -40,7 +40,33 @@
           <NuxtLink :to="localePath(`/lessons/exercise/${lesson?.id}`)" class="btn btn_success">
             {{ t('lessons.detail.startExercise') }}
           </NuxtLink>
+          <button class="btn btn_primary" @click="toggleEditMode">
+            {{ isEditMode ? t('lessons.detail.cancelEdit') : t('lessons.detail.edit') }}
+          </button>
         </div>
+
+        <section v-if="isEditMode" class="lesson-detail__editor">
+          <h2 class="lesson-detail__subtitle">{{ t('lessons.detail.editLesson') }}</h2>
+
+          <div class="lesson-detail__editor-form">
+            <LessonExerciseEditor v-model="editExercises" />
+
+            <VideoMetaForm
+              :title="editTitle"
+              :description="editDescription"
+              :level="editLevel"
+              :saving="savingChanges"
+              :save-error="saveError"
+              :save-ok="saveSuccess"
+              :save-id="lessonId"
+              :can-save="true"
+              @update:title="onUpdateEditTitle"
+              @update:description="onUpdateEditDescription"
+              @update:level="onUpdateEditLevel"
+              @save="saveChanges"
+            />
+          </div>
+        </section>
 
         <section class="lesson-detail__comments">
           <h2 class="lesson-detail__subtitle">{{ t('lessons.detail.commentsTitle') }}</h2>
@@ -96,6 +122,13 @@
 <script setup lang="ts">
 import { ref, computed, watch, onBeforeUnmount } from 'vue';
 import { useI18n } from 'vue-i18n';
+import type {
+  ThaiSentences,
+  SubtitleText,
+  LocaleText,
+  SubtitleItem,
+  ExerciseItem,
+} from '@/types/lesson';
 
 const route = useRoute();
 const supabase = useSupabaseClient();
@@ -179,6 +212,16 @@ const loadingComments = ref(false);
 const commentsError = ref(false);
 const newComment = ref('');
 const submittingComment = ref(false);
+
+const isEditMode = ref(false);
+const editTitle = ref<LocaleText>({ th: '', ru: '', en: '' });
+const editDescription = ref<LocaleText>({ th: '', ru: '', en: '' });
+const editLevel = ref<string>('A1');
+const editorSubtitles = ref<SubtitleItem[]>([]);
+const editExercises = ref<ExerciseItem[]>([]);
+const savingChanges = ref(false);
+const saveSuccess = ref(false);
+const saveError = ref('');
 
 const loadingTimedOut = ref(false);
 let loadingTimeout: ReturnType<typeof setTimeout> | null = null;
@@ -270,6 +313,176 @@ function formatDate(dateStr: string): string {
 
 await loadComments();
 
+function normalizeLocaleField(value: unknown): string {
+  if (!value) return '';
+  if (typeof value === 'string') return value;
+  if (typeof value === 'object' && 'sentences' in (value as Record<string, unknown>)) {
+    const sentences = (value as { sentences?: string[][] }).sentences || [];
+    return sentences
+      .map((sentence) =>
+        sentence
+          .map((word) => word.trim())
+          .filter(Boolean)
+          .join(' ')
+      )
+      .filter((sentence) => sentence.length > 0)
+      .join('   ');
+  }
+  return String(value ?? '');
+}
+
+function normalizeLocaleText(value: unknown): LocaleText {
+  if (!value) return { th: '', ru: '', en: '' };
+  if (typeof value === 'string') {
+    const str = String(value);
+    return { th: '', ru: str, en: '' };
+  }
+  if (typeof value === 'object') {
+    const obj = value as Record<'th' | 'ru' | 'en', unknown>;
+    return {
+      th: obj.th ? normalizeLocaleField(obj.th) : '',
+      ru: obj.ru ? normalizeLocaleField(obj.ru) : '',
+      en: obj.en ? normalizeLocaleField(obj.en) : '',
+    };
+  }
+  return { th: '', ru: String(value ?? ''), en: '' };
+}
+
+function normalizeEditorSubtitles(items: any[]): SubtitleItem[] {
+  return items.map((item, index) => {
+    const baseText = typeof item.text === 'string' ? { ru: item.text } : { ...(item.text ?? {}) };
+    const thaiSource =
+      typeof item.text === 'string'
+        ? item.text
+        : (() => {
+            const th = baseText.th;
+            if (!th) return undefined;
+            return th;
+          })();
+    return {
+      ...item,
+      id: item.id ?? index + 1,
+      start: Number(item.start ?? 0),
+      end: Number(item.end ?? 0),
+      text: {
+        ...baseText,
+        th: normalizeLocaleField(thaiSource),
+      },
+    };
+  });
+}
+
+function buildThaiSentencesPayload(value: string | any): any {
+  if (!value) return { sentences: [] };
+  if (typeof value === 'object' && value.sentences) {
+    return {
+      sentences: (value.sentences ?? [])
+        .map((sentence: string[]) => sentence.map((word: string) => word.trim()).filter(Boolean))
+        .filter((sentence: string[]) => sentence.length > 0),
+    };
+  }
+  const normalized = String(value)
+    .replace(/\r?\n/gu, ' ')
+    .replace(/\u00A0/gu, ' ')
+    .trim();
+  if (!normalized) return { sentences: [] };
+  const rawSentences = normalized
+    .split(/(?:\s{3,}|\.\s*)/gu)
+    .map((sentence) => sentence.trim())
+    .filter(Boolean);
+  const sentences = rawSentences
+    .map((sentence) => {
+      if (sentence.includes(' ')) {
+        return sentence
+          .split(/\s+/gu)
+          .map((word) => word.trim())
+          .filter(Boolean);
+      }
+      return [sentence];
+    })
+    .filter((words) => words.length > 0);
+  return { sentences };
+}
+
+function buildSubtitlesPayload(items: SubtitleItem[]): SubtitleItem[] {
+  return items.map((item, index) => {
+    const text = typeof item.text === 'string' ? { ru: item.text } : { ...(item.text ?? {}) };
+    const thaiSource = text.th;
+    const thai = buildThaiSentencesPayload(thaiSource);
+    return {
+      id: item.id ?? index + 1,
+      start: Number(item.start ?? 0),
+      end: Number(item.end ?? 0),
+      text: {
+        ...text,
+        th: thai,
+      },
+    };
+  });
+}
+
+function toggleEditMode() {
+  isEditMode.value = !isEditMode.value;
+  if (isEditMode.value && lesson.value) {
+    editTitle.value = normalizeLocaleText(lesson.value.title);
+    editDescription.value = normalizeLocaleText(lesson.value.description);
+    editLevel.value = String(lesson.value.level || 'A1');
+    editorSubtitles.value = normalizeEditorSubtitles((lesson.value.subtitles as any) || []);
+    editExercises.value = ((lesson.value as any).exercises || []) as ExerciseItem[];
+    saveSuccess.value = false;
+    saveError.value = '';
+  }
+}
+
+function onUpdateEditTitle(v: LocaleText) {
+  editTitle.value = v;
+}
+
+function onUpdateEditDescription(v: LocaleText) {
+  editDescription.value = v;
+}
+
+function onUpdateEditLevel(v: string) {
+  editLevel.value = v;
+}
+
+async function saveChanges() {
+  saveError.value = '';
+  saveSuccess.value = false;
+  savingChanges.value = true;
+  try {
+    const payload = {
+      title: editTitle.value,
+      description: editDescription.value,
+      level: editLevel.value,
+      subtitles: buildSubtitlesPayload(editorSubtitles.value),
+      exercises: editExercises.value,
+    };
+    const res = await fetch(`/api/lesson-items/${encodeURIComponent(lessonId.value)}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json?.error || t('lessons.detail.saveError'));
+    saveSuccess.value = true;
+    if (lesson.value) {
+      lesson.value = {
+        ...lesson.value,
+        title: editTitle.value,
+        description: editDescription.value,
+        level: editLevel.value,
+        subtitles: payload.subtitles,
+        exercises: editExercises.value,
+      } as LessonItem;
+    }
+  } catch (e: any) {
+    saveError.value = t('lessons.detail.saveError', { error: e?.message || 'unknown' });
+  } finally {
+    savingChanges.value = false;
+  }
+}
+
 useHead(() => ({
   title: titleText.value || t('lessons.detail.title'),
 }));
@@ -334,6 +547,20 @@ useHead(() => ({
 
   &__comments {
     margin-top: 32px;
+  }
+
+  &__editor {
+    margin-top: 32px;
+    padding: 24px;
+    background: #f9fafb;
+    border-radius: 12px;
+  }
+
+  &__editor-form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    margin-top: 16px;
   }
 
   &__comment-form {
