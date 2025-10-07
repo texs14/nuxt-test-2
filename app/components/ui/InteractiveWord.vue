@@ -35,6 +35,7 @@
                   }}
                 </button>
                 <button
+                  v-if="canModerate"
                   class="interactive-word__popup_edit-btn"
                   type="button"
                   @click.stop="onOpenEditDialog"
@@ -108,6 +109,7 @@
           <div v-else class="interactive-word__popup_state">
             <p class="interactive-word__popup_empty">{{ t('dictionary.empty') }}</p>
             <button
+              v-if="canModerate"
               class="interactive-word__popup_add-btn"
               type="button"
               @click.stop="onOpenAddDialog"
@@ -141,6 +143,7 @@ const props = defineProps<{ word: string }>();
 const emit = defineEmits<{ (event: 'open-change', value: boolean): void }>();
 
 const client = useSupabaseClient<Database>();
+const { canModerate } = useUserRole();
 
 interface DictionaryExample {
   th?: string;

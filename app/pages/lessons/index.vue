@@ -1,7 +1,11 @@
 <template>
   <section class="lessons-page">
     <PageHeader :title="t('lessons.title')">
-      <NuxtLink v-if="user" :to="localePath('/lessons/add-new')" class="btn btn_primary">
+      <NuxtLink
+        v-if="user && canModerate"
+        :to="localePath('/lessons/add-new')"
+        class="btn btn_primary"
+      >
         {{ t('lessons.addNew') }}
       </NuxtLink>
     </PageHeader>
@@ -37,6 +41,7 @@ const { t, locale } = useI18n();
 const localePath = useLocalePath();
 const supabase = useSupabaseClient();
 const user = useSupabaseUser();
+const { canModerate } = useUserRole();
 
 type Json = Record<string, any> | null;
 

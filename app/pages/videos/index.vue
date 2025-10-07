@@ -42,8 +42,12 @@ const supabase = useSupabaseClient();
 const { t, locale } = useI18n();
 const localePath = useLocalePath();
 const safeLocalePath = useSafeLocalePath();
+const { canModerate } = useUserRole();
 
-const addNewLink = computed(() => safeLocalePath({ name: 'videos-add-new' }));
+const addNewLink = computed(() => {
+  if (!canModerate.value) return '#';
+  return safeLocalePath({ name: 'videos-add-new' });
+});
 
 const {
   data: items,

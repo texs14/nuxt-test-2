@@ -10,7 +10,7 @@
       <PageHeader :title="titleText">
         <span v-if="video?.level" class="badge badge_level">{{ video.level }}</span>
 
-        <button class="btn btn_primary" type="button" @click="toggleEditMode">
+        <button v-if="canModerate" class="btn btn_primary" type="button" @click="toggleEditMode">
           {{ isEditMode ? t('videos.detail.cancelEdit') : t('videos.detail.edit') }}
         </button>
       </PageHeader>
@@ -79,6 +79,7 @@ import type {
 import SubtitleClickExercise from '~/components/SubtitleClickExercise.vue';
 const route = useRoute();
 const supabase = useSupabaseClient();
+const { canModerate } = useUserRole();
 
 type Json = Record<string, any> | null;
 

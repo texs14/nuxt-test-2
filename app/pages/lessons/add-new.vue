@@ -110,6 +110,10 @@ import { ref, computed, watch } from 'vue';
 import { useHead, useRoute, useSupabaseClient } from '#imports';
 import { useI18n } from 'vue-i18n';
 
+definePageMeta({
+  middleware: 'moderator',
+});
+
 const { t } = useI18n();
 
 const WEBHOOK_URL = '/api/webhook-upload';

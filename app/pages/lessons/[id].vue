@@ -40,7 +40,7 @@
           <NuxtLink :to="localePath(`/lessons/exercise/${lesson?.id}`)" class="btn btn_success">
             {{ t('lessons.detail.startExercise') }}
           </NuxtLink>
-          <button class="btn btn_primary" @click="toggleEditMode">
+          <button v-if="canModerate" class="btn btn_primary" @click="toggleEditMode">
             {{ isEditMode ? t('lessons.detail.cancelEdit') : t('lessons.detail.edit') }}
           </button>
         </div>
@@ -135,6 +135,7 @@ const supabase = useSupabaseClient();
 const user = useSupabaseUser();
 const localePath = useLocalePath();
 const { locale, t } = useI18n();
+const { canModerate } = useUserRole();
 
 type Json = Record<string, any> | null;
 

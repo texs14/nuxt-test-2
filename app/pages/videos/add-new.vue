@@ -139,6 +139,10 @@ import type {
   ThaiSentences,
 } from '@/types/video.types';
 
+definePageMeta({
+  middleware: 'moderator',
+});
+
 const WEBHOOK_URL = '/api/webhook-upload';
 
 const { t } = useI18n();

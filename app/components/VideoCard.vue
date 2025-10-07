@@ -43,13 +43,17 @@ const displayTitle = computed(() => {
 
 const { t } = useI18n();
 const safeLocalePath = useSafeLocalePath();
+const { canModerate } = useUserRole();
 
 const videoLink = computed(() => {
   const link = safeLocalePath({ name: 'videos-id', params: { id: props.id } });
   return link === '#' ? null : link;
 });
 
-const editLink = computed(() => safeLocalePath({ name: 'videos-add-new', query: { editId: String(props.id) } }));
+const editLink = computed(() => {
+  if (!canModerate.value) return '#';
+  return safeLocalePath({ name: 'videos-add-new', query: { editId: String(props.id) } });
+});
 </script>
 
 <style lang="scss" scoped>
