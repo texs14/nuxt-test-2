@@ -1,58 +1,65 @@
 <template>
-  <section class="video-page">
-    <div v-if="pendingVideo || (!video && !loadingTimedOut)" class="video-page__state">
-      <div class="video-page__loader">Загрузка видео…</div>
-    </div>
-    <div v-else-if="errorVideo" class="video-page__state">Ошибка: {{ errorVideo.message }}</div>
-    <div v-else-if="!video && loadingTimedOut" class="video-page__state">Видео не найдено</div>
+  <ContentDetailLayout
+    :title="titleText"
+    :level="video?.level!"
+    :loading="pendingVideo || (!video && !loadingTimedOut)"
+    :error="errorVideo?.message || (!video && loadingTimedOut ? 'Видео не найдено' : null)"
+    :loading-text="'Загрузка видео…'"
+    :error-text="errorVideo ? `Ошибка: ${errorVideo.message}` : 'Видео не найдено'"
+  >
+    <template #header-actions>
+      <NuxtLink :to="localePath('/videos')" class="btn btn_secondary">
+        {{ t('videos.detail.backToList') }}
+      </NuxtLink>
+    </template>
 
-    <template v-else>
-      <PageHeader :title="titleText">
-        <span v-if="video?.level" class="badge badge_level">{{ video.level }}</span>
-
-        <button v-if="canModerate" class="btn btn_primary" type="button" @click="toggleEditMode">
-          {{ isEditMode ? t('videos.detail.cancelEdit') : t('videos.detail.edit') }}
-        </button>
-      </PageHeader>
-
+    <template #player>
       <VideoPlayer
         v-if="video?.video_url"
-        class="video-page__player"
         :src="video.video_url"
         :subtitles="subs"
         :restricted-range="exerciseRange"
         :hide-timeline="showExercise"
       />
+    </template>
 
-      <section v-if="isEditMode" class="video-page__editor">
-        <h2 class="video-page__subtitle">{{ t('videos.detail.editVideo') }}</h2>
+    <template #description>
+      <p v-if="descriptionText">{{ descriptionText }}</p>
+    </template>
 
-        <div class="video-page__editor-form">
-          <SubtitleEditor v-model="editorSubtitles" />
-
-          <VideoMetaForm
-            :title="editTitle"
-            :description="editDescription"
-            :level="editLevel"
-            :saving="savingChanges"
-            :save-error="saveError"
-            :save-ok="saveSuccess"
-            :save-id="idParam"
-            :can-save="true"
-            @update:title="onUpdateEditTitle"
-            @update:description="onUpdateEditDescription"
-            @update:level="onUpdateEditLevel"
-            @save="saveChanges"
-          />
-        </div>
-      </section>
-
-      <p v-if="descriptionText" class="video-page__description">{{ descriptionText }}</p>
-
+    <template #actions>
       <NuxtLink v-if="canStartExercise" :to="exerciseLink" class="btn btn_success">
         {{ t('videos.exercise.startPage') }}
       </NuxtLink>
+      <UiButton v-if="canModerate" class="btn btn_primary" type="button" @click="toggleEditMode">
+        {{ isEditMode ? t('videos.detail.cancelEdit') : t('videos.detail.edit') }}
+      </UiButton>
+    </template>
 
+    <template v-if="isEditMode" #editor>
+      <h2 class="video-page__subtitle">{{ t('videos.detail.editVideo') }}</h2>
+
+      <div class="video-page__editor-form">
+        <SubtitleEditor v-model="editorSubtitles" />
+
+        <VideoMetaForm
+          :title="editTitle"
+          :description="editDescription"
+          :level="editLevel"
+          :saving="savingChanges"
+          :save-error="saveError"
+          :save-ok="saveSuccess"
+          :save-id="idParam"
+          :can-save="true"
+          @update:title="onUpdateEditTitle"
+          @update:description="onUpdateEditDescription"
+          @update:level="onUpdateEditLevel"
+          @save="saveChanges"
+        />
+      </div>
+    </template>
+
+    <template #comments>
       <CommentsList
         :title="t('comments.title')"
         :comments="comments"
@@ -64,7 +71,7 @@
         :anonymous-text="t('comments.anonymous')"
       />
     </template>
-  </section>
+  </ContentDetailLayout>
 </template>
 
 <script setup lang="ts">
@@ -449,28 +456,6 @@ async function saveChanges() {
 
 <style scoped lang="scss">
 .video-page {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 24px;
-
-  &__state {
-    text-align: center;
-    padding: 40px;
-    color: #6b7280;
-  }
-
-  &__player {
-    margin: 0 auto 24px;
-    max-width: 100%;
-  }
-
-  &__editor {
-    margin-top: 24px;
-    padding: 24px;
-    background: #f9fafb;
-    border-radius: 12px;
-  }
-
   &__subtitle {
     margin: 0;
     font-size: 20px;
@@ -482,55 +467,6 @@ async function saveChanges() {
     display: flex;
     flex-direction: column;
     gap: 24px;
-  }
-
-  &__description {
-    padding: 20px;
-    background: #f9fafb;
-    border-radius: 12px;
-    color: #374151;
-    line-height: 1.6;
-    margin-bottom: 24px;
-  }
-}
-
-.btn {
-  padding: 10px 20px;
-  border-radius: 8px;
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 14px;
-  transition: background 0.2s ease;
-  display: inline-block;
-
-  &_primary {
-    background: #2563eb;
-    color: white;
-
-    &:hover {
-      background: #1d4ed8;
-    }
-  }
-
-  &_success {
-    background: #16a34a;
-    color: white;
-
-    &:hover {
-      background: #15803d;
-    }
-  }
-}
-
-.badge {
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 600;
-
-  &_level {
-    background: #dbeafe;
-    color: #1e40af;
   }
 }
 </style>

@@ -2,6 +2,11 @@
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
+  css: [
+    '~/assets/styles/layouts/content-page.scss',
+    '~/assets/styles/components/buttons.scss',
+    '~/assets/styles/components/badges.scss',
+  ],
   modules: [
     '@nuxtjs/supabase',
     [
@@ -42,6 +47,7 @@ export default defineNuxtConfig({
         '/ru/login',
         '/login',
         '/register',
+        '/ru/register',
         '/videos',
         '/videos/**',
         '/ru',

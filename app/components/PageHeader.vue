@@ -1,6 +1,7 @@
 <template>
   <header class="page-header">
     <h1 class="page-header__title">{{ title }}</h1>
+    <span v-if="level" class="badge badge_level">{{ level }}</span>
     <div v-if="$slots.default" class="page-header__actions">
       <slot />
     </div>
@@ -10,10 +11,16 @@
 <script setup lang="ts">
 defineProps<{
   title: string;
+  level?: string;
 }>();
 </script>
 
 <style scoped lang="scss">
+.badge {
+  margin-left: 12px;
+  margin-right: auto;
+}
+
 .page-header {
   display: flex;
   justify-content: space-between;

@@ -4,7 +4,6 @@
   },
   "nav": {
     "home": "Home",
-    "about": "About",
     "videos": "Videos",
     "vocabulary": "My Vocabulary",
     "login": "Sign in",
@@ -21,10 +20,19 @@
   },
   "videos": {
     "title": "Videos",
+    "pageTitle": "Thai Video Lessons",
+    "pageDescription": "Learn Thai with our comprehensive video lessons, covering all levels from beginner to advanced. Filter by difficulty or search for specific topics to find the perfect lesson for you.",
     "add": "Add video",
     "loading": "Loading…",
     "error": "Loading error",
     "edit": "Edit",
+    "detail": {
+      "backToList": "Back to videos",
+      "edit": "Edit",
+      "cancelEdit": "Cancel",
+      "editVideo": "Edit video",
+      "saveError": "Save error: {error}"
+    },
     "exercise": {
       "start": "Start exercise",
       "startPage": "Go to exercise page",
@@ -187,6 +195,8 @@
   },
   "lessons": {
     "title": "Lessons",
+    "pageTitle": "Interactive Thai Language Lessons",
+    "pageDescription": "Learn Thai with our structured lessons featuring videos, subtitles, and exercises. Choose your difficulty level and develop your skills step by step.",
     "addNew": "Add lesson",
     "empty": "No lessons found",
     "loading": "Loading lessons...",

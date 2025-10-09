@@ -5,8 +5,8 @@
     <input
       :id="inputId"
       ref="inputRef"
-      class="ui-input__control"
       v-model="innerValue"
+      class="ui-input__control"
       :type="type"
       :name="name"
       :placeholder="placeholder"
@@ -32,96 +32,100 @@
 </template>
 
 <script setup lang="ts">
-const props = withDefaults(defineProps<{
-  modelValue: string | number | null
-  type?: 'text' | 'email' | 'password' | 'number' | 'search' | 'tel' | 'url' | 'hidden'
-  label?: string
-  name?: string
-  id?: string
-  placeholder?: string
-  autocomplete?: string
-  required?: boolean
-  disabled?: boolean
-  min?: number | string
-  max?: number | string
-  minlength?: number
-  maxlength?: number
-  step?: number | string
-  inputmode?: 'none' | 'text' | 'tel' | 'url' | 'email' | 'numeric' | 'decimal' | 'search'
-  hint?: string
-  error?: string | null
-}>(), {
-  modelValue: null,
-  type: 'text',
-  label: '',
-  name: '',
-  id: '',
-  placeholder: '',
-  autocomplete: '',
-  required: false,
-  disabled: false,
-  min: undefined,
-  max: undefined,
-  minlength: undefined,
-  maxlength: undefined,
-  step: undefined,
-  inputmode: undefined,
-  hint: '',
-  error: null
-})
+const props = withDefaults(
+  defineProps<{
+    modelValue: string | number | null;
+    type?: 'text' | 'email' | 'password' | 'number' | 'search' | 'tel' | 'url' | 'hidden';
+    label?: string;
+    name?: string;
+    id?: string;
+    placeholder?: string;
+    autocomplete?: string;
+    required?: boolean;
+    disabled?: boolean;
+    min?: number | string;
+    max?: number | string;
+    minlength?: number;
+    maxlength?: number;
+    step?: number | string;
+    inputmode?: 'none' | 'text' | 'tel' | 'url' | 'email' | 'numeric' | 'decimal' | 'search';
+    hint?: string;
+    error?: string | null;
+  }>(),
+  {
+    modelValue: null,
+    type: 'text',
+    label: '',
+    name: '',
+    id: '',
+    placeholder: '',
+    autocomplete: '',
+    required: false,
+    disabled: false,
+    min: undefined,
+    max: undefined,
+    minlength: undefined,
+    maxlength: undefined,
+    step: undefined,
+    inputmode: undefined,
+    hint: '',
+    error: null,
+  }
+);
 
-const emit = defineEmits<{(e: 'update:modelValue', value: string | number | null): void
-  (e: 'blur', event: FocusEvent): void
-  (e: 'focus', event: FocusEvent): void
-  (e: 'change', event: Event): void
-  (e: 'input', event: Event): void
-}>()
+const emit = defineEmits<{
+  (e: 'update:modelValue', value: string | number | null): void;
+  (e: 'blur', event: FocusEvent): void;
+  (e: 'focus', event: FocusEvent): void;
+  (e: 'change', event: Event): void;
+  (e: 'input', event: Event): void;
+}>();
 
-const attrs = useAttrs()
-const inputRef = ref<HTMLInputElement | null>(null)
-const inputId = computed(() => props.id || props.name || undefined)
-const hasError = computed(() => Boolean(props.error))
+const attrs = useAttrs();
+const inputRef = ref<HTMLInputElement | null>(null);
+const inputId = computed(() => props.id || props.name || undefined);
+const hasError = computed(() => Boolean(props.error));
 
 const innerValue = computed({
   get() {
     if (props.type === 'number') {
-      if (props.modelValue === null || props.modelValue === undefined) return ''
-      return props.modelValue
+      if (props.modelValue === null || props.modelValue === undefined) return '';
+      return props.modelValue;
     }
-    return props.modelValue ?? ''
+    return props.modelValue ?? '';
   },
   set(val: unknown) {
     if (props.type === 'number') {
       if (val === '' || val === null) {
-        emit('update:modelValue', null)
+        emit('update:modelValue', null);
       } else if (typeof val === 'number') {
-        emit('update:modelValue', val)
+        emit('update:modelValue', val);
       } else if (typeof val === 'string') {
-        const parsed = Number(val)
-        emit('update:modelValue', Number.isNaN(parsed) ? null : parsed)
+        const parsed = Number(val);
+        emit('update:modelValue', Number.isNaN(parsed) ? null : parsed);
       }
     } else {
-      emit('update:modelValue', typeof val === 'string' ? val : String(val ?? ''))
+      emit('update:modelValue', typeof val === 'string' ? val : String(val ?? ''));
     }
-  }
-})
+  },
+});
 
 const inputAttrs = computed<Record<string, unknown>>(() => {
-  const { class: _cls, style: _style, ...rest } = attrs
-  return rest
-})
+  const { class: _cls, style: _style, ...rest } = attrs;
+  return rest;
+});
 
 function handleBlur(event: FocusEvent) {
-  emit('blur', event)
+  emit('blur', event);
 }
 function handleFocus(event: FocusEvent) {
-  emit('focus', event)
+  emit('focus', event);
 }
 function handleChange(event: Event) {
-  emit('change', event)
+  emit('change', event);
 }
 function handleInput(event: Event) {
-  emit('input', event)
+  emit('input', event);
 }
 </script>
 
@@ -142,10 +146,13 @@ function handleInput(event: Event) {
   width: 100%;
   border: 1px solid #d1d5db;
   border-radius: 10px;
+  box-sizing: border-box;
   padding: 10px 14px;
   font-size: 1rem;
   background-color: #ffffff;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
   color: #111827;
 }
 

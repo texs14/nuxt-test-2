@@ -553,7 +553,7 @@ async function saveVideo() {
 
 <style scoped>
 .video-upload-form {
-  max-width: 1024px;
+  max-width: 1440px;
   margin: 24px auto;
   background: #ffffff;
   border-radius: 12px;

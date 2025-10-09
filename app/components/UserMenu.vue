@@ -13,9 +13,8 @@
       </span>
       <span class="user-menu__info">
         <span class="user-menu__name">{{ displayName }}</span>
-        <span v-if="userEmail" class="user-menu__email">{{ userEmail }}</span>
       </span>
-      <span class="user-menu__chevron" aria-hidden="true">в–ѕ</span>
+      <ChevronIcon class="user-menu__chevron" :open="isOpen" aria-hidden="true" />
     </button>
 
     <div v-if="isOpen" class="user-menu__dropdown">
@@ -39,6 +38,8 @@
 </template>
 
 <script setup lang="ts">
+import ChevronIcon from '~/components/ui/icons/ChevronIcon.vue';
+
 const { t } = useI18n();
 const router = useRouter();
 const route = useRoute();
@@ -220,19 +221,9 @@ watch(
     white-space: nowrap;
   }
 
-  &__email {
-    font-size: 12px;
-    color: #6b7280;
-    line-height: 1.2;
-    max-width: 180px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
   &__chevron {
-    font-size: 16px;
     color: #6b7280;
+    width: 16px;
   }
 
   &__dropdown {
@@ -255,6 +246,7 @@ watch(
     padding: 0.5rem 1rem;
     background: none;
     border: none;
+    box-sizing: border-box;
     font-size: 14px;
     color: #1f2937;
     text-decoration: none;

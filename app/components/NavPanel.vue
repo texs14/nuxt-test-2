@@ -7,11 +7,6 @@
         }}</NuxtLink>
       </li>
       <li class="navigation__item">
-        <NuxtLink :to="safeLocalePath({ name: 'about' })" class="navigation__link">{{
-          t('nav.about')
-        }}</NuxtLink>
-      </li>
-      <li class="navigation__item">
         <NuxtLink :to="safeLocalePath({ name: 'videos' })" class="navigation__link">{{
           t('nav.videos')
         }}</NuxtLink>
@@ -30,17 +25,7 @@
 
     <div class="navigation__actions">
       <div class="navigation__lang">
-        <label :for="langSelectId" class="navigation__lang_label">{{ t('lang.select') }}</label>
-        <select
-          :id="langSelectId"
-          class="navigation__lang_select"
-          :aria-label="t('lang.select')"
-          :value="locale"
-          @change="onChange"
-        >
-          <option value="en">{{ t('lang.english') }}</option>
-          <option value="ru">{{ t('lang.russian') }}</option>
-        </select>
+        <LanguageSelector />
       </div>
 
       <NuxtLink
@@ -58,48 +43,50 @@
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
-import { useRouter } from '#imports';
+import LanguageSelector from './LanguageSelector.vue';
 
-const { t, locale } = useI18n();
-const switchLocalePath = useSwitchLocalePath();
+const { t } = useI18n();
 const safeLocalePath = useSafeLocalePath();
-const router = useRouter();
-const langSelectId = 'lang-select';
 const { user } = useAuth();
 const isAuthenticated = computed(() => Boolean(user.value));
-
-function onChange(e: Event) {
-  const target = e.target as HTMLSelectElement;
-  const code = target.value as 'en' | 'ru';
-  const path = switchLocalePath(code);
-  if (path) router.push(path);
-}
 </script>
 
 <style lang="scss" scoped>
 .navigation {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 2rem;
 
   &__list {
-    display: flex;
-    gap: 1rem;
-
+    display: none;
     list-style: none;
+    margin: 0;
+    padding: 0;
+
+    @media (min-width: 768px) {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
   }
 
   &__item {
-    padding: 12px 16px;
+    padding: 0;
   }
 
   &__link {
-    color: black;
-
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: rgb(71 85 105);
     text-decoration: none;
+    transition: color 0.2s ease;
 
-    &:open {
-      color: black;
+    &:hover {
+      color: #13a4ec;
+    }
+
+    &.router-link-active {
+      color: #13a4ec;
     }
   }
 
@@ -111,32 +98,34 @@ function onChange(e: Event) {
   }
 
   &__lang {
-    display: inline-flex;
+    display: none;
     align-items: center;
     gap: 0.5rem;
 
-    &_label {
-      font-size: 14px;
-    }
-
-    &_select {
-      padding: 4px 8px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      background: #fff;
+    @media (min-width: 768px) {
+      display: inline-flex;
     }
   }
 
   &__button {
-    padding: 8px 12px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    background-color: #fff;
+    padding: 0.625rem 1rem;
+    border-radius: 0.5rem;
+    border: none;
+    background-color: #13a4ec;
+    color: white;
+    font-size: 0.875rem;
     cursor: pointer;
     transition: background-color 0.2s ease;
+    text-decoration: none;
+
+    @media (min-width: 640px) {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
 
     &_login {
-      color: #2563eb;
+      color: white;
     }
 
     &:disabled {
@@ -145,7 +134,7 @@ function onChange(e: Event) {
     }
 
     &:hover:not(:disabled) {
-      background-color: rgba(0, 0, 0, 0.05);
+      background-color: rgba(19, 164, 236, 0.9);
     }
   }
 }

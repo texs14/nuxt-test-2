@@ -1,21 +1,54 @@
 <!-- eslint-disable camelcase -->
 <template>
   <form class="auth-register" @submit.prevent="onSubmit">
-    <div class="auth-register__field">
-      <UiInput v-model="first_name" :label="t('register.firstName')" name="first_name" required />
+    <div class="auth-register__row">
+      <div class="auth-register__field auth-register__field_half">
+        <UiInput v-model="first_name" :label="t('register.firstName')" name="first_name" required />
+      </div>
+
+      <div class="auth-register__field auth-register__field_half">
+        <UiInput v-model="last_name" :label="t('register.lastName')" name="last_name" />
+      </div>
+    </div>
+
+    <div class="auth-register__row">
+      <div class="auth-register__field auth-register__field_half">
+        <UiInput
+          v-model="username"
+          :label="t('register.username')"
+          name="username"
+          @blur="checkUsername"
+        />
+        <p
+          v-if="usernameStatus && usernameStatus.type === 'ok'"
+          class="auth-register__status auth-register__status_success"
+        >
+          {{ t('register.usernameAvailable') }}
+        </p>
+        <p
+          v-if="usernameStatus && usernameStatus.type === 'err'"
+          class="auth-register__status auth-register__status_error"
+        >
+          {{ t('register.usernameTaken') }}
+        </p>
+      </div>
+
+      <div class="auth-register__field auth-register__field_half">
+        <UiInput
+          v-model="age"
+          :label="t('register.age')"
+          name="age"
+          type="number"
+          min="1"
+          max="150"
+          required
+          inputmode="numeric"
+        />
+      </div>
     </div>
 
     <div class="auth-register__field">
-      <UiInput
-        v-model="age"
-        :label="t('register.age')"
-        name="age"
-        type="number"
-        min="1"
-        max="150"
-        required
-        inputmode="numeric"
-      />
+      <UiInput v-model="city" :label="t('register.city')" name="city" />
     </div>
 
     <div class="auth-register__field">
@@ -41,31 +74,6 @@
     </div>
 
     <div class="auth-register__field">
-      <UiInput v-model="last_name" :label="t('register.lastName')" name="last_name" />
-    </div>
-
-    <div class="auth-register__field">
-      <UiInput
-        v-model="username"
-        :label="t('register.username')"
-        name="username"
-        @blur="checkUsername"
-      />
-      <p
-        v-if="usernameStatus && usernameStatus.type === 'ok'"
-        class="auth-register__status auth-register__status_success"
-      >
-        {{ t('register.usernameAvailable') }}
-      </p>
-      <p
-        v-if="usernameStatus && usernameStatus.type === 'err'"
-        class="auth-register__status auth-register__status_error"
-      >
-        {{ t('register.usernameTaken') }}
-      </p>
-    </div>
-
-    <div class="auth-register__field">
       <UiInput
         v-model="avatar_url"
         :label="t('register.avatarUrl')"
@@ -75,14 +83,10 @@
       />
     </div>
 
-    <div class="auth-register__field">
-      <UiInput v-model="city" :label="t('register.city')" name="city" />
-    </div>
-
     <div class="auth-register__actions">
-      <button class="auth-register__submit" type="submit" :disabled="loading">
+      <UiButton type="submit" :disabled="loading" block>
         {{ t('register.submit') }}
-      </button>
+      </UiButton>
     </div>
 
     <p v-if="message" class="auth-register__status auth-register__status_success">{{ message }}</p>
@@ -179,5 +183,34 @@ const onSubmit = async () => {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+}
+
+.auth-register__row {
+  display: flex;
+  gap: 1rem;
+}
+
+.auth-register__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.auth-register__field_half {
+  flex: 1 1 0;
+}
+
+@media (max-width: 768px) {
+  .auth-register {
+    width: 100%;
+  }
+
+  .auth-register__row {
+    flex-direction: column;
+  }
+
+  .auth-register__field_half {
+    width: 100%;
+  }
 }
 </style>

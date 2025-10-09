@@ -1,0 +1,17 @@
+.badge {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 12px;
+  display: inline-block;
+
+  &_level {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+
+  &_duration {
+    background: #f3f4f6;
+    color: #374151;
+  }
+}

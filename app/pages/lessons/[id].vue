@@ -1,122 +1,115 @@
 <template>
-  <section class="lesson-detail">
-    <div v-if="pending || (!lesson && !loadingTimedOut)" class="lesson-detail__loader">
-      {{ t('lessons.detail.loading') }}
-    </div>
-    <div v-else-if="error" class="lesson-detail__error">
-      {{ t('lessons.detail.error', { message: error.message }) }}
-    </div>
-    <div v-else-if="!lesson && loadingTimedOut" class="lesson-detail__error">
-      {{ t('lessons.detail.notFound') }}
-    </div>
+  <ContentDetailLayout
+    :title="titleText"
+    :loading="pending || (!lesson && !loadingTimedOut)"
+    :level="lesson?.level!"
+    :error="error?.message || (!lesson && loadingTimedOut ? t('lessons.detail.notFound') : null)"
+    :loading-text="t('lessons.detail.loading')"
+    :error-text="
+      error ? t('lessons.detail.error', { message: error.message }) : t('lessons.detail.notFound')
+    "
+  >
+    <template #header-actions>
+      <NuxtLink :to="localePath('/lessons')" class="btn btn_secondary">
+        {{ t('lessons.detail.backToList') }}
+      </NuxtLink>
+    </template>
 
-    <template v-else>
-      <PageHeader :title="titleText">
-        <NuxtLink :to="localePath('/lessons')" class="btn btn_secondary">
-          {{ t('lessons.detail.backToList') }}
-        </NuxtLink>
-      </PageHeader>
+    <template #player>
+      <VideoPlayer
+        v-if="lesson?.video_url"
+        :src="lesson.video_url"
+        :subtitles="subs"
+        :hide-navigation-buttons="true"
+      />
+    </template>
 
-      <div class="lesson-detail__content">
-        <VideoPlayer
-          v-if="lesson?.video_url"
-          class="lesson-detail__player"
-          :src="lesson.video_url"
-          :subtitles="subs"
-          :hide-navigation-buttons="true"
-        />
-
-        <div class="lesson-detail__meta">
-          <span class="badge badge_level">{{ lesson?.level }}</span>
-          <span class="badge badge_duration">{{ getDuration }}</span>
-        </div>
-
-        <div v-if="descriptionText" class="lesson-detail__description">
-          <h2 class="lesson-detail__subtitle">{{ t('lessons.detail.description') }}</h2>
-          <p class="lesson-detail__description-text">{{ descriptionText }}</p>
-        </div>
-
-        <div class="lesson-detail__actions">
-          <NuxtLink :to="localePath(`/lessons/exercise/${lesson?.id}`)" class="btn btn_success">
-            {{ t('lessons.detail.startExercise') }}
-          </NuxtLink>
-          <button v-if="canModerate" class="btn btn_primary" @click="toggleEditMode">
-            {{ isEditMode ? t('lessons.detail.cancelEdit') : t('lessons.detail.edit') }}
-          </button>
-        </div>
-
-        <section v-if="isEditMode" class="lesson-detail__editor">
-          <h2 class="lesson-detail__subtitle">{{ t('lessons.detail.editLesson') }}</h2>
-
-          <div class="lesson-detail__editor-form">
-            <LessonExerciseEditor v-model="editExercises" />
-
-            <VideoMetaForm
-              :title="editTitle"
-              :description="editDescription"
-              :level="editLevel"
-              :saving="savingChanges"
-              :save-error="saveError"
-              :save-ok="saveSuccess"
-              :save-id="lessonId"
-              :can-save="true"
-              @update:title="onUpdateEditTitle"
-              @update:description="onUpdateEditDescription"
-              @update:level="onUpdateEditLevel"
-              @save="saveChanges"
-            />
-          </div>
-        </section>
-
-        <section class="lesson-detail__comments">
-          <h2 class="lesson-detail__subtitle">{{ t('lessons.detail.commentsTitle') }}</h2>
-
-          <div v-if="user" class="lesson-detail__comment-form">
-            <textarea
-              v-model="newComment"
-              class="lesson-detail__comment-input"
-              :placeholder="t('lessons.detail.commentPlaceholder')"
-              rows="3"
-            ></textarea>
-            <button
-              class="lesson-detail__comment-submit"
-              :disabled="!newComment.trim() || submittingComment"
-              @click="submitComment"
-            >
-              {{ submittingComment ? t('lessons.detail.submitting') : t('lessons.detail.submit') }}
-            </button>
-          </div>
-          <div v-else class="lesson-detail__comment-auth">
-            <NuxtLink :to="localePath('/login')" class="lesson-detail__comment-auth-link">
-              {{ t('lessons.detail.loginPrompt') }}
-            </NuxtLink>
-            {{ t('lessons.detail.loginPromptSuffix') }}
-          </div>
-
-          <div v-if="loadingComments" class="lesson-detail__comments-loader">
-            {{ t('lessons.detail.commentsLoading') }}
-          </div>
-          <div v-else-if="commentsError" class="lesson-detail__comments-error">
-            {{ t('lessons.detail.commentsError') }}
-          </div>
-          <div v-else-if="comments.length === 0" class="lesson-detail__comments-empty">
-            {{ t('lessons.detail.commentsEmpty') }}
-          </div>
-          <div v-else class="lesson-detail__comments-list">
-            <div v-for="comment in comments" :key="comment.id" class="lesson-comment">
-              <div class="lesson-comment__header">
-                <span class="lesson-comment__author">
-                  {{ comment.profiles?.username || t('lessons.detail.anonymous') }}
-                </span>
-                <span class="lesson-comment__date">{{ formatDate(comment.created_at) }}</span>
-              </div>
-              <p class="lesson-comment__content">{{ comment.content }}</p>
-            </div>
-          </div>
-        </section>
+    <template #description>
+      <div v-if="descriptionText">
+        <h2 class="lesson-detail__subtitle">{{ t('lessons.detail.description') }}</h2>
+        <p class="lesson-detail__description-text">{{ descriptionText }}</p>
       </div>
     </template>
-  </section>
+
+    <template #actions>
+      <NuxtLink :to="localePath(`/lessons/exercise/${lesson?.id}`)" class="btn btn_success">
+        {{ t('lessons.detail.startExercise') }}
+      </NuxtLink>
+      <UiButton v-if="canModerate" class="btn btn_primary" @click="toggleEditMode">
+        {{ isEditMode ? t('lessons.detail.cancelEdit') : t('lessons.detail.edit') }}
+      </UiButton>
+    </template>
+
+    <template v-if="isEditMode" #editor>
+      <h2 class="lesson-detail__subtitle">{{ t('lessons.detail.editLesson') }}</h2>
+
+      <div class="lesson-detail__editor-form">
+        <LessonExerciseEditor v-model="editExercises" />
+
+        <VideoMetaForm
+          :title="editTitle"
+          :description="editDescription"
+          :level="editLevel"
+          :saving="savingChanges"
+          :save-error="saveError"
+          :save-ok="saveSuccess"
+          :save-id="lessonId"
+          :can-save="true"
+          @update:title="onUpdateEditTitle"
+          @update:description="onUpdateEditDescription"
+          @update:level="onUpdateEditLevel"
+          @save="saveChanges"
+        />
+      </div>
+    </template>
+
+    <template #comments>
+      <h2 class="lesson-detail__subtitle">{{ t('lessons.detail.commentsTitle') }}</h2>
+
+      <div v-if="user" class="lesson-detail__comment-form">
+        <textarea
+          v-model="newComment"
+          class="lesson-detail__comment-input"
+          :placeholder="t('lessons.detail.commentPlaceholder')"
+          rows="3"
+        ></textarea>
+        <button
+          class="lesson-detail__comment-submit"
+          :disabled="!newComment.trim() || submittingComment"
+          @click="submitComment"
+        >
+          {{ submittingComment ? t('lessons.detail.submitting') : t('lessons.detail.submit') }}
+        </button>
+      </div>
+      <div v-else class="lesson-detail__comment-auth">
+        <NuxtLink :to="localePath('/login')" class="lesson-detail__comment-auth-link">
+          {{ t('lessons.detail.loginPrompt') }}
+        </NuxtLink>
+        {{ t('lessons.detail.loginPromptSuffix') }}
+      </div>
+
+      <div v-if="loadingComments" class="lesson-detail__comments-loader">
+        {{ t('lessons.detail.commentsLoading') }}
+      </div>
+      <div v-else-if="commentsError" class="lesson-detail__comments-error">
+        {{ t('lessons.detail.commentsError') }}
+      </div>
+      <div v-else-if="comments.length === 0" class="lesson-detail__comments-empty">
+        {{ t('lessons.detail.commentsEmpty') }}
+      </div>
+      <div v-else class="lesson-detail__comments-list">
+        <div v-for="comment in comments" :key="comment.id" class="lesson-comment">
+          <div class="lesson-comment__header">
+            <span class="lesson-comment__author">
+              {{ comment.profiles?.username || t('lessons.detail.anonymous') }}
+            </span>
+            <span class="lesson-comment__date">{{ formatDate(comment.created_at) }}</span>
+          </div>
+          <p class="lesson-comment__content">{{ comment.content }}</p>
+        </div>
+      </div>
+    </template>
+  </ContentDetailLayout>
 </template>
 
 <script setup lang="ts">
@@ -491,44 +484,6 @@ useHead(() => ({
 
 <style scoped lang="scss">
 .lesson-detail {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 24px;
-
-  &__loader,
-  &__error {
-    text-align: center;
-    padding: 40px;
-    color: #6b7280;
-  }
-
-  &__error {
-    color: #dc2626;
-  }
-
-  &__content {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-  }
-
-  &__player {
-    margin: 0 auto;
-    max-width: 100%;
-  }
-
-  &__meta {
-    display: flex;
-    gap: 12px;
-    font-size: 14px;
-  }
-
-  &__description {
-    background: #f9fafb;
-    padding: 20px;
-    border-radius: 12px;
-  }
-
   &__subtitle {
     font-size: 20px;
     font-weight: 600;
@@ -539,22 +494,6 @@ useHead(() => ({
     margin: 0;
     line-height: 1.6;
     color: #374151;
-  }
-
-  &__actions {
-    display: flex;
-    gap: 12px;
-  }
-
-  &__comments {
-    margin-top: 32px;
-  }
-
-  &__editor {
-    margin-top: 32px;
-    padding: 24px;
-    background: #f9fafb;
-    border-radius: 12px;
   }
 
   &__editor-form {
@@ -664,59 +603,6 @@ useHead(() => ({
   &__content {
     margin: 0;
     line-height: 1.5;
-    color: #374151;
-  }
-}
-
-.btn {
-  padding: 10px 20px;
-  border-radius: 8px;
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 14px;
-  transition: background 0.2s ease;
-  display: inline-block;
-
-  &_primary {
-    background: #2563eb;
-    color: white;
-
-    &:hover {
-      background: #1d4ed8;
-    }
-  }
-
-  &_secondary {
-    background: #64748b;
-    color: white;
-
-    &:hover {
-      background: #475569;
-    }
-  }
-
-  &_success {
-    background: #16a34a;
-    color: white;
-
-    &:hover {
-      background: #15803d;
-    }
-  }
-}
-
-.badge {
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-weight: 600;
-
-  &_level {
-    background: #dbeafe;
-    color: #1e40af;
-  }
-
-  &_duration {
-    background: #f3f4f6;
     color: #374151;
   }
 }

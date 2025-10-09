@@ -1,7 +1,7 @@
 <template>
   <div class="app">
     <NuxtRouteAnnouncer />
-    <NavPanel />
+    <NavPanel class="app__nav-panel" />
     <NuxtPage />
   </div>
 </template>
@@ -15,10 +15,21 @@ useHead(() => ({
 }));
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .app {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+
+  &__nav-panel {
+    max-width: 1440px;
+    width: 100%;
+    margin: 0 auto;
+    box-sizing: border-box;
+
+    @media screen and (max-width: 1440px) {
+      padding: 0 16px;
+    }
+  }
 }
 </style>

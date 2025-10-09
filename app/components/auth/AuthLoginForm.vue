@@ -24,20 +24,29 @@
     </div>
 
     <div class="auth-login__actions">
-      <button class="auth-login__submit" type="submit" :disabled="loading">
+      <UiButton type="submit" :loading="loading" :disabled="loading" block>
         {{ t('auth.login.submit') }}
-      </button>
-      <button
-        class="auth-login__submit auth-login__submit_google"
+      </UiButton>
+
+      <UiButton
+        variant="google"
         type="button"
+        :loading="loading"
         :disabled="loading"
+        block
         @click="signInGoogle"
       >
         {{ t('auth.login.google') }}
-      </button>
-      <NuxtLink v-if="registerLink !== '#'" class="auth-login__link" :to="registerLink">{{
-        t('auth.login.register')
-      }}</NuxtLink>
+      </UiButton>
+
+      <UiButton
+        v-if="registerLink !== '#'"
+        variant="ghost"
+        :to="registerLink"
+        size="sm"
+      >
+        {{ t('auth.login.register') }}
+      </UiButton>
     </div>
 
     <p v-if="message" class="auth-login__status auth-login__status_success">{{ message }}</p>
@@ -90,9 +99,7 @@ const signInGoogle = async () => {
 <style lang="scss" scoped>
 .auth-login {
   width: 50%;
-
   margin: auto;
-
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -101,17 +108,7 @@ const signInGoogle = async () => {
 .auth-login__actions {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-}
-
-.auth-login__link {
-  align-self: center;
-  color: var(--color-primary, #2563eb);
-  font-weight: 500;
-  text-decoration: none;
-}
-
-.auth-login__link:hover {
-  text-decoration: underline;
+  gap: 0.75rem;
+  align-items: center;
 }
 </style>
