@@ -84,7 +84,7 @@
     "instruction": "Click on the words in the correct order to build the sentence",
     "feedbackSuccess": "Excellent! Sentence completed correctly!",
     "empty": "No available sentences for the exercise",
-    "progress": "Sentence: {current} of {total}",
+    "progress": "Sentence: {current} / {total}",
     "completion": "Completed: {completed} | Remaining: {remaining}",
     "playAgain": "Play again",
     "playSlowly": "Play slowly",
@@ -150,6 +150,7 @@
     "examples": "Examples",
     "links": "Links",
     "addWord": "Add word",
+    "edit": "Edit",
     "editWord": "Edit",
     "addWordForm": "Add word to dictionary",
     "editWordForm": "Edit word",
@@ -164,10 +165,13 @@
     "cancel": "Cancel",
     "saving": "Saving...",
     "saved": "Word successfully added",
-    "saveError": "Error saving word"
+    "saveError": "Error saving word",
+    "prevSlide": "Previous slide: {section}",
+    "nextSlide": "Next slide: {section}"
   },
   "vocabulary": {
     "title": "My Vocabulary",
+    "add": "Add to vocabulary",
     "addToVocabulary": "Add to vocabulary",
     "removeFromVocabulary": "Remove from vocabulary",
     "empty": "Your vocabulary is empty",
@@ -175,7 +179,9 @@
     "loading": "Loading vocabulary...",
     "error": "Error loading vocabulary",
     "wordCount": "{count} words",
-    "remove": "Remove"
+    "remove": "Remove from vocabulary",
+    "showMore": "Show more",
+    "showLess": "Show less"
   },
   "register": {
     "firstName": "First Name*",
@@ -256,6 +262,65 @@
       "notFound": "Lesson not found",
       "backToLesson": "Back to lesson",
       "title": "Exercise"
+    }
+  },
+  "home": {
+    "hero": {
+      "title": "Master the Thai Language",
+      "description": "Your journey to fluency starts here. Interactive lessons, real-life conversations, and a vibrant community to guide you every step of the way.",
+      "primaryCta": "Start learning now",
+      "secondaryCta": "Explore lessons"
+    },
+    "about": {
+      "title": "About us",
+      "paragraph1": "We are a passionate team of language enthusiasts and educators dedicated to making Thai accessible to everyone.",
+      "paragraph2": "Our platform goes beyond grammar and vocabulary, offering cultural insights, etiquette tips, and real-life stories.",
+      "imageAlt": "Thailand landscape illustration"
+    },
+    "features": {
+      "title": "Key features",
+      "subtitle": "Everything you need to learn Thai effectively, all in one place.",
+      "items": {
+        "video": {
+          "title": "Interactive video lessons",
+          "description": "Engaging video content that makes learning Thai grammar and vocabulary intuitive and fun."
+        },
+        "dialogues": {
+          "title": "Real-life dialogues",
+          "description": "Practice conversations for everyday situations, from street food orders to new friendships."
+        },
+        "culture": {
+          "title": "Cultural insights",
+          "description": "Deepen your understanding with lessons on Thai traditions, etiquette, and daily life."
+        }
+      }
+    },
+    "why": {
+      "title": "Why learn Thai?",
+      "subtitle": "Unlock opportunities and unforgettable experiences by learning the language of Thailand.",
+      "items": {
+        "travel": {
+          "title": "Travel with confidence",
+          "description": "Navigate Thailand with ease and connect with locals wherever you go."
+        },
+        "connect": {
+          "title": "Connect with people",
+          "description": "Build deeper relationships with Thai friends, family, and colleagues."
+        },
+        "career": {
+          "title": "Career opportunities",
+          "description": "Boost your resume and open doors in tourism, business, and more."
+        },
+        "brain": {
+          "title": "Boost brain power",
+          "description": "Learning a new language improves memory, problem-solving, and cognitive flexibility."
+        }
+      }
+    },
+    "footer": {
+      "copyright": "© 2024 Learn Thai. All rights reserved.",
+      "privacy": "Privacy policy",
+      "terms": "Terms of service"
     }
   }
 }

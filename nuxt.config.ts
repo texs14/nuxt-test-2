@@ -9,18 +9,18 @@ export default defineNuxtConfig({
   ],
   modules: [
     '@nuxtjs/supabase',
+    '@nuxt/ui',
     [
       '@nuxtjs/i18n',
       {
         locales: [
           { code: 'en', language: 'en', name: 'English', file: 'en.json' },
-          { code: 'ru', language: 'ru', name: 'Р СѓСЃСЃРєРёР№', file: 'ru.json' },
+          { code: 'ru', language: 'ru', name: 'Р СѓСЃСЃРєРёР№', file: 'ru.json' },
         ],
         defaultLocale: 'en',
         strategy: 'prefix_except_default',
         detectBrowserLanguage: {
           useCookie: true,
-          cookieKey: 'i18n_redirected',
           redirectOn: 'root',
         },
         lazy: true,

@@ -27,7 +27,7 @@
       <UiButton type="submit" :loading="loading" :disabled="loading" block>
         {{ t('auth.login.submit') }}
       </UiButton>
-
+      <!-- 
       <UiButton
         variant="google"
         type="button"
@@ -37,14 +37,9 @@
         @click="signInGoogle"
       >
         {{ t('auth.login.google') }}
-      </UiButton>
+      </UiButton> -->
 
-      <UiButton
-        v-if="registerLink !== '#'"
-        variant="ghost"
-        :to="registerLink"
-        size="sm"
-      >
+      <UiButton v-if="registerLink !== '#'" variant="ghost" :to="registerLink" size="sm">
         {{ t('auth.login.register') }}
       </UiButton>
     </div>

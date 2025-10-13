@@ -1,13 +1,15 @@
 <template>
-  <div class="app">
-    <NuxtRouteAnnouncer />
-    <NavPanel class="app__nav-panel" />
-    <NuxtPage />
-  </div>
+  <UApp>
+    <div class="app">
+      <NuxtRouteAnnouncer />
+      <NavPanel class="app__nav-panel" />
+      <NuxtPage />
+    </div>
+  </UApp>
 </template>
 
 <script setup lang="ts">
-const i18nHead = useLocaleHead({ addDirAttribute: true, addSeoAttributes: true });
+const i18nHead = useLocaleHead();
 useHead(() => ({
   htmlAttrs: i18nHead.value.htmlAttrs,
   link: i18nHead.value.link,
@@ -27,8 +29,12 @@ useHead(() => ({
     margin: 0 auto;
     box-sizing: border-box;
 
+    padding-top: 16px;
+    padding-bottom: 16px;
+
     @media screen and (max-width: 1440px) {
-      padding: 0 16px;
+      padding-left: 16px;
+      padding-right: 16px;
     }
   }
 }

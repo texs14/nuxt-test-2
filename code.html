@@ -1,0 +1,687 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Thai Lessons</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;700;900&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              primary: '#13a4ec',
+              'background-light': '#f6f7f8',
+              'background-dark': '#101c22',
+            },
+            fontFamily: {
+              display: ['Work Sans'],
+            },
+            borderRadius: {
+              DEFAULT: '0.25rem',
+              lg: '0.5rem',
+              xl: '0.75rem',
+              full: '9999px',
+            },
+          },
+        },
+      };
+    </script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+      rel="stylesheet"
+    />
+    <style type="text/tailwindcss">
+      .group:focus-within .group-focus-within\:block {
+        display: block;
+      }
+    </style>
+  </head>
+  <body
+    class="font-display bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200"
+  >
+    <div class="flex flex-col min-h-screen">
+      <header
+        class="bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm sticky top-0 z-20 border-b border-slate-200 dark:border-slate-800"
+      >
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex h-16 items-center justify-between">
+            <div class="flex items-center gap-8">
+              <a
+                class="flex items-center gap-2 text-xl font-bold text-slate-900 dark:text-white"
+                href="#"
+              >
+                <svg
+                  class="h-6 w-6 text-primary"
+                  fill="none"
+                  viewBox="0 0 48 48"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <g clip-path="url(#clip0_6_535)">
+                    <path
+                      clip-rule="evenodd"
+                      d="M47.2426 24L24 47.2426L0.757355 24L24 0.757355L47.2426 24ZM12.2426 21H35.7574L24 9.24264L12.2426 21Z"
+                      fill="currentColor"
+                      fill-rule="evenodd"
+                    ></path>
+                  </g>
+                  <defs>
+                    <clipPath id="clip0_6_535">
+                      <rect fill="white" height="48" width="48"></rect>
+                    </clipPath>
+                  </defs>
+                </svg>
+                <span>Thai Lessons</span>
+              </a>
+              <nav class="hidden md:flex items-center gap-6">
+                <a
+                  class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary transition-colors"
+                  href="#"
+                  >Home</a
+                >
+                <a
+                  class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary transition-colors"
+                  href="#"
+                  >About</a
+                >
+                <a
+                  class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary transition-colors"
+                  href="#"
+                  >Videos</a
+                >
+                <a class="text-sm font-medium text-primary dark:text-primary" href="#">Lessons</a>
+                <a
+                  class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary transition-colors"
+                  href="#"
+                  >My Vocabulary</a
+                >
+              </nav>
+            </div>
+            <div class="flex items-center gap-4">
+              <div class="relative hidden md:block group">
+                <button
+                  class="flex items-center gap-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary transition-colors focus:outline-none"
+                >
+                  <img
+                    alt="English"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZ3bji4Y05Y05iagxpOqsh9EC2shiJskLgegLzymDH0Cw8-LYaw_2k4m9kynFtewMKttOLH6haY5JhN8A9vYVezmhfoIxPhNvMWjZn64Y_-0O9Czfqv-oNONJ-xnPJqSj8J5JEkwmGwpaCMT4_8FTyabBDF9wVJcp-sOj2DsqsyIofEkij5xpG7DZSWa6eG0ZC7gzkDAWJSimKvXQIpnG1mkQSeJS4SjeMLcInIRtezqeoaqAD3zTtKQ2juWxDixb3KxIJVHkUVdI"
+                    srcset="https://flagcdn.com/w40/gb.png 2x"
+                    width="20"
+                  />
+                  <span>English</span>
+                  <span
+                    class="material-symbols-outlined text-base transition-transform group-focus-within:rotate-180"
+                    >expand_more</span
+                  >
+                </button>
+                <div
+                  class="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 hidden group-focus-within:block z-10"
+                >
+                  <div class="py-1">
+                    <a
+                      class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700"
+                      href="#"
+                    >
+                      <img
+                        alt="Thai"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBtWdSjdJGWzi8db6qFfn8Wq2q3A9xO-xhHvs3QSVG6a21-YnixWEEBCFGP0apu4mfQGRtnPwGCQXO7bxEpbNzj6PfFFtPyUwd1pWoF3ARFDMkLKu3LeE853ho3y-lol7nhUp6TDFPGwZ8n7e1hvGo_BdQxDi0rvKB1VA2Pq-Cp02t-atiomhqIJCgbi7je9XWjPoWw0k2Lv6usjgFB2x79QtykfS51RpAV_kql_M2SvlSCK500BkRt2D4jkpAX1nPWASE0ACmGDQg"
+                        srcset="https://flagcdn.com/w40/th.png 2x"
+                        width="20"
+                      />
+                      <span>ภาษาไทย</span>
+                    </a>
+                    <a
+                      class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700"
+                      href="#"
+                    >
+                      <img
+                        alt="Spanish"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuCNYNrkPzDDWFr00zYamWZ1D9zruojVXlFFrU0SL1fIiBUUuHP2YCvgwifEbKLPf6INpNLoPAeesGrRUzluDc3ID6ze9Ggx7pXniSgR-TPPiJKjrQSOOmn7FyaMUzK0IBROgGXGtvWBWeI6T7WZPkf89me6rYJ1AtnpZibgci4t0ppH95vEiEAiE5mYTXc_xuqtmLsMuqbrYEaMex0OCzq8KnX0tEhqCG4ldfGgMJnQ5fNMgzIXlr_TFlym0QNiNRTmMlyv_b1qM30"
+                        srcset="https://flagcdn.com/w40/es.png 2x"
+                        width="20"
+                      />
+                      <span>Español</span>
+                    </a>
+                    <a
+                      class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700"
+                      href="#"
+                    >
+                      <img
+                        alt="French"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJB9Sp3aUXE_tSgb1gP9Fje8vSwHlGgOPpCnE9jIvt4uOop33ML5_b4GAo0DsNucpe6hq-RmkM7IQc3H6XmqPuP5X7RlVqOmxe_PzHW0AZ_e7l48ntk1hcNwRiUrklBc4u9eYL8HRc2Li8xZPehyCPHPkTixYaZEInpSpwyeStdbg_FgcD3AKEE-dAFJcyoileWQPrmYzXcRyeEv83kuwe1tSFCLr8eMFSr7zYAirGxXPPllP9Bbju8nJpL7TQebYfs22BOZCKZcM"
+                        srcset="https://flagcdn.com/w40/fr.png 2x"
+                        width="20"
+                      />
+                      <span>Français</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+              <button
+                class="hidden sm:inline-flex items-center justify-center rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold shadow-sm hover:bg-primary/90 transition-colors"
+              >
+                Sign in
+              </button>
+              <div class="relative">
+                <button class="flex items-center gap-2">
+                  <div
+                    class="h-10 w-10 rounded-full bg-cover bg-center"
+                    style="
+                      background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAEph91lSpqs7aFtduUrK19owh-7-sICjLP6RMYjirBtI2RQKaTWJtQnrEYksCnzRDtrvuyFwVk_azaFecv-QhtTd9vjrSCMpTV5pskG4r1O_S9V-EYb4VMmySuZFuRuNqvzYOWPTtdoOrWSJNOFrG3vHao5n-00QzU_fh9d0azumUAScSyWoTyqb2jXCJQ3FuyKH7Dm2Gx0Otm1Wj7z4WCV4NTISIl6Pgkwf1n3h-895X3AUB8FiARzJRLsgZl-sHfN4dLkkpF8rY');
+                    "
+                  ></div>
+                  <span
+                    class="hidden sm:block text-sm font-medium text-slate-700 dark:text-slate-200"
+                    >Nickname</span
+                  >
+                  <span
+                    class="material-symbols-outlined text-base text-slate-500 dark:text-slate-400 hidden sm:block"
+                    >expand_more</span
+                  >
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+      <main class="flex-grow">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+          <div class="max-w-3xl mx-auto text-center mb-12">
+            <h1
+              class="text-4xl sm:text-5xl font-bold tracking-tight text-slate-900 dark:text-white"
+            >
+              Thai Video Lessons
+            </h1>
+            <p class="mt-4 text-lg text-slate-600 dark:text-slate-300">
+              Learn Thai with our comprehensive video lessons, covering all levels from beginner to
+              advanced. Filter by difficulty or search for specific topics to find the perfect
+              lesson for you.
+            </p>
+          </div>
+          <div class="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-lg mb-12">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+                  <svg
+                    class="h-5 w-5 text-slate-400 dark:text-slate-500"
+                    fill="currentColor"
+                    viewBox="0 0 256 256"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"
+                    ></path>
+                  </svg>
+                </span>
+                <input
+                  class="block w-full rounded-lg border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 pl-10 pr-4 py-3 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                  placeholder="Search for lessons..."
+                  type="search"
+                />
+              </div>
+              <div>
+                <select
+                  class="w-full rounded-lg border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                >
+                  <option selected="">All Difficulty Levels</option>
+                  <option>Beginner</option>
+                  <option>Intermediate</option>
+                  <option>Advanced</option>
+                </select>
+              </div>
+              <div class="flex items-center space-x-2">
+                <button
+                  class="w-full inline-flex items-center justify-center rounded-lg h-12 px-6 bg-primary text-white text-sm font-bold shadow-sm hover:bg-primary/90 transition-colors"
+                >
+                  Search
+                </button>
+                <button
+                  class="inline-flex items-center justify-center rounded-lg h-12 px-4 bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-sm font-medium hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors"
+                >
+                  <svg
+                    class="h-5 w-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M12 6V4m0 16v-2m8-6h2M2 12H4m14.364 7.636l-1.414-1.414M4.364 5.636L5.778 7.05M19.636 5.636l-1.414 1.414m-12.448 11.182l1.414-1.414"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                    ></path>
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="3"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                    ></circle>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div
+            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-10"
+          >
+            <div class="flex flex-col group">
+              <div class="relative">
+                <div
+                  class="w-full aspect-video bg-cover bg-center rounded-lg shadow-md"
+                  style="
+                    background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDbGYiP_sVcveyBekO2XEm2GfJEKL1L5kZGpuPsn9YRIm5PT3f_12lCS6kJN3I7DDEk6CsZ5tkA5kF7x5kfU6aDiYs6Er00hpaATZoh8NMhjxRH3BoAZEOg7mFpHv67wkpIzckL4FUpZq4zBedD5w8L4_KUmcdnuvzSSEDZgMIGTebq_U4NgqNmK5PSanGYhkaGfCPdfmF_ZtL4a_hCXSMH_5yhDU1MeJ_-lTsxXzHSG0IY0M2RkC8UtIP5dT4sqnkTPTa5UHiDJmE');
+                  "
+                ></div>
+                <div
+                  class="absolute inset-0 bg-black/20 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                >
+                  <button
+                    class="w-14 h-14 bg-primary/80 text-white rounded-full flex items-center justify-center"
+                  >
+                    <svg
+                      class="h-8 w-8 ml-1"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        clip-rule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
+                        fill-rule="evenodd"
+                      ></path>
+                    </svg>
+                  </button>
+                </div>
+                <div class="absolute top-3 left-3">
+                  <span
+                    class="px-2 py-1 text-xs font-semibold text-green-800 bg-green-200 rounded-full"
+                    >Beginner</span
+                  >
+                </div>
+                <div class="absolute bottom-3 right-3">
+                  <span class="px-2 py-1 text-xs font-semibold text-white bg-black/50 rounded-md"
+                    >12:34</span
+                  >
+                </div>
+              </div>
+              <div class="pt-3">
+                <p
+                  class="font-semibold text-slate-800 dark:text-slate-100 group-hover:text-primary dark:group-hover:text-primary transition-colors"
+                >
+                  Lesson 1: Greetings &amp; Introductions
+                </p>
+                <p class="text-sm text-slate-500 dark:text-slate-400">
+                  Learn how to greet people and introduce yourself in Thai.
+                </p>
+              </div>
+            </div>
+            <div class="flex flex-col group">
+              <div class="relative">
+                <div
+                  class="w-full aspect-video bg-cover bg-center rounded-lg shadow-md"
+                  style="
+                    background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuB1bGb1BqLIaiNwAxFVgQaDt-K1_JGC5-B9lMOsOzKPw7lAdtHg9VG1Tj62xLsUzNMVxtqvzwXgleWha8H-BWIW-e5aVnYLsBmqUv_2Mms8SC8cepksVfr0CZsS6J3e_U5jRM-MyYs92Yb3_zsxkGdMMytGOM0QlwM9NpXK4XlVIP4lXaNu7zL-Cr5LF97rZy-OijkpV0iz5O7U2xqy4I3Pmym59VKYzLw0nVuG81GA8OvMs_WzeUUmYhktRDbVJuYUJIMHEZeTBr0');
+                  "
+                ></div>
+                <div
+                  class="absolute inset-0 bg-black/20 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                >
+                  <button
+                    class="w-14 h-14 bg-primary/80 text-white rounded-full flex items-center justify-center"
+                  >
+                    <svg
+                      class="h-8 w-8 ml-1"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        clip-rule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
+                        fill-rule="evenodd"
+                      ></path>
+                    </svg>
+                  </button>
+                </div>
+                <div class="absolute top-3 left-3">
+                  <span
+                    class="px-2 py-1 text-xs font-semibold text-green-800 bg-green-200 rounded-full"
+                    >Beginner</span
+                  >
+                </div>
+                <div class="absolute bottom-3 right-3">
+                  <span class="px-2 py-1 text-xs font-semibold text-white bg-black/50 rounded-md"
+                    >8:15</span
+                  >
+                </div>
+              </div>
+              <div class="pt-3">
+                <p
+                  class="font-semibold text-slate-800 dark:text-slate-100 group-hover:text-primary dark:group-hover:text-primary transition-colors"
+                >
+                  Lesson 2: Basic Phrases
+                </p>
+                <p class="text-sm text-slate-500 dark:text-slate-400">
+                  Master essential phrases for everyday conversations.
+                </p>
+              </div>
+            </div>
+            <div class="flex flex-col group">
+              <div class="relative">
+                <div
+                  class="w-full aspect-video bg-cover bg-center rounded-lg shadow-md"
+                  style="
+                    background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC3vW_9gP4YP6pyuum4u_6-AGYzji2yNaHrLVirz1pvmx7Xt-ohIptQwiW2V78sZsvpdX2R2dSHTHJfJdyAgfl6CbRlUhjR2GI0e_4OJKRVKxcj9P-xGaRK5zGgMydEKvTtoO9ppJVXUe8-YjRIHgfCURW53RuLT7K8j6rUONdkBAuEpM5vySv2VdayUPjzzta_HsP2GyTvOVNjmJjiO4XESQ6X1CWkj5N4Jmlord9pJfUbkcAFBvV8Vo-4qdDSKdLZ5-dMBR9lrMo');
+                  "
+                ></div>
+                <div
+                  class="absolute inset-0 bg-black/20 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                >
+                  <button
+                    class="w-14 h-14 bg-primary/80 text-white rounded-full flex items-center justify-center"
+                  >
+                    <svg
+                      class="h-8 w-8 ml-1"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        clip-rule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
+                        fill-rule="evenodd"
+                      ></path>
+                    </svg>
+                  </button>
+                </div>
+                <div class="absolute top-3 left-3">
+                  <span
+                    class="px-2 py-1 text-xs font-semibold text-orange-800 bg-orange-200 rounded-full"
+                    >Intermediate</span
+                  >
+                </div>
+                <div class="absolute bottom-3 right-3">
+                  <span class="px-2 py-1 text-xs font-semibold text-white bg-black/50 rounded-md"
+                    >15:02</span
+                  >
+                </div>
+              </div>
+              <div class="pt-3">
+                <p
+                  class="font-semibold text-slate-800 dark:text-slate-100 group-hover:text-primary dark:group-hover:text-primary transition-colors"
+                >
+                  Lesson 3: Ordering Food
+                </p>
+                <p class="text-sm text-slate-500 dark:text-slate-400">
+                  Learn how to order food at a restaurant or street vendor.
+                </p>
+              </div>
+            </div>
+            <div class="flex flex-col group">
+              <div class="relative">
+                <div
+                  class="w-full aspect-video bg-cover bg-center rounded-lg shadow-md"
+                  style="
+                    background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAfrj9rKtt8oPSMmgHHTIsvLEQq21CPYXpv0Zw07TTAqAHlqRe66j73bQctKLAolYeulmns1sS1-AtvGxnK_IfDnKlCnX2Gh8AHfWmeMta9DiktadiulsoHO8zHLj1Eyd0Xxoq9aHnAYqgfCm17P6m5UXQrlcjfacTE4qojLIdwBrLN_TpdROfVy7Bz_ENO9ZO8iVQqgyy45e8E8_lvZBX7fjaAahuEL0mdQpWnnq43zB_11fyS4weD2k5qUbrcyfPL0I2ORQOMrS8');
+                  "
+                ></div>
+                <div
+                  class="absolute inset-0 bg-black/20 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                >
+                  <button
+                    class="w-14 h-14 bg-primary/80 text-white rounded-full flex items-center justify-center"
+                  >
+                    <svg
+                      class="h-8 w-8 ml-1"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        clip-rule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
+                        fill-rule="evenodd"
+                      ></path>
+                    </svg>
+                  </button>
+                </div>
+                <div class="absolute top-3 left-3">
+                  <span
+                    class="px-2 py-1 text-xs font-semibold text-orange-800 bg-orange-200 rounded-full"
+                    >Intermediate</span
+                  >
+                </div>
+                <div class="absolute bottom-3 right-3">
+                  <span class="px-2 py-1 text-xs font-semibold text-white bg-black/50 rounded-md"
+                    >11:55</span
+                  >
+                </div>
+              </div>
+              <div class="pt-3">
+                <p
+                  class="font-semibold text-slate-800 dark:text-slate-100 group-hover:text-primary dark:group-hover:text-primary transition-colors"
+                >
+                  Lesson 4: Asking for Directions
+                </p>
+                <p class="text-sm text-slate-500 dark:text-slate-400">
+                  Get comfortable asking for directions and navigating your way around.
+                </p>
+              </div>
+            </div>
+            <div class="flex flex-col group">
+              <div class="relative">
+                <div
+                  class="w-full aspect-video bg-cover bg-center rounded-lg shadow-md"
+                  style="
+                    background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC2EIe0YbA77fQZrUN94BB9fz7mhuoTNOlU20aL0tkRnys85c8oVPY9a_BWFhumFL8cuyLTrawH8KyaNuBVUMBvVNyKgNVjM5Ls-rKlSUTR-rq1MS5qNILeg2oaNXuZOzwOMSxfBHwTmKSFvz87Vlv1SBvCCnctJxxNddKZXDAGhLde_eRt1dI3dZP7IZ_e_AZt-QFSOmVHLf0edlGD0VGmbDgz7uEE49Qzf12vSyrldEWcQqf800yaz1KZCcsb0iQ5_Qqe6-7x08s');
+                  "
+                ></div>
+                <div
+                  class="absolute inset-0 bg-black/20 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                >
+                  <button
+                    class="w-14 h-14 bg-primary/80 text-white rounded-full flex items-center justify-center"
+                  >
+                    <svg
+                      class="h-8 w-8 ml-1"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        clip-rule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
+                        fill-rule="evenodd"
+                      ></path>
+                    </svg>
+                  </button>
+                </div>
+                <div class="absolute top-3 left-3">
+                  <span
+                    class="px-2 py-1 text-xs font-semibold text-orange-800 bg-orange-200 rounded-full"
+                    >Intermediate</span
+                  >
+                </div>
+                <div class="absolute bottom-3 right-3">
+                  <span class="px-2 py-1 text-xs font-semibold text-white bg-black/50 rounded-md"
+                    >13:20</span
+                  >
+                </div>
+              </div>
+              <div class="pt-3">
+                <p
+                  class="font-semibold text-slate-800 dark:text-slate-100 group-hover:text-primary dark:group-hover:text-primary transition-colors"
+                >
+                  Lesson 5: Shopping
+                </p>
+                <p class="text-sm text-slate-500 dark:text-slate-400">
+                  Learn how to shop and bargain in Thai markets.
+                </p>
+              </div>
+            </div>
+            <div class="flex flex-col group">
+              <div class="relative">
+                <div
+                  class="w-full aspect-video bg-cover bg-center rounded-lg shadow-md"
+                  style="
+                    background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAF_047Wexr2i1s1mUnYBsS4nr45SSKKBsC57mIhlIzB1fyd4oFd8A7PJmQyzOt1yisH6qNcD05RccKBQzZ48rG72cH_-slKb_RjgwITpCos76EXbda56uqoSzITyjjmpRaaDj7tNrGH5lAQhu1-1ietcQWRc8poP3EiE2xZ9uMy-r9n0ccWQVwWTI7u1OZmH68d83E_E6eMu-bxsumJUzpKrcZw1a-hhYfc8XgAWX3xM54sGW9q2cB11od6kjwgl6AkMoc3odm2R8');
+                  "
+                ></div>
+                <div
+                  class="absolute inset-0 bg-black/20 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                >
+                  <button
+                    class="w-14 h-14 bg-primary/80 text-white rounded-full flex items-center justify-center"
+                  >
+                    <svg
+                      class="h-8 w-8 ml-1"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        clip-rule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
+                        fill-rule="evenodd"
+                      ></path>
+                    </svg>
+                  </button>
+                </div>
+                <div class="absolute top-3 left-3">
+                  <span class="px-2 py-1 text-xs font-semibold text-red-800 bg-red-200 rounded-full"
+                    >Advanced</span
+                  >
+                </div>
+                <div class="absolute bottom-3 right-3">
+                  <span class="px-2 py-1 text-xs font-semibold text-white bg-black/50 rounded-md"
+                    >18:45</span
+                  >
+                </div>
+              </div>
+              <div class="pt-3">
+                <p
+                  class="font-semibold text-slate-800 dark:text-slate-100 group-hover:text-primary dark:group-hover:text-primary transition-colors"
+                >
+                  Lesson 6: Numbers and Counting
+                </p>
+                <p class="text-sm text-slate-500 dark:text-slate-400">
+                  Understand and use numbers and counting in Thai.
+                </p>
+              </div>
+            </div>
+            <div class="flex flex-col group">
+              <div class="relative">
+                <div
+                  class="w-full aspect-video bg-cover bg-center rounded-lg shadow-md"
+                  style="
+                    background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCSlpx4714KrBSXxfZXc54lNcxCgWhkDqF-e6xOSlNCBzrfHHUWrAf0D613IButc-9WQJghyLRWfs8Kvat8sTCn04j2UAR3eGlgkjdaAtkJzjcsqMLkap10c5VA4ThQii6Zbo3PQTLqgy3p9gkbakgLX4vYWNv4CqVGm1aF-uh0Jy_2zpb7spUXu_M7l43rjmkLSdNAyLKZuTjlc3EWCa0tQuWLGAZCcDRb9TfjyZfJq57RsC96h2qM_luHTsDpGTaCSFIKm9uR1W0');
+                  "
+                ></div>
+                <div
+                  class="absolute inset-0 bg-black/20 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                >
+                  <button
+                    class="w-14 h-14 bg-primary/80 text-white rounded-full flex items-center justify-center"
+                  >
+                    <svg
+                      class="h-8 w-8 ml-1"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        clip-rule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
+                        fill-rule="evenodd"
+                      ></path>
+                    </svg>
+                  </button>
+                </div>
+                <div class="absolute top-3 left-3">
+                  <span class="px-2 py-1 text-xs font-semibold text-red-800 bg-red-200 rounded-full"
+                    >Advanced</span
+                  >
+                </div>
+                <div class="absolute bottom-3 right-3">
+                  <span class="px-2 py-1 text-xs font-semibold text-white bg-black/50 rounded-md"
+                    >16:10</span
+                  >
+                </div>
+              </div>
+              <div class="pt-3">
+                <p
+                  class="font-semibold text-slate-800 dark:text-slate-100 group-hover:text-primary dark:group-hover:text-primary transition-colors"
+                >
+                  Lesson 7: Time and Dates
+                </p>
+                <p class="text-sm text-slate-500 dark:text-slate-400">
+                  Learn how to tell time and discuss dates.
+                </p>
+              </div>
+            </div>
+            <div class="flex flex-col group">
+              <div class="relative">
+                <div
+                  class="w-full aspect-video bg-cover bg-center rounded-lg shadow-md"
+                  style="
+                    background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDbhE6w_ZFXPzaPlbsfaXgjxk8ir5UA3bxIfq1RT3ySzMuD0EJhgGcNmJ00ltCnWkLWZpbCa6Rw2Bb6xMliwT8c0MucW9NbYanSpOiOqQdSJKOx5Ac9fmRNNDECvO5B7YElPExLgc2XSuaOVWRpVLhbncO2qHlv_mIiDx31T0UtRMwHAL_xW4J88OYytaOw9N7JZbnndAlIKNS81XuPW5LQNw5mMCrDXgDJIrUEutBqZxVst_y6ouB_2Su_TUNhKPiDug1FP08YpDs');
+                  "
+                ></div>
+                <div
+                  class="absolute inset-0 bg-black/20 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                >
+                  <button
+                    class="w-14 h-14 bg-primary/80 text-white rounded-full flex items-center justify-center"
+                  >
+                    <svg
+                      class="h-8 w-8 ml-1"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        clip-rule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
+                        fill-rule="evenodd"
+                      ></path>
+                    </svg>
+                  </button>
+                </div>
+                <div class="absolute top-3 left-3">
+                  <span class="px-2 py-1 text-xs font-semibold text-red-800 bg-red-200 rounded-full"
+                    >Advanced</span
+                  >
+                </div>
+                <div class="absolute bottom-3 right-3">
+                  <span class="px-2 py-1 text-xs font-semibold text-white bg-black/50 rounded-md"
+                    >20:05</span
+                  >
+                </div>
+              </div>
+              <div class="pt-3">
+                <p
+                  class="font-semibold text-slate-800 dark:text-slate-100 group-hover:text-primary dark:group-hover:text-primary transition-colors"
+                >
+                  Lesson 8: Transportation
+                </p>
+                <p class="text-sm text-slate-500 dark:text-slate-400">
+                  Learn how to use different modes of transportation.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>

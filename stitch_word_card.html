@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Dictionary Word Card</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;700&amp;family=Noto+Sans:wght@400;500;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              primary: {
+                DEFAULT: '#3B82F6', // Calm indigo/blue
+                hover: '#2563EB',
+              },
+              'background-light': '#F9FAFB', // Neutral light surface
+              'background-dark': '#1F2937',
+              'card-light': '#FFFFFF',
+              'card-dark': '#374151',
+              'text-light-primary': '#111827',
+              'text-dark-primary': '#F9FAFB',
+              'text-light-muted': '#6B7280',
+              'text-dark-muted': '#9CA3AF',
+              'border-light': '#E5E7EB',
+              'border-dark': '#4B5563',
+              accent: '#14B8A6', // Calm teal
+            },
+            fontFamily: {
+              sans: ['Noto Sans', 'sans-serif'],
+              'sans-thai': ['Noto Sans Thai', 'sans-serif'],
+            },
+            borderRadius: {
+              DEFAULT: '0.75rem', // 12px
+              lg: '1rem', // 16px
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      .slider-container {
+        scroll-snap-type: x mandatory;
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+      }
+      .slider-item {
+        scroll-snap-align: start;
+      }
+      .slider-container::-webkit-scrollbar {
+        display: none;
+      }
+    </style>
+  </head>
+  <body
+    class="bg-background-light dark:bg-background-dark flex items-center justify-center min-h-screen p-4 sm:p-6 font-sans"
+  >
+    <div
+      class="w-full max-w-xl bg-card-light dark:bg-card-dark rounded-lg shadow-subtle p-6 sm:p-8 space-y-6"
+    >
+      <div
+        class="flex flex-col sm:flex-row justify-between sm:items-start gap-4 pb-4 border-b border-border-light dark:border-border-dark"
+      >
+        <div>
+          <h1
+            class="text-4xl sm:text-5xl font-bold font-sans-thai text-text-light-primary dark:text-text-dark-primary"
+          >
+            กิน
+          </h1>
+          <p class="text-lg text-text-light-muted dark:text-text-dark-muted mt-1">kin</p>
+        </div>
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-shrink-0">
+          <button
+            class="bg-accent hover:bg-teal-600 text-white px-4 py-2 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent focus:ring-offset-card-light dark:focus:ring-offset-card-dark transition-colors w-full sm:w-auto"
+            id="dictionary-action-btn"
+          >
+            Добавить в словарь
+          </button>
+          <button
+            class="px-4 py-2 text-sm font-medium rounded-md border border-border-light dark:border-border-dark text-text-light-primary dark:text-text-dark-primary hover:bg-border-light dark:hover:bg-border-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent focus:ring-offset-card-light dark:focus:ring-offset-card-dark transition-colors w-full sm:w-auto"
+          >
+            Редактировать
+          </button>
+        </div>
+      </div>
+      <div>
+        <h2 class="text-lg font-bold text-text-light-primary dark:text-text-dark-primary mb-3">
+          Переводы
+        </h2>
+        <ul class="space-y-2 pl-5">
+          <li
+            class="text-base text-text-light-primary dark:text-text-dark-primary list-disc list-item marker:text-accent"
+          >
+            есть
+          </li>
+          <li
+            class="text-base text-text-light-primary dark:text-text-dark-primary list-disc list-item marker:text-accent"
+          >
+            принимать пищу
+          </li>
+          <li
+            class="text-base text-text-light-primary dark:text-text-dark-primary list-disc list-item marker:text-accent"
+          >
+            кушать
+          </li>
+        </ul>
+      </div>
+      <div class="space-y-3">
+        <div class="flex justify-between items-center">
+          <h2 class="text-lg font-bold text-text-light-primary dark:text-text-dark-primary">
+            Примеры
+          </h2>
+          <div class="flex items-center space-x-3">
+            <button
+              aria-label="Предыдущий слайд: Примеры"
+              class="text-text-light-muted dark:text-text-dark-muted hover:text-text-light-primary dark:hover:text-text-dark-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent focus:ring-offset-card-light dark:focus:ring-offset-card-dark rounded-full disabled:opacity-50 disabled:cursor-not-allowed"
+              id="examples-prev"
+            >
+              <span class="material-icons-outlined">chevron_left</span>
+            </button>
+            <span
+              class="text-sm text-text-light-muted dark:text-text-dark-muted"
+              id="examples-pager"
+              >1/2</span
+            >
+            <button
+              aria-label="Следующий слайд: Примеры"
+              class="text-text-light-muted dark:text-text-dark-muted hover:text-text-light-primary dark:hover:text-text-dark-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent focus:ring-offset-card-light dark:focus:ring-offset-card-dark rounded-full disabled:opacity-50 disabled:cursor-not-allowed"
+              id="examples-next"
+            >
+              <span class="material-icons-outlined">chevron_right</span>
+            </button>
+          </div>
+        </div>
+        <div class="slider-container flex overflow-x-auto gap-4" id="examples-slider">
+          <div
+            class="slider-item flex-shrink-0 w-full bg-background-light dark:bg-background-dark p-4 rounded"
+          >
+            <p class="font-sans-thai text-lg text-text-light-primary dark:text-text-dark-primary">
+              ฉันกินข้าวแล้ว
+            </p>
+            <p class="text-base text-text-light-muted dark:text-text-dark-muted mt-1">
+              Я уже поел.
+            </p>
+          </div>
+          <div
+            class="slider-item flex-shrink-0 w-full bg-background-light dark:bg-background-dark p-4 rounded"
+          >
+            <p class="font-sans-thai text-lg text-text-light-primary dark:text-text-dark-primary">
+              แมวกินปลา
+            </p>
+            <p class="text-base text-text-light-muted dark:text-text-dark-muted mt-1">
+              Кот ест рыбу.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div class="space-y-3">
+          <div class="flex justify-between items-center">
+            <h2 class="text-lg font-bold text-text-light-primary dark:text-text-dark-primary">
+              Синонимы
+            </h2>
+            <div class="flex items-center space-x-3">
+              <button
+                aria-label="Предыдущий слайд: Синонимы"
+                class="text-text-light-muted dark:text-text-dark-muted hover:text-text-light-primary dark:hover:text-text-dark-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent focus:ring-offset-card-light dark:focus:ring-offset-card-dark rounded-full disabled:opacity-50 disabled:cursor-not-allowed"
+                id="synonyms-prev"
+              >
+                <span class="material-icons-outlined">chevron_left</span>
+              </button>
+              <span
+                class="text-sm text-text-light-muted dark:text-text-dark-muted"
+                id="synonyms-pager"
+                >1/2</span
+              >
+              <button
+                aria-label="Следующий слайд: Синонимы"
+                class="text-text-light-muted dark:text-text-dark-muted hover:text-text-light-primary dark:hover:text-text-dark-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent focus:ring-offset-card-light dark:focus:ring-offset-card-dark rounded-full disabled:opacity-50 disabled:cursor-not-allowed"
+                id="synonyms-next"
+              >
+                <span class="material-icons-outlined">chevron_right</span>
+              </button>
+            </div>
+          </div>
+          <div class="slider-container flex overflow-x-auto gap-3" id="synonyms-slider">
+            <div class="slider-item flex-shrink-0 w-full flex items-center justify-start gap-3">
+              <span
+                class="font-sans-thai bg-border-light dark:bg-border-dark text-text-light-primary dark:text-text-dark-primary px-3 py-1.5 rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent focus:ring-offset-card-light dark:focus:ring-offset-card-dark"
+                tabindex="0"
+                >รับประทาน</span
+              >
+            </div>
+            <div class="slider-item flex-shrink-0 w-full flex items-center justify-start gap-3">
+              <span
+                class="font-sans-thai bg-border-light dark:bg-border-dark text-text-light-primary dark:text-text-dark-primary px-3 py-1.5 rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent focus:ring-offset-card-light dark:focus:ring-offset-card-dark"
+                tabindex="0"
+                >ทาน</span
+              >
+            </div>
+          </div>
+        </div>
+        <div class="space-y-3">
+          <div class="flex justify-between items-center">
+            <h2 class="text-lg font-bold text-text-light-primary dark:text-text-dark-primary">
+              Антонимы
+            </h2>
+            <div class="flex items-center space-x-3">
+              <button
+                aria-label="Предыдущий слайд: Антонимы"
+                class="text-text-light-muted dark:text-text-dark-muted hover:text-text-light-primary dark:hover:text-text-dark-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent focus:ring-offset-card-light dark:focus:ring-offset-card-dark rounded-full disabled:opacity-50 disabled:cursor-not-allowed"
+                id="antonyms-prev"
+              >
+                <span class="material-icons-outlined">chevron_left</span>
+              </button>
+              <span
+                class="text-sm text-text-light-muted dark:text-text-dark-muted"
+                id="antonyms-pager"
+                >1/2</span
+              >
+              <button
+                aria-label="Следующий слайд: Антонимы"
+                class="text-text-light-muted dark:text-text-dark-muted hover:text-text-light-primary dark:hover:text-text-dark-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent focus:ring-offset-card-light dark:focus:ring-offset-card-dark rounded-full disabled:opacity-50 disabled:cursor-not-allowed"
+                id="antonyms-next"
+              >
+                <span class="material-icons-outlined">chevron_right</span>
+              </button>
+            </div>
+          </div>
+          <div class="slider-container flex overflow-x-auto gap-3" id="antonyms-slider">
+            <div class="slider-item flex-shrink-0 w-full flex items-center justify-start gap-3">
+              <span
+                class="font-sans-thai bg-border-light dark:bg-border-dark text-text-light-primary dark:text-text-dark-primary px-3 py-1.5 rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent focus:ring-offset-card-light dark:focus:ring-offset-card-dark"
+                tabindex="0"
+                >อด</span
+              >
+            </div>
+            <div class="slider-item flex-shrink-0 w-full flex items-center justify-start gap-3">
+              <span
+                class="font-sans-thai bg-border-light dark:bg-border-dark text-text-light-primary dark:text-text-dark-primary px-3 py-1.5 rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent focus:ring-offset-card-light dark:focus:ring-offset-card-dark"
+                tabindex="0"
+                >งดกิน</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="space-y-3">
+        <div class="flex justify-between items-center">
+          <h2 class="text-lg font-bold text-text-light-primary dark:text-text-dark-primary">
+            Ссылки
+          </h2>
+          <div class="flex items-center space-x-3">
+            <button
+              aria-label="Предыдущий слайд: Ссылки"
+              class="text-text-light-muted dark:text-text-dark-muted hover:text-text-light-primary dark:hover:text-text-dark-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent focus:ring-offset-card-light dark:focus:ring-offset-card-dark rounded-full disabled:opacity-50 disabled:cursor-not-allowed"
+              id="links-prev"
+            >
+              <span class="material-icons-outlined">chevron_left</span>
+            </button>
+            <span class="text-sm text-text-light-muted dark:text-text-dark-muted" id="links-pager"
+              >1/2</span
+            >
+            <button
+              aria-label="Следующий слайд: Ссылки"
+              class="text-text-light-muted dark:text-text-dark-muted hover:text-text-light-primary dark:hover:text-text-dark-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent focus:ring-offset-card-light dark:focus:ring-offset-card-dark rounded-full disabled:opacity-50 disabled:cursor-not-allowed"
+              id="links-next"
+            >
+              <span class="material-icons-outlined">chevron_right</span>
+            </button>
+          </div>
+        </div>
+        <div class="slider-container flex overflow-x-auto gap-4" id="links-slider">
+          <a
+            class="slider-item flex-shrink-0 w-full bg-background-light dark:bg-background-dark p-4 rounded flex items-center justify-between group focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent focus:ring-offset-card-light dark:focus:ring-offset-card-dark"
+            href="#"
+          >
+            <div class="flex items-center space-x-3">
+              <img
+                alt="Wiktionary favicon"
+                class="w-6 h-6 rounded-full"
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0JISVLYheV6VNGEYLGEKy1OJfE7lO0W3AS8isPIGuZDJXA0S2h3JKO-HbxmG6dGIxfbM3zKfcCgqx4s7Qk7IoqQO7oi_L_r5SKuR0EfuzS7Z87BSVDYnbtbA4ruFzmhY1BP9L0p1YLnlMN6XkW2Wfv0NkPY-8rpKJjpeF0SYSTCnjZReczYw-7GA0BZiUG1GTGh_jMSP-5jWFFMKP6Y3sYyK8urYLdMjVl7ogBVnYFdSX1YoklMPFGkAE2oHIn12iSjhlLej1f641"
+              />
+              <span class="text-base text-text-light-primary dark:text-text-dark-primary"
+                >th.wiktionary.org</span
+              >
+            </div>
+            <span
+              class="material-icons-outlined text-text-light-muted dark:text-text-dark-muted group-hover:text-accent transition-colors"
+              >arrow_forward_ios</span
+            >
+          </a>
+          <a
+            class="slider-item flex-shrink-0 w-full bg-background-light dark:bg-background-dark p-4 rounded flex items-center justify-between group focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent focus:ring-offset-card-light dark:focus:ring-offset-card-dark"
+            href="#"
+          >
+            <div class="flex items-center space-x-3">
+              <span
+                class="material-icons-outlined text-text-light-muted dark:text-text-dark-muted w-6 h-6"
+                >link</span
+              >
+              <span class="text-base text-text-light-primary dark:text-text-dark-primary"
+                >example.com</span
+              >
+            </div>
+            <span
+              class="material-icons-outlined text-text-light-muted dark:text-text-dark-muted group-hover:text-accent transition-colors"
+              >arrow_forward_ios</span
+            >
+          </a>
+        </div>
+      </div>
+    </div>
+    <script>
+      function setupSlider(id) {
+        const slider = document.getElementById(`${id}-slider`);
+        const prevBtn = document.getElementById(`${id}-prev`);
+        const nextBtn = document.getElementById(`${id}-next`);
+        const pager = document.getElementById(`${id}-pager`);
+        if (!slider) return;
+        const slides = Array.from(slider.children).filter((child) =>
+          child.classList.contains('slider-item')
+        );
+        const totalSlides = slides.length;
+        if (totalSlides === 0) return;
+        let currentIndex = 0;
+        const slideWidth = () =>
+          slides[0].offsetWidth + parseInt(window.getComputedStyle(slider).gap);
+        function updateUI() {
+          const currentScroll = currentIndex * slideWidth();
+          slider.scrollTo({
+            left: currentScroll,
+            behavior: 'smooth',
+          });
+          if (pager) pager.textContent = `${currentIndex + 1}/${totalSlides}`;
+          if (prevBtn) prevBtn.disabled = currentIndex === 0;
+          if (nextBtn) nextBtn.disabled = currentIndex === totalSlides - 1;
+        }
+        function handleScroll() {
+          const newIndex = Math.round(slider.scrollLeft / slideWidth());
+          if (newIndex !== currentIndex) {
+            currentIndex = newIndex;
+            updateUI();
+          }
+        }
+        if (nextBtn)
+          nextBtn.addEventListener('click', () => {
+            if (currentIndex < totalSlides - 1) {
+              currentIndex++;
+              updateUI();
+            }
+          });
+        if (prevBtn)
+          prevBtn.addEventListener('click', () => {
+            if (currentIndex > 0) {
+              currentIndex--;
+              updateUI();
+            }
+          });
+        let debounceTimer;
+        slider.addEventListener('scroll', () => {
+          clearTimeout(debounceTimer);
+          debounceTimer = setTimeout(handleScroll, 150);
+        });
+        slider.addEventListener('keydown', (e) => {
+          if (e.key === 'ArrowRight') {
+            e.preventDefault();
+            nextBtn.click();
+          } else if (e.key === 'ArrowLeft') {
+            e.preventDefault();
+            prevBtn.click();
+          }
+        });
+        window.addEventListener('resize', () => {
+          // Recalculate scroll position on resize
+          updateUI();
+        });
+        updateUI();
+      }
+      document.addEventListener('DOMContentLoaded', () => {
+        setupSlider('synonyms');
+        setupSlider('antonyms');
+        setupSlider('examples');
+        setupSlider('links');
+        const dictionaryBtn = document.getElementById('dictionary-action-btn');
+        let isInDictionary = false;
+        dictionaryBtn.addEventListener('click', () => {
+          isInDictionary = !isInDictionary;
+          if (isInDictionary) {
+            dictionaryBtn.textContent = 'Удалить из словаря';
+            dictionaryBtn.classList.remove('bg-accent', 'hover:bg-teal-600');
+            dictionaryBtn.classList.add('bg-red-500', 'hover:bg-red-600');
+          } else {
+            dictionaryBtn.textContent = 'Добавить в словарь';
+            dictionaryBtn.classList.remove('bg-red-500', 'hover:bg-red-600');
+            dictionaryBtn.classList.add('bg-accent', 'hover:bg-teal-600');
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

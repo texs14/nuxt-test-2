@@ -22,58 +22,14 @@
         </p>
 
         <div class="vocabulary-page__list">
-          <div v-for="word in vocabularyList" :key="word.id" class="vocabulary-card">
-            <div class="vocabulary-card__header">
-              <h3 class="vocabulary-card__word">{{ word.word_th }}</h3>
-              <button
-                class="vocabulary-card__remove-btn"
-                type="button"
-                @click="removeWord(word.id)"
-              >
-                {{ t('vocabulary.remove') }}
-              </button>
-            </div>
-
-            <p v-if="word.transcription_en" class="vocabulary-card__transcription">
-              {{ word.transcription_en }}
-            </p>
-
-            <div v-if="word.translation?.length" class="vocabulary-card__section">
-              <h4 class="vocabulary-card__label">{{ t('dictionary.translation') }}</h4>
-              <ul class="vocabulary-card__list">
-                <li v-for="(trans, idx) in word.translation" :key="`trans-${idx}`">
-                  {{ trans }}
-                </li>
-              </ul>
-            </div>
-
-            <div v-if="word.synonyms?.length" class="vocabulary-card__section">
-              <h4 class="vocabulary-card__label">{{ t('dictionary.synonyms') }}</h4>
-              <ul class="vocabulary-card__list">
-                <li v-for="(syn, idx) in word.synonyms" :key="`syn-${idx}`">
-                  {{ syn }}
-                </li>
-              </ul>
-            </div>
-
-            <div v-if="word.antonyms?.length" class="vocabulary-card__section">
-              <h4 class="vocabulary-card__label">{{ t('dictionary.antonyms') }}</h4>
-              <ul class="vocabulary-card__list">
-                <li v-for="(ant, idx) in word.antonyms" :key="`ant-${idx}`">
-                  {{ ant }}
-                </li>
-              </ul>
-            </div>
-
-            <div v-if="word.examples?.length" class="vocabulary-card__section">
-              <h4 class="vocabulary-card__label">{{ t('dictionary.examples') }}</h4>
-              <ul class="vocabulary-card__list">
-                <li v-for="(example, idx) in word.examples" :key="`ex-${idx}`">
-                  {{ formatExample(example) }}
-                </li>
-              </ul>
-            </div>
-          </div>
+          <VocabularyWordCard
+            v-for="word in vocabularyList"
+            :key="word.id"
+            :word="word"
+            :is-in-vocabulary="true"
+            @toggle-vocabulary="removeWord(word.id)"
+            @edit="editWord(word.id)"
+          />
         </div>
       </div>
     </div>
@@ -118,20 +74,6 @@ const {
 
 const vocabularyList = computed(() => vocabularyData.value || []);
 
-const formatExample = (value: Json | DictionaryExample) => {
-  if (!value || typeof value !== 'object') return '';
-
-  const parts: string[] = [];
-  for (const key in value) {
-    const val = (value as Record<string, unknown>)[key];
-    if (typeof val === 'string' && val.trim()) {
-      parts.push(val.trim());
-    }
-  }
-
-  return parts.filter(Boolean).join(' — ');
-};
-
 const removeWord = async (id: number) => {
   try {
     await $fetch(`/api/vocabulary/${id}`, { method: 'DELETE' });
@@ -139,6 +81,11 @@ const removeWord = async (id: number) => {
   } catch {
     // Ignore errors silently
   }
+};
+
+const editWord = (id: number) => {
+  // TODO: Implement edit functionality
+  navigateTo(`/dictionary/edit/${id}`);
 };
 </script>
 
@@ -150,7 +97,7 @@ const removeWord = async (id: number) => {
   min-height: calc(100vh - 120px);
 
   &__container {
-    width: min(1200px, 100%);
+    width: min(1440px, 100%);
     padding: 2rem 1.5rem 3rem;
     display: flex;
     flex-direction: column;
@@ -210,99 +157,10 @@ const removeWord = async (id: number) => {
   }
 
   &__list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
     gap: 1.5rem;
-  }
-}
-
-.vocabulary-card {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  transition: box-shadow 0.2s;
-
-  &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  }
-
-  &__header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 1rem;
-  }
-
-  &__word {
-    margin: 0;
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #0f172a;
-  }
-
-  &__remove-btn {
-    padding: 0.5rem 1rem;
-    background-color: #ef4444;
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    font-size: 0.875rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    white-space: nowrap;
-
-    &:hover {
-      background-color: #dc2626;
-    }
-  }
-
-  &__transcription {
-    margin: 0;
-    font-size: 1rem;
-    color: #64748b;
-    font-style: italic;
-  }
-
-  &__section {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  &__label {
-    margin: 0;
-    font-size: 0.875rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: #475569;
-  }
-
-  &__list {
-    margin: 0;
-    padding-left: 1.25rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    font-size: 0.875rem;
-    color: #334155;
-
-    li {
-      line-height: 1.5;
-    }
-  }
-}
-
-@media (max-width: 768px) {
-  .vocabulary-page {
-    &__list {
-      grid-template-columns: 1fr;
-    }
+    justify-content: flex-start;
   }
 }
 </style>

@@ -1,8 +1,9 @@
-import { defineComponent, h, resolveComponent } from 'vue';
+import { defineComponent, h } from 'vue';
+import HomePage from './home.vue';
 
 export default defineComponent({
   name: 'IndexPage',
   setup() {
-    return () => h('section', { class: 'home' }, []);
+    return () => h(HomePage);
   },
 });

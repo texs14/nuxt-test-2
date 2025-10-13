@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Learn Thai</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;700;900&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              primary: '#8b5cf6',
+              secondary: '#a78bfa',
+              'background-light': '#f3f4f6',
+              'background-dark': '#1f2937',
+              'text-light': '#374151',
+              'text-dark': '#e5e7eb',
+            },
+            fontFamily: {
+              display: ['Work Sans'],
+            },
+            borderRadius: {
+              DEFAULT: '0.5rem',
+              lg: '0.75rem',
+              xl: '1.5rem',
+              '2xl': '2rem',
+              '3xl': '3rem',
+              full: '9999px',
+            },
+            boxShadow: {
+              zen: '0 10px 30px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.03)',
+            },
+            keyframes: {
+              'fade-in-up': {
+                '0%': { opacity: '0', transform: 'translateY(20px)' },
+                '100%': { opacity: '1', transform: 'translateY(0)' },
+              },
+              float: {
+                '0%, 100%': { transform: 'translateY(0)' },
+                '50%': { transform: 'translateY(-10px)' },
+              },
+            },
+            animation: {
+              'fade-in-up': 'fade-in-up 0.6s ease-out forwards',
+              float: 'float 3s ease-in-out infinite',
+            },
+          },
+        },
+      };
+    </script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+      rel="stylesheet"
+    />
+    <style type="text/tailwindcss">
+      body {
+        @apply font-display bg-gradient-to-br from-gray-100 to-gray-200 dark:from-slate-900 dark:to-slate-800 text-text-light dark:text-text-dark overflow-x-hidden;
+      }
+      .zen-card {
+        @apply bg-white dark:bg-gray-800 rounded-3xl shadow-zen p-6 transition-all duration-300 ease-in-out hover:shadow-lg hover:scale-[1.01] animate-fade-in-up;
+      }
+      .zen-button {
+        @apply inline-flex items-center justify-center rounded-full h-12 px-8 text-base font-semibold shadow-md transition-all duration-300 ease-in-out transform hover:scale-105;
+      }
+    </style>
+  </head>
+  <body class="antialiased">
+    <div class="flex flex-col min-h-screen">
+      <main class="flex-grow">
+        <section class="py-20 sm:py-32 relative overflow-hidden">
+          <div
+            class="absolute inset-0 bg-gradient-to-br from-green-50/50 to-blue-50/50 dark:from-slate-900/50 dark:to-slate-800/50 -z-10"
+          ></div>
+          <div
+            class="absolute w-64 h-64 rounded-full bg-primary/10 blur-3xl -top-16 -left-16 animate-float"
+          ></div>
+          <div
+            class="absolute w-48 h-48 rounded-full bg-secondary/10 blur-3xl bottom-0 right-0 animate-float animation-delay-2000"
+          ></div>
+          <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+            <h1
+              class="text-4xl sm:text-6xl font-bold tracking-tight text-gray-900 dark:text-white leading-tight animate-fade-in-up"
+            >
+              Master the Thai Language
+            </h1>
+            <p
+              class="mt-6 text-lg text-gray-700 dark:text-gray-300 max-w-2xl mx-auto animate-fade-in-up animation-delay-200"
+            >
+              Your journey to fluency starts here. Interactive lessons, real-life conversations, and
+              a vibrant community to guide you every step of the way.
+            </p>
+            <div class="mt-10 flex justify-center gap-4 animate-fade-in-up animation-delay-400">
+              <a
+                class="zen-button bg-gradient-to-r from-primary to-secondary text-white shadow-lg hover:from-secondary hover:to-primary"
+                href="#"
+                >Start Learning Now</a
+              >
+              <a
+                class="zen-button bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 shadow-lg hover:bg-gray-50 dark:hover:bg-gray-600"
+                href="#"
+                >Explore Lessons</a
+              >
+            </div>
+          </div>
+        </section>
+        <section class="py-20 sm:py-32 bg-gray-50 dark:bg-gray-900" id="about">
+          <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              <div class="animate-fade-in-up">
+                <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
+                  About Us
+                </h2>
+                <p class="mt-4 text-lg text-gray-700 dark:text-gray-300">
+                  We are a passionate team of language enthusiasts and educators dedicated to making
+                  Thai accessible to everyone. Our mission is to create a learning experience that
+                  is not only effective but also fun and culturally immersive.
+                </p>
+                <p class="mt-4 text-lg text-gray-700 dark:text-gray-300">
+                  We believe that language is a gateway to understanding a new culture. That's why
+                  our platform goes beyond grammar and vocabulary, offering insights into Thai
+                  traditions, etiquette, and daily life.
+                </p>
+              </div>
+              <div
+                class="w-full h-80 rounded-3xl bg-cover bg-center shadow-xl animate-fade-in-up animation-delay-200"
+                style="
+                  background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuATljtgKmRhrA36brD6Xx7fPTrgXRdR1Rm1jdGuvJeQq_ixw2JFGt-4IGua_QwOShNEeHimSy9x7bwewux4EOJy-SaWdvUl4cT9I0hG0uofDDQcU4AJX_Gvzp566piulCM65VYHypdLiTVRm2zqek3fDGa9KLa7o82xG5lgHIDrJ1dZtyGUUr6O9wlvoz-LGIYnoIUkZ3EDqLAfpvQAnt0vLwGEoIjUDzdey0MTebLkdYnLkn389GY96cSCFVE1VRBnB6o53DZa7ps');
+                "
+              ></div>
+            </div>
+          </div>
+        </section>
+        <section class="py-20 sm:py-32" id="features">
+          <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="max-w-3xl mx-auto text-center mb-16">
+              <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
+                Key Features
+              </h2>
+              <p class="mt-4 text-lg text-gray-700 dark:text-gray-300">
+                Everything you need to learn Thai effectively, all in one place.
+              </p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+              <div class="zen-card">
+                <div
+                  class="flex items-center justify-center h-16 w-16 rounded-full bg-primary/10 text-primary mx-auto mb-6 shadow-md"
+                >
+                  <span class="material-symbols-outlined text-3xl">play_circle</span>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white">
+                  Interactive Video Lessons
+                </h3>
+                <p class="mt-2 text-gray-700 dark:text-gray-300">
+                  Engaging video content that makes learning Thai grammar and vocabulary intuitive
+                  and fun.
+                </p>
+              </div>
+              <div class="zen-card animation-delay-100">
+                <div
+                  class="flex items-center justify-center h-16 w-16 rounded-full bg-primary/10 text-primary mx-auto mb-6 shadow-md"
+                >
+                  <span class="material-symbols-outlined text-3xl">record_voice_over</span>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white">Real-Life Dialogues</h3>
+                <p class="mt-2 text-gray-700 dark:text-gray-300">
+                  Practice with conversations you'll actually have, from ordering street food to
+                  making new friends.
+                </p>
+              </div>
+              <div class="zen-card animation-delay-200">
+                <div
+                  class="flex items-center justify-center h-16 w-16 rounded-full bg-primary/10 text-primary mx-auto mb-6 shadow-md"
+                >
+                  <span class="material-symbols-outlined text-3xl">lightbulb</span>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white">Cultural Insights</h3>
+                <p class="mt-2 text-gray-700 dark:text-gray-300">
+                  Deepen your understanding of Thailand with lessons on culture, traditions, and
+                  etiquette.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section class="py-20 sm:py-32 bg-gray-50 dark:bg-gray-900" id="why-learn-thai">
+          <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="max-w-3xl mx-auto text-center mb-16">
+              <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
+                Why Learn Thai?
+              </h2>
+              <p class="mt-4 text-lg text-gray-700 dark:text-gray-300">
+                Unlock a world of opportunities and experiences by learning the beautiful language
+                of Thailand.
+              </p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              <div class="flex items-start gap-4 animate-fade-in-up">
+                <span class="material-symbols-outlined text-3xl text-primary mt-1">flight</span>
+                <div>
+                  <h3 class="font-bold text-lg text-gray-800 dark:text-gray-200">
+                    Travel with Confidence
+                  </h3>
+                  <p class="text-gray-700 dark:text-gray-300">
+                    Navigate Thailand with ease, connect with locals, and experience the country
+                    like never before.
+                  </p>
+                </div>
+              </div>
+              <div class="flex items-start gap-4 animate-fade-in-up animation-delay-100">
+                <span class="material-symbols-outlined text-3xl text-primary mt-1"
+                  >diversity_3</span
+                >
+                <div>
+                  <h3 class="font-bold text-lg text-gray-800 dark:text-gray-200">
+                    Connect with People
+                  </h3>
+                  <p class="text-gray-700 dark:text-gray-300">
+                    Form deeper relationships with Thai friends, family, or colleagues by speaking
+                    their language.
+                  </p>
+                </div>
+              </div>
+              <div class="flex items-start gap-4 animate-fade-in-up animation-delay-200">
+                <span class="material-symbols-outlined text-3xl text-primary mt-1">work</span>
+                <div>
+                  <h3 class="font-bold text-lg text-gray-800 dark:text-gray-200">
+                    Career Opportunities
+                  </h3>
+                  <p class="text-gray-700 dark:text-gray-300">
+                    Enhance your resume and open doors to job opportunities in tourism, business,
+                    and more.
+                  </p>
+                </div>
+              </div>
+              <div class="flex items-start gap-4 animate-fade-in-up animation-delay-300">
+                <span class="material-symbols-outlined text-3xl text-primary mt-1">psychology</span>
+                <div>
+                  <h3 class="font-bold text-lg text-gray-800 dark:text-gray-200">
+                    Boost Brain Power
+                  </h3>
+                  <p class="text-gray-700 dark:text-gray-300">
+                    Learning a new language improves memory, problem-solving skills, and cognitive
+                    flexibility.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+      <footer class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div class="flex flex-col md:flex-row justify-between items-center">
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+              © 2024 Learn Thai. All rights reserved.
+            </p>
+            <div class="flex gap-4 mt-4 md:mt-0">
+              <a
+                class="text-sm text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-primary"
+                href="#"
+                >Privacy Policy</a
+              >
+              <a
+                class="text-sm text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-primary"
+                href="#"
+                >Terms of Service</a
+              >
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

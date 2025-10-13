@@ -1,18 +1,12 @@
 <template>
   <div class="click-exercise">
     <header class="click-exercise__header">
-      <h3 class="click-exercise__title">{{ t('clickExercise.title') }}</h3>
       <div class="click-exercise__progress-wrapper">
         <span class="click-exercise__progress">{{ progressLabel }}</span>
-        <span class="click-exercise__completion">{{ completionLabel }}</span>
       </div>
     </header>
 
     <div v-if="currentSentence" class="click-exercise__body">
-      <p class="click-exercise__instruction">
-        {{ t('clickExercise.instruction') }}
-      </p>
-
       <p v-if="showTranslation && currentTranslation" class="click-exercise__translation">
         {{ currentTranslation }}
       </p>
