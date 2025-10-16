@@ -63,10 +63,11 @@ export default defineNuxtConfig({
     },
   },
   runtimeConfig: {
-    // СЃРµСЂРІРµСЂРЅС‹Рµ РїСЂРёРІР°С‚РЅС‹Рµ Р·РЅР°С‡РµРЅРёСЏ
+    // серверные приватные значения
     transgate: {
       apiKey: process.env.TRANSGATE_KEY,
     },
+    resembleKey: process.env.RESEMBLE_KEY,
     supabaseServiceKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
     public: {
       siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000',

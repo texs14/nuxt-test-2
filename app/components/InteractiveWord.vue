@@ -12,9 +12,38 @@
     <Teleport :to="teleportTarget">
       <Transition name="interactive-word__popup">
         <div v-if="isOpen" ref="popupRef" class="interactive-word__popup" :style="popupStyle">
-          <!-- <UiButton class="interactive-word__popup_add-btn" type="button" @click="onFetchWord">
-            получить слово из супабазы
-          </UiButton> -->
+          <div v-if="state === 'loaded' && entry" class="interactive-word__audio-controls">
+            <!-- Кнопка воспроизведения, если аудио уже есть -->
+            <UiButton
+              v-if="hasValidAudio(entry.headword)"
+              class="interactive-word__popup_add-btn"
+              type="button"
+              :disabled="isPlayingAudio"
+              @click="isPlayingAudio ? onStopAudio() : onPlayAudio()"
+            >
+              {{ isPlayingAudio ? '⏸ Остановить' : '▶ Воспроизвести аудио' }}
+            </UiButton>
+
+            <!-- Кнопка синтеза, если аудио отсутствует -->
+            <UiButton
+              v-if="
+                needsSynthesis({
+                  entryId: entry.entryId,
+                  headword: entry.headword,
+                  senses: entry.senses,
+                })
+              "
+              class="interactive-word__popup_add-btn"
+              type="button"
+              :disabled="isSynthesizing"
+              @click="onSynthesizeAudio"
+            >
+              {{ isSynthesizing ? getSynthesisStatusText() : 'Синтезировать аудио' }}
+            </UiButton>
+            <div v-if="synthesisError" class="interactive-word__synthesis-error">
+              {{ synthesisError }}
+            </div>
+          </div>
           <VocabularyWordCard
             v-if="state === 'loaded' && entry"
             :word="entry"
@@ -60,6 +89,7 @@
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { DictionaryEntry } from '../../types/dictionary';
+import { hasValidAudio } from '~~/utils/audio-manager';
 import AddWordDialog from '~/components/ui/AddWordDialog.vue';
 import VocabularyWordCard from '~/components/VocabularyWordCard.vue';
 
@@ -69,6 +99,20 @@ const emit = defineEmits<{ (event: 'open-change', value: boolean): void }>();
 
 const { canModerate } = useUserRole();
 const { t } = useI18n();
+
+// Composable для синтеза аудио
+const {
+  synthesizeById,
+  isSynthesizing,
+  synthesisError,
+  progress: synthesisProgress,
+  needsSynthesis,
+  clearError: clearSynthesisError,
+} = useAudioSynthesis({
+  voiceUuid: '6e922b40', // TODO: Заменить на реальный UUID тайского голоса
+  sampleRate: 44100,
+  outputFormat: 'wav',
+});
 
 // CRUD composable для работы со словарём
 const dictionaryCrud = useSupabaseCrud({ table: 'new_dictionar' });
@@ -92,6 +136,8 @@ const entry = ref<DictionaryEntry | null>(null);
 const isAddDialogOpen = ref(false);
 const editId = ref<string | null>(null);
 const inVocabulary = ref(false);
+const isPlayingAudio = ref(false);
+const currentAudio = ref<HTMLAudioElement | null>(null);
 
 const getFullscreenElement = (): Element | null => {
   if (!process.client) return null;
@@ -356,8 +402,113 @@ const onFetchWord = async () => {
   console.log('Загрузка:', dictionaryCrud.loading.value);
 };
 
+const getSynthesisStatusText = () => {
+  switch (synthesisProgress.value) {
+    case 'checking':
+      return 'Проверка...';
+    case 'synthesizing':
+      return 'Синтез речи...';
+    case 'saving':
+      return 'Сохранение...';
+    case 'done':
+      return 'Готово';
+    default:
+      return 'Синтезировать аудио';
+  }
+};
+
+const onPlayAudio = async () => {
+  if (!entry.value || !hasValidAudio(entry.value.headword)) {
+    return;
+  }
+
+  // Останавливаем предыдущее воспроизведение, если есть
+  if (currentAudio.value) {
+    currentAudio.value.pause();
+    currentAudio.value = null;
+  }
+
+  // Находим первое валидное аудио с base64
+  const audioAsset = entry.value.headword.audio?.find(
+    (audio) => audio.base64 && audio.base64.length > 0
+  );
+
+  if (!audioAsset?.base64) {
+    return;
+  }
+
+  try {
+    isPlayingAudio.value = true;
+
+    // Создаем Audio элемент из base64
+    const audio = new Audio(audioAsset.base64);
+    currentAudio.value = audio;
+
+    audio.addEventListener('ended', () => {
+      isPlayingAudio.value = false;
+      currentAudio.value = null;
+    });
+
+    audio.addEventListener('error', () => {
+      isPlayingAudio.value = false;
+      currentAudio.value = null;
+    });
+
+    await audio.play();
+  } catch (error) {
+    isPlayingAudio.value = false;
+    currentAudio.value = null;
+  }
+};
+
+const onStopAudio = () => {
+  if (currentAudio.value) {
+    currentAudio.value.pause();
+    currentAudio.value = null;
+    isPlayingAudio.value = false;
+  }
+};
+
+const onSynthesizeAudio = async () => {
+  if (!entry.value) {
+    return;
+  }
+
+  // Проверяем, нужен ли синтез
+  const tempEntry = {
+    entryId: entry.value.entryId,
+    headword: entry.value.headword,
+    senses: entry.value.senses,
+  };
+
+  if (!needsSynthesis(tempEntry)) {
+    return;
+  }
+
+  // Синтезируем и сохраняем
+  const success = await synthesizeById(entry.value.entryId, entry.value.headword);
+
+  if (success) {
+    // Обновляем кэш и перезагружаем слово
+    const normalizedWord = props.word.trim();
+    delete cache.value[normalizedWord];
+
+    // Перезагружаем данные
+    await onToggle();
+    await nextTick();
+    await onToggle();
+  }
+};
+
 onBeforeUnmount(() => {
   if (!process.client) return;
+
+  // Останавливаем аудио при размонтировании
+  if (currentAudio.value) {
+    currentAudio.value.pause();
+    currentAudio.value = null;
+  }
+
   document.removeEventListener('click', onClickOutside);
   document.removeEventListener('keydown', onEscape);
   document.removeEventListener('fullscreenchange', updatePosition);

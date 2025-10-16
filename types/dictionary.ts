@@ -16,7 +16,8 @@ export type TranslationBlock = {
 
 export type MediaAsset = {
   mediaId: string;
-  url: string;
+  url?: string;
+  base64?: string;
   start?: number;
   end?: number;
   captions?: Record<string, string>;
