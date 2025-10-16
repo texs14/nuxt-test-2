@@ -61,25 +61,33 @@
           </div>
 
           <div v-else class="interactive-word__popup_state">
-            <p class="interactive-word__popup_empty">{{ t('dictionary.empty') }}</p>
-            <button
-              v-if="canModerate"
-              class="interactive-word__popup_add-btn"
-              type="button"
-              @click.stop="onOpenAddDialog"
-            >
-              {{ t('dictionary.addWord') }}
-            </button>
+            <GenerationProgress
+              v-if="isGenerating"
+              :progress="generationProgress"
+              :error="generationError"
+              @retry="onOpenAddDialog"
+            />
+            <template v-else>
+              <p class="interactive-word__popup_empty">{{ t('dictionary.empty') }}</p>
+              <button
+                v-if="canModerate"
+                class="interactive-word__popup_add-btn"
+                type="button"
+                @click.stop="onOpenAddDialog"
+              >
+                {{ t('dictionary.addWord') }}
+              </button>
+            </template>
           </div>
         </div>
       </Transition>
     </Teleport>
 
     <AddWordDialog
-      :is-open="isAddDialogOpen"
+      :is-open="isEditDialogOpen"
       :word="props.word"
       :edit-id="editId"
-      @close="onCloseAddDialog"
+      @close="onCloseEditDialog"
       @saved="onWordSaved"
     />
   </span>
@@ -92,6 +100,7 @@ import type { DictionaryEntry } from '../../types/dictionary';
 import { hasValidAudio } from '~~/utils/audio-manager';
 import AddWordDialog from '~/components/ui/AddWordDialog.vue';
 import VocabularyWordCard from '~/components/VocabularyWordCard.vue';
+import GenerationProgress from '~/components/ui/GenerationProgress.vue';
 
 const props = defineProps<{ word: string }>();
 
@@ -133,11 +142,14 @@ const fullscreenKey = ref(0);
 const isOpen = ref(false);
 const state = ref<'idle' | 'loading' | 'loaded' | 'not-found' | 'error'>('idle');
 const entry = ref<DictionaryEntry | null>(null);
-const isAddDialogOpen = ref(false);
 const editId = ref<string | null>(null);
 const inVocabulary = ref(false);
 const isPlayingAudio = ref(false);
 const currentAudio = ref<HTMLAudioElement | null>(null);
+const isGenerating = ref(false);
+const generationProgress = ref<'generating' | 'synthesizing' | 'saving' | 'done'>('generating');
+const generationError = ref<string | null>(null);
+const isEditDialogOpen = ref(false);
 
 const getFullscreenElement = (): Element | null => {
   if (!process.client) return null;
@@ -332,20 +344,54 @@ watch(activeInstance, (value) => {
   }
 });
 
-const onOpenAddDialog = () => {
-  editId.value = null;
-  isAddDialogOpen.value = true;
+const onOpenAddDialog = async () => {
+  if (isGenerating.value) return;
+
+  isGenerating.value = true;
+  generationError.value = null;
+  generationProgress.value = 'generating';
+
+  try {
+    const response = await $fetch('/api/dictionary/generate', {
+      method: 'POST',
+      body: {
+        word: props.word.trim(),
+      },
+    });
+
+    if (response.success) {
+      generationProgress.value = 'done';
+
+      // Обновляем кэш
+      const normalizedWord = props.word.trim();
+      delete cache.value[normalizedWord];
+
+      // Небольшая задержка для показа успеха
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      // Закрываем popup и открываем снова с новыми данными
+      closePopup();
+      await nextTick();
+      await onToggle();
+    }
+  } catch (error: any) {
+    generationError.value =
+      error.data?.statusMessage || error.message || 'Ошибка генерации словарной записи';
+    generationProgress.value = 'generating';
+  } finally {
+    isGenerating.value = false;
+  }
 };
 
 const onOpenEditDialog = () => {
   if (entry.value?.entryId) {
     editId.value = entry.value.entryId;
-    isAddDialogOpen.value = true;
+    isEditDialogOpen.value = true;
   }
 };
 
-const onCloseAddDialog = () => {
-  isAddDialogOpen.value = false;
+const onCloseEditDialog = () => {
+  isEditDialogOpen.value = false;
   editId.value = null;
 };
 
@@ -353,7 +399,7 @@ const onWordSaved = async () => {
   const normalizedWord = props.word.trim();
   delete cache.value[normalizedWord];
 
-  isAddDialogOpen.value = false;
+  isEditDialogOpen.value = false;
   closePopup();
 
   await nextTick();
@@ -389,17 +435,6 @@ const onToggleVocabulary = async () => {
   } catch {
     // Ignore errors silently
   }
-};
-
-const onFetchWord = async () => {
-  const normalizedWord = props.word.trim();
-  console.log('Запрос слова:', normalizedWord);
-
-  const result = await dictionaryCrud.select({ 'headword->>script': normalizedWord });
-
-  console.log('Результат из Supabase:', result?.[0]);
-  console.log('Ошибка:', dictionaryCrud.error.value);
-  console.log('Загрузка:', dictionaryCrud.loading.value);
 };
 
 const getSynthesisStatusText = () => {
