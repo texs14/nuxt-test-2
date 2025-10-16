@@ -8,10 +8,10 @@ export default defineEventHandler(async (event) => {
   }
 
   const query = getQuery(event);
-  const dictionaryId = query.dictionary_id;
+  const entryId = query.entry_id;
 
-  if (!dictionaryId) {
-    throw createError({ statusCode: 400, message: 'dictionary_id is required' });
+  if (!entryId) {
+    throw createError({ statusCode: 400, message: 'entry_id is required' });
   }
 
   const client = await serverSupabaseClient<Database>(event);
@@ -26,6 +26,6 @@ export default defineEventHandler(async (event) => {
     return { inVocabulary: false };
   }
 
-  const wordId = parseInt(dictionaryId as string);
-  return { inVocabulary: profile.vocabulary.includes(wordId) };
+  const vocabulary = profile.vocabulary as unknown as string[];
+  return { inVocabulary: vocabulary.includes(entryId as string) };
 });

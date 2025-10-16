@@ -7,12 +7,10 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 401, message: 'Unauthorized' });
   }
 
-  const id = getRouterParam(event, 'id');
-  if (!id) {
-    throw createError({ statusCode: 400, message: 'id is required' });
+  const entryId = getRouterParam(event, 'id');
+  if (!entryId) {
+    throw createError({ statusCode: 400, message: 'entry_id is required' });
   }
-
-  const dictionaryId = parseInt(id);
 
   const client = await serverSupabaseClient<Database>(event);
 
@@ -27,14 +25,14 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 500, message: profileError?.message || 'Profile not found' });
   }
 
-  const currentVocabulary = profile.vocabulary || [];
+  const currentVocabulary = (profile.vocabulary as unknown as string[]) || [];
 
   // Remove from vocabulary
-  const updatedVocabulary = currentVocabulary.filter((wordId) => wordId !== dictionaryId);
+  const updatedVocabulary = currentVocabulary.filter((id) => id !== entryId);
 
   const { error: updateError } = await client
     .from('profiles')
-    .update({ vocabulary: updatedVocabulary })
+    .update({ vocabulary: updatedVocabulary as unknown as number[] })
     .eq('id', user.id);
 
   if (updateError) {

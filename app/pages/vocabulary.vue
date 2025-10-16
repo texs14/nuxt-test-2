@@ -24,11 +24,11 @@
         <div class="vocabulary-page__list">
           <VocabularyWordCard
             v-for="word in vocabularyList"
-            :key="word.id"
+            :key="word.entryId"
             :word="word"
             :is-in-vocabulary="true"
-            @toggle-vocabulary="removeWord(word.id)"
-            @edit="editWord(word.id)"
+            @toggle-vocabulary="removeWord(word.entryId)"
+            @edit="editWord(word.entryId)"
           />
         </div>
       </div>
@@ -37,31 +37,12 @@
 </template>
 
 <script setup lang="ts">
-import type { Json } from '~~/types/supabase';
+import type { DictionaryEntry } from '~~/types/dictionary';
 
 definePageMeta({
   middleware: ['auth'],
   requiresAuth: true,
 });
-
-interface DictionaryExample {
-  th?: string;
-  ru?: string;
-  en?: string;
-  [key: string]: string | undefined;
-}
-
-interface DictionaryWord {
-  id: number;
-  word_th: string;
-  translation: string[];
-  transcription_en: string | null;
-  synonyms: string[] | null;
-  antonyms: string[] | null;
-  examples: Json[] | null;
-  links: string[] | null;
-  created_at: string | null;
-}
 
 const { t } = useI18n();
 
@@ -70,22 +51,22 @@ const {
   pending,
   error,
   refresh,
-} = await useFetch<DictionaryWord[]>('/api/vocabulary');
+} = await useFetch<DictionaryEntry[]>('/api/vocabulary');
 
 const vocabularyList = computed(() => vocabularyData.value || []);
 
-const removeWord = async (id: number) => {
+const removeWord = async (entryId: string) => {
   try {
-    await $fetch(`/api/vocabulary/${id}`, { method: 'DELETE' });
+    await $fetch(`/api/vocabulary/${entryId}`, { method: 'DELETE' });
     await refresh();
   } catch {
     // Ignore errors silently
   }
 };
 
-const editWord = (id: number) => {
+const editWord = (entryId: string) => {
   // TODO: Implement edit functionality
-  navigateTo(`/dictionary/edit/${id}`);
+  navigateTo(`/dictionary/edit/${entryId}`);
 };
 </script>
 

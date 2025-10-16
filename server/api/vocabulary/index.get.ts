@@ -1,5 +1,6 @@
 import { serverSupabaseClient, serverSupabaseUser } from '#supabase/server';
 import type { Database } from '~~/types/supabase';
+import type { DictionaryEntry } from '~~/types/dictionary';
 
 export default defineEventHandler(async (event) => {
   const user = await serverSupabaseUser(event);
@@ -20,20 +21,31 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 500, message: profileError?.message || 'Profile not found' });
   }
 
+  const vocabulary = (profile.vocabulary as unknown as string[]) || [];
+
   // If vocabulary is empty, return empty array
-  if (!profile.vocabulary || profile.vocabulary.length === 0) {
+  if (vocabulary.length === 0) {
     return [];
   }
 
-  // Get dictionary entries for vocabulary IDs
+  // Get dictionary entries for vocabulary entry_ids
   const { data: words, error: wordsError } = await client
-    .from('dictionary')
+    .from('new_dictionar')
     .select('*')
-    .in('id', profile.vocabulary);
+    .in('entry_id', vocabulary);
 
   if (wordsError) {
     throw createError({ statusCode: 500, message: wordsError.message });
   }
 
-  return words || [];
+  // Transform to DictionaryEntry format
+  const entries: DictionaryEntry[] = (words || []).map((word: any) => ({
+    entryId: word.entry_id,
+    headword: word.headword,
+    metadata: word.metadata,
+    senses: word.senses,
+    related: word.related,
+  }));
+
+  return entries;
 });
