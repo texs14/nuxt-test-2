@@ -23,7 +23,13 @@ import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { VideoItem } from '~/types/content';
 
-const supabase = useSupabaseClient();
+const {
+  select,
+  loading: crudLoading,
+  error: crudError,
+} = useSupabaseCrud({
+  table: 'video_items',
+});
 const { t } = useI18n();
 const safeLocalePath = useSafeLocalePath();
 const { canModerate } = useUserRole();
@@ -35,15 +41,32 @@ const addNewLink = computed(() => {
 
 const {
   data: items,
-  pending,
-  error,
+  pending: asyncPending,
+  error: asyncError,
 } = await useAsyncData<VideoItem[]>('video-items', async () => {
-  const { data, error } = await supabase
-    .from('video_items')
-    .select('id, title, description, level, preview_url, duration')
-    .order('id', { ascending: true });
+  const result = await select(undefined, {
+    columns: 'id, title, description, level, preview_url, duration',
+    orderBy: { column: 'id', ascending: true },
+  });
 
-  if (error) throw error;
-  return data || [];
+  if (!result) {
+    throw new Error(crudError.value || 'Failed to fetch video items');
+  }
+
+  return result.map((item) => ({
+    id: item.id,
+    title: item.title,
+    description: item.description,
+    level: item.level,
+    preview_url: item.preview_url,
+    duration: item.duration,
+  })) as VideoItem[];
+});
+
+const pending = computed(() => asyncPending.value || crudLoading.value);
+const error = computed<Error | null>(() => {
+  if (asyncError.value) return asyncError.value;
+  if (crudError.value) return new Error(crudError.value);
+  return null;
 });
 </script>

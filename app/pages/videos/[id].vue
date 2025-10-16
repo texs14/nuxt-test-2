@@ -85,7 +85,20 @@ import type {
 } from '@/types/video.types';
 import SubtitleClickExercise from '~/components/SubtitleClickExercise.vue';
 const route = useRoute();
-const supabase = useSupabaseClient();
+const {
+  select: selectVideo,
+  loading: videoLoading,
+  error: videoCrudError,
+} = useSupabaseCrud({
+  table: 'video_items',
+});
+const {
+  select: selectComments,
+  loading: commentsLoading,
+  error: commentsCrudError,
+} = useSupabaseCrud({
+  table: 'comments',
+});
 const { canModerate } = useUserRole();
 
 type Json = Record<string, any> | null;
@@ -115,20 +128,34 @@ const exerciseLink = computed(() =>
 
 const {
   data: video,
-  pending: pendingVideo,
-  error: errorVideo,
+  pending: asyncPendingVideo,
+  error: asyncErrorVideo,
 } = await useAsyncData<VideoItem | null>(
   () => `video-${idParam.value}`,
   async () => {
-    const { data, error } = await supabase
-      .from('video_items')
-      .select('id, title, description, level, video_url, subtitles')
-      .eq('id', idParam.value)
-      .maybeSingle();
-    if (error) throw error;
-    return data;
+    const result = await selectVideo(
+      { id: idParam.value },
+      {
+        columns: 'id, title, description, level, video_url, subtitles',
+        limit: 1,
+      }
+    );
+
+    if (!result || result.length === 0) {
+      if (videoCrudError.value) throw new Error(videoCrudError.value);
+      return null;
+    }
+
+    return result[0] as VideoItem;
   }
 );
+
+const pendingVideo = computed(() => asyncPendingVideo.value || videoLoading.value);
+const errorVideo = computed<Error | null>(() => {
+  if (asyncErrorVideo.value) return asyncErrorVideo.value;
+  if (videoCrudError.value) return new Error(videoCrudError.value);
+  return null;
+});
 
 interface CommentItem {
   id: string | number;
@@ -138,20 +165,33 @@ interface CommentItem {
 }
 const {
   data: comments,
-  pending: pendingComments,
-  error: errorComments,
+  pending: asyncPendingComments,
+  error: asyncErrorComments,
 } = await useAsyncData<CommentItem[]>(
   () => `comments-${idParam.value}`,
   async () => {
-    const { data, error } = await supabase
-      .from('comments')
-      .select('*')
-      .eq('video_id', idParam.value)
-      .order('created_at', { ascending: true });
-    if (error) throw error;
-    return data || [];
+    const result = await selectComments(
+      { video_id: idParam.value },
+      {
+        orderBy: { column: 'created_at', ascending: true },
+      }
+    );
+
+    if (!result) {
+      if (commentsCrudError.value) throw new Error(commentsCrudError.value);
+      return [];
+    }
+
+    return result as CommentItem[];
   }
 );
+
+const pendingComments = computed(() => asyncPendingComments.value || commentsLoading.value);
+const errorComments = computed<Error | null>(() => {
+  if (asyncErrorComments.value) return asyncErrorComments.value;
+  if (commentsCrudError.value) return new Error(commentsCrudError.value);
+  return null;
+});
 
 const { locale, t } = useI18n();
 const currentLocale = computed<'ru' | 'en'>(() =>

@@ -124,11 +124,17 @@ import type {
 } from '@/types/lesson';
 
 const route = useRoute();
-const supabase = useSupabaseClient();
 const user = useSupabaseUser();
 const localePath = useLocalePath();
 const { locale, t } = useI18n();
 const { canModerate } = useUserRole();
+const {
+  select,
+  loading: crudLoading,
+  error: crudError,
+} = useSupabaseCrud({
+  table: 'lesson_items',
+});
 
 type Json = Record<string, any> | null;
 
@@ -159,17 +165,24 @@ const lessonId = computed(() => route.params.id as string);
 
 const {
   data: lesson,
-  pending,
-  error,
+  pending: asyncPending,
+  error: asyncError,
 } = await useAsyncData<LessonItem | null>(`lesson-${lessonId.value}`, async () => {
-  const { data, error } = await supabase
-    .from('lesson_items')
-    .select('*')
-    .eq('id', lessonId.value)
-    .maybeSingle();
+  const result = await select({ id: lessonId.value }, { limit: 1 });
 
-  if (error) throw error;
-  return data;
+  if (!result || result.length === 0) {
+    if (crudError.value) throw new Error(crudError.value);
+    return null;
+  }
+
+  return result[0] as LessonItem;
+});
+
+const pending = computed(() => asyncPending.value || crudLoading.value);
+const error = computed<Error | null>(() => {
+  if (asyncError.value) return asyncError.value;
+  if (crudError.value) return new Error(crudError.value);
+  return null;
 });
 
 const currentLocale = computed<'ru' | 'en' | 'th'>(() =>
