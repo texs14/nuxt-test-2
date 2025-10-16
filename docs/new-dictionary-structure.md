@@ -21,7 +21,8 @@ type TranslationBlock = {
 
 type MediaAsset = {
   mediaId: string;
-  url: string;
+  url?: string;
+  base64?: string;
   start?: number;
   end?: number;
   captions?: Record<string, string>;
@@ -116,6 +117,7 @@ type DictionaryEntry = {
       {
         "type": "word",
         "url": "https://cdn.example.com/audio/ไฟ.mp3",
+        "base64": "data:audio/mpeg;base64,...",
         "speaker": "native_female",
         "license": "CC-BY"
       }

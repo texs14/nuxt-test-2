@@ -4,6 +4,15 @@
 
 Система управления словарем работает с таблицей `new_dictionar` в Supabase. Каждая строка хранит полноформатную структуру `DictionaryEntry`, описанную в `docs/new-dictionary-structure.md`, включая варианты переводов, примеры и медиа. Компоненты Nuxt используют эту таблицу для отображения карточек слов, интерактивного редактирования и синхронизации данных между фронтендом и БД.
 
+### Мультиязычность
+
+Система автоматически определяет язык отображения переводов на основе текущей локали пользователя (i18n):
+- **Русская локаль** (`ru`, `ru-RU`) → показываются переводы на русском языке
+- **Английская локаль** (`en`, `en-US`, `en-GB`) → показываются переводы на английском языке  
+- **Тайская локаль** (`th`, `th-TH`) → переводы на английском языке (по умолчанию)
+
+**Если перевод на выбранном языке отсутствует**, отображается сообщение из i18n: `dictionary.noTranslationAvailable` ("Перевод на выбранном языке недоступен").
+
 ## Структура таблицы `new_dictionar`
 
 Таблица содержит следующие поля:
@@ -16,6 +25,11 @@
 | `senses` | jsonb | Да | Массив `Sense[]` с переводами, примерами и медиа. |
 | `related` | jsonb | Нет | Ссылки на родственные записи (омонимы, составные слова). |
 | `created_at` | timestamptz | Нет | Время создания (UTC, по умолчанию `timezone('utc', now())`). |
+
+### Доступ через RLS
+
+- Для публичного чтения включена политика `Allow anon read new_dictionar`, разрешающая ролям `anon` и `authenticated` выполнять `SELECT` без ограничений (`USING (true)`).
+- При обновлении политик нужно перепроверять REST-запрос `headword->>script`, чтобы убедиться в доступности данных для фронтенда.
 | `updated_at` | timestamptz | Нет | Время последнего изменения (UTC, обновляется триггером). |
 
 > Полные определения типов `Headword`, `Sense`, `TranslationBlock` и др. приведены в `docs/new-dictionary-structure.md`.
@@ -39,6 +53,7 @@
 - Загрузка и кэширование данных из словаря
 - Показ попапа с переводом и дополнительной информацией
 - Открытие диалогов добавления/редактирования
+- Динамическое определение языка отображения переводов
 
 **Состояния компонента**:
 ```typescript
@@ -46,7 +61,19 @@
 - state: 'idle' | 'loading' | 'loaded' | 'not-found' | 'error'
 - entry: DictionaryEntry | null  // Загруженные данные слова
 - isAddDialogOpen: boolean // Открыт ли диалог добавления/редактирования
-- editId: number | null    // ID записи для редактирования
+- editId: string | null    // ID записи для редактирования (entry_id)
+- dictionaryLanguage: 'ru' | 'en' // Текущий язык переводов
+```
+
+**Определение языка переводов**:
+```typescript
+import { getDictionaryLanguage } from '../../../utils/language-mapping';
+
+const { t, locale } = useI18n();
+
+const dictionaryLanguage = computed<'ru' | 'en'>(() => {
+  return getDictionaryLanguage(locale.value);
+});
 ```
 
 ### 2. AddWordDialog.vue
@@ -60,9 +87,20 @@
 {
   isOpen: boolean;      // Открыт ли диалог
   word?: string;        // Слово для предзаполнения (при добавлении)
-  editId?: number | null; // ID записи для редактирования
+  editId?: string | number | null; // ID записи для редактирования (entry_id для новой структуры)
 }
 ```
+
+**Определение языка переводов**:
+```typescript
+const { t, locale } = useI18n();
+
+const dictionaryLanguage = computed<'ru' | 'en'>(() => {
+  return getDictionaryLanguage(locale.value);
+});
+```
+
+При сохранении слова используется текущий язык локали для создания переводов.
 
 **Режимы работы**:
 1. **Добавление** (`editId = null`): Создание новой записи в словаре
@@ -155,14 +193,40 @@ watch(
 2. JSON примеров парсится через `parseExamples()`
 3. Формируется payload с типизированными данными
 
-**Запрос к Supabase** (через MCP):
+**Запрос к Supabase**:
 ```typescript
-// AddWordDialog.vue (строки ~298-304)
+// Создание payload с учетом текущего языка
+const newPayload = {
+  entry_id: entryId,
+  headword: {
+    script: form.value.word_th.trim(),
+    romanization: form.value.transcription_en
+      ? { paiboon: form.value.transcription_en.trim() }
+      : undefined,
+  },
+  senses: [
+    {
+      senseId,
+      definition: {
+        [dictionaryLanguage.value]: translations[0] || '', // Динамический язык
+      },
+      translations: [
+        {
+          language: dictionaryLanguage.value, // Используется текущая локаль
+          variants: translations.map((text: string) => ({ text, register: 'neutral' })),
+        },
+      ],
+      examples: Array.isArray(examples) ? examples : [],
+    },
+  ],
+  // ...
+};
+
 if (props.editId) {
-  const result = await client.from('dictionary').update(payload).eq('id', props.editId);
+  const result = await client.from('new_dictionar').update(newPayload).eq('entry_id', props.editId);
   saveError = result.error;
 } else {
-  const result = await client.from('dictionary').insert(payload); // INSERT
+  const result = await client.from('new_dictionar').insert(newPayload);
   saveError = result.error;
 }
 ```
@@ -425,9 +489,48 @@ delete cache.value[normalizedWord];
     "cancel": "Отмена",
     "saving": "Сохранение...",
     "saved": "Слово успешно добавлено",
-    "saveError": "Ошибка при сохранении"
+    "saveError": "Ошибка при сохранении",
+    "languageLabel": "Язык переводов",
+    "noTranslationAvailable": "Перевод на выбранном языке недоступен",
+    "fallbackLanguageUsed": "Показан перевод на английском языке",
+    "showingEnglish": "Отображается на английском",
+    "showingRussian": "Отображается на русском"
   }
 }
+```
+
+### Динамическое определение языка переводов
+
+**Маппинг локалей** (`utils/language-mapping.ts`):
+```typescript
+export const LOCALE_TO_DICTIONARY_LANG: Record<string, 'ru' | 'en'> = {
+  ru: 'ru',
+  'ru-RU': 'ru',
+  en: 'en',
+  'en-US': 'en',
+  'en-GB': 'en',
+  th: 'en', // Fallback для тайского
+  'th-TH': 'en',
+};
+
+export function getDictionaryLanguage(locale: string): 'ru' | 'en' {
+  return LOCALE_TO_DICTIONARY_LANG[locale] || 'en';
+}
+```
+
+**Использование в компонентах**:
+```typescript
+import { getDictionaryLanguage } from '../../utils/language-mapping';
+
+const { locale } = useI18n();
+const dictionaryLanguage = computed(() => getDictionaryLanguage(locale.value));
+
+// При извлечении переводов
+const translation = extractPrimaryTranslation(
+  entry.senses,
+  dictionaryLanguage.value, // Динамический язык
+  true // Включить fallback
+);
 ```
 
 ## Валидация данных
@@ -599,6 +702,99 @@ const onClickOutside = (event: MouseEvent) => {
 };
 ```
 
+## Мультиязычная поддержка переводов
+
+### Автоматический выбор языка
+
+Компоненты автоматически определяют язык отображения на основе текущей локали:
+
+```typescript
+// VocabularyWordCard.vue
+const dictionaryLanguage = computed<'ru' | 'en'>(() => {
+  return getDictionaryLanguage(locale.value);
+});
+
+const wordTranslations = computed(() => {
+  if (isNewStructure.value) {
+    const translations = getAllTranslations(
+      (props.word as DictionaryEntry).senses,
+      dictionaryLanguage.value, // Используется текущая локаль
+      false // Fallback отключен - показываем сообщение если нет перевода
+    );
+    return translations.length > 0 ? translations : [t('dictionary.noTranslationAvailable')];
+  }
+  return (props.word as LegacyWordData).translation || [];
+});
+```
+
+### Обработка отсутствующих переводов
+
+Если перевод на запрошенном языке отсутствует, система отображает локализованное сообщение:
+
+```typescript
+// VocabularyWordCard.vue
+const wordPrimaryTranslation = computed(() => {
+  if (isNewStructure.value) {
+    const translation = extractPrimaryTranslation(
+      (props.word as DictionaryEntry).senses,
+      dictionaryLanguage.value,
+      false // fallback отключен
+    );
+    // Если перевода нет, показываем сообщение
+    return translation || t('dictionary.noTranslationAvailable');
+  }
+  return getPrimaryTranslation((props.word as LegacyWordData).translation);
+});
+
+const wordTranslations = computed(() => {
+  if (isNewStructure.value) {
+    const translations = getAllTranslations(
+      (props.word as DictionaryEntry).senses,
+      dictionaryLanguage.value,
+      false // fallback отключен
+    );
+    // Если переводов нет, возвращаем массив с сообщением
+    return translations.length > 0 ? translations : [t('dictionary.noTranslationAvailable')];
+  }
+  return (props.word as LegacyWordData).translation || [];
+});
+```
+
+**Локализованные сообщения**:
+- **Русский**: "Перевод на выбранном языке недоступен"
+- **Английский**: "Translation not available in selected language"
+
+### Сохранение слов с учетом языка
+
+При добавлении/редактировании слова переводы сохраняются на языке текущей локали:
+
+```typescript
+// AddWordDialog.vue
+const newPayload = {
+  senses: [
+    {
+      definition: {
+        [dictionaryLanguage.value]: translations[0] || '',
+      },
+      translations: [
+        {
+          language: dictionaryLanguage.value,
+          variants: translations.map((text) => ({ text, register: 'neutral' })),
+        },
+      ],
+    },
+  ],
+};
+```
+
+**Пример**:
+- Пользователь с локалью `ru` добавляет слово → сохраняется перевод на русском
+- Пользователь с локалью `en` добавляет слово → сохраняется перевод на английском
+- При просмотре:
+  - Если есть перевод на языке пользователя → отображается перевод
+  - Если нет перевода на языке пользователя → отображается "Перевод на выбранном языке недоступен"
+  - Пользователь может отредактировать слово и добавить перевод на своем языке
+
 ## Расширение функционала
 
 ### Возможные улучшения
@@ -611,6 +807,8 @@ const onClickOutside = (event: MouseEvent) => {
 6. **Поиск дубликатов**: Предупреждение при добавлении существующего слова
 7. **Аудио произношение**: Добавление аудиофайлов
 8. **Картинки**: Визуальные примеры использования
+9. **Индикатор языка**: Отображение флага текущего языка переводов
+10. **Ручной выбор языка**: Переопределение автоматического выбора пользователем
 
 ## Заключение
 

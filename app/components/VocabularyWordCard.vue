@@ -2,12 +2,12 @@
   <div class="word-card">
     <div class="word-card__header">
       <div class="word-card__title-block">
-        <h2 class="word-card__title">{{ word.word_th }}</h2>
-        <p v-if="word.transcription_en" class="word-card__transcription">
-          {{ word.transcription_en }}
+        <h2 class="word-card__title">{{ wordScript }}</h2>
+        <p v-if="wordTranscription" class="word-card__transcription">
+          {{ wordTranscription }}
         </p>
-        <p v-if="word.translation" class="word-card__transcription">
-          {{ getPrimaryTranslation(word.translation) }}
+        <p v-if="wordPrimaryTranslation" class="word-card__transcription">
+          {{ wordPrimaryTranslation }}
         </p>
       </div>
       <div class="word-card__actions">
@@ -54,10 +54,10 @@
 
     <Transition name="expand">
       <div v-show="isExpanded" class="word-card__content">
-        <div v-if="word.translation?.length" class="word-card__section">
+        <div v-if="wordTranslations?.length" class="word-card__section">
           <h3 class="word-card__section-title">{{ t('dictionary.translation') }}</h3>
           <ul class="word-card__list">
-            <li v-for="(trans, idx) in word.translation" :key="`trans-${idx}`">
+            <li v-for="(trans, idx) in wordTranslations" :key="`trans-${idx}`">
               {{ trans }}
             </li>
           </ul>
@@ -65,39 +65,48 @@
 
         <!-- eslint-disable vue/attribute-hyphenation -->
         <WordCardSlider
-          v-if="word.examples?.length"
+          v-if="wordExamples?.length"
           ref="examplesSlider"
           :title="t('dictionary.examples')"
-          :items="word.examples"
+          :items="wordExamples"
           :ariaLabelPrev="t('dictionary.prevSlide', { section: t('dictionary.examples') })"
           :ariaLabelNext="t('dictionary.nextSlide', { section: t('dictionary.examples') })"
         >
           <!-- eslint-enable vue/attribute-hyphenation -->
-          <template #item="{ item }">
+          <template #item="{ item, index }">
             <div class="word-card__example-item">
               <p
-                v-if="getExampleField(item as Json | DictionaryExample, 'text')"
+                v-if="getExampleField(item as ExampleItem, 'text')"
                 class="word-card__example-text word-card__example-text_thai"
               >
-                {{ getExampleField(item as Json | DictionaryExample, 'text') }}
+                {{ getExampleField(item as ExampleItem, 'text') }}
               </p>
               <p
-                v-if="getExampleField(item as Json | DictionaryExample, 'translation')"
+                v-if="getExampleField(item as ExampleItem, 'translation')"
                 class="word-card__example-text word-card__example-text_translation"
               >
-                {{ getExampleField(item as Json | DictionaryExample, 'translation') }}
+                {{ getExampleField(item as ExampleItem, 'translation') }}
               </p>
+              <pre
+                v-if="!getExampleField(item as ExampleItem, 'text')"
+                style="font-size: 10px; color: red"
+              >
+DEBUG #{{ index }}
+text: "{{ getExampleField(item as ExampleItem, 'text') }}"
+translation: "{{ getExampleField(item as ExampleItem, 'translation') }}"
+raw: {{ item }}
+              </pre>
             </div>
           </template>
         </WordCardSlider>
 
-        <div v-if="word.synonyms?.length || word.antonyms?.length" class="word-card__grid">
+        <div v-if="wordSynonyms?.length || wordAntonyms?.length" class="word-card__grid">
           <!-- eslint-disable vue/attribute-hyphenation -->
           <WordCardSlider
-            v-if="word.synonyms?.length"
+            v-if="wordSynonyms?.length"
             ref="synonymsSlider"
             :title="t('dictionary.synonyms')"
-            :items="word.synonyms"
+            :items="wordSynonyms"
             :ariaLabelPrev="t('dictionary.prevSlide', { section: t('dictionary.synonyms') })"
             :ariaLabelNext="t('dictionary.nextSlide', { section: t('dictionary.synonyms') })"
           >
@@ -111,10 +120,10 @@
 
           <!-- eslint-disable vue/attribute-hyphenation -->
           <WordCardSlider
-            v-if="word.antonyms?.length"
+            v-if="wordAntonyms?.length"
             ref="antonymsSlider"
             :title="t('dictionary.antonyms')"
-            :items="word.antonyms"
+            :items="wordAntonyms"
             :ariaLabelPrev="t('dictionary.prevSlide', { section: t('dictionary.antonyms') })"
             :ariaLabelNext="t('dictionary.nextSlide', { section: t('dictionary.antonyms') })"
           >
@@ -129,10 +138,10 @@
 
         <!-- eslint-disable vue/attribute-hyphenation -->
         <WordCardSlider
-          v-if="word.links?.length"
+          v-if="wordLinks?.length"
           ref="linksSlider"
           :title="t('dictionary.links')"
-          :items="word.links"
+          :items="wordLinks"
           :ariaLabelPrev="t('dictionary.prevSlide', { section: t('dictionary.links') })"
           :ariaLabelNext="t('dictionary.nextSlide', { section: t('dictionary.links') })"
         >
@@ -160,6 +169,14 @@
 <script setup lang="ts">
 import { nextTick, watch } from 'vue';
 import type { Json } from '~~/types/supabase';
+import type { DictionaryEntry, ExampleItem } from '../../types/dictionary';
+import {
+  extractPrimaryTranslation,
+  getAllTranslations,
+  flattenExamples,
+  getExampleField as getExampleFieldUtil,
+} from '../../utils/dictionary-adapter';
+import { getDictionaryLanguage } from '../../utils/language-mapping';
 import WordCardSlider from './WordCardSlider.vue';
 import ChevronIcon from '~/components/ui/icons/ChevronIcon.vue';
 
@@ -171,7 +188,8 @@ interface DictionaryExample {
   translation?: string;
 }
 
-interface WordData {
+// Поддержка обеих структур
+interface LegacyWordData {
   id?: number;
   word_th: string;
   translation: string[];
@@ -181,6 +199,8 @@ interface WordData {
   examples: Json[] | DictionaryExample[] | null;
   links: string[] | null;
 }
+
+type WordData = DictionaryEntry | LegacyWordData;
 
 interface Props {
   word: WordData;
@@ -198,29 +218,169 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<Emits>();
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const { canModerate } = useUserRole();
 
 const isExpanded = ref(false);
+
+// Определяем язык словаря на основе текущей локали
+const dictionaryLanguage = computed<'ru' | 'en'>(() => {
+  return getDictionaryLanguage(locale.value);
+});
+
+// Проверка типа структуры
+const isNewStructure = computed(() => {
+  return 'entryId' in props.word && 'headword' in props.word;
+});
+
+// Адаптированные данные для отображения
+const wordScript = computed(() => {
+  if (isNewStructure.value) {
+    return (props.word as DictionaryEntry).headword.script;
+  }
+  return (props.word as LegacyWordData).word_th;
+});
+
+const wordTranscription = computed(() => {
+  if (isNewStructure.value) {
+    const entry = props.word as DictionaryEntry;
+    return entry.headword.romanization?.paiboon || entry.headword.romanization?.ipa || null;
+  }
+  return (props.word as LegacyWordData).transcription_en;
+});
+
+const wordPrimaryTranslation = computed(() => {
+  if (isNewStructure.value) {
+    const translation = extractPrimaryTranslation(
+      (props.word as DictionaryEntry).senses,
+      dictionaryLanguage.value,
+      false // Отключаем fallback на другой язык
+    );
+    return translation || t('dictionary.noTranslationAvailable');
+  }
+  return getPrimaryTranslation((props.word as LegacyWordData).translation);
+});
+
+const wordTranslations = computed(() => {
+  if (isNewStructure.value) {
+    const translations = getAllTranslations(
+      (props.word as DictionaryEntry).senses,
+      dictionaryLanguage.value,
+      false // Отключаем fallback на другой язык
+    );
+    // Если переводов нет, возвращаем массив с сообщением
+    return translations.length > 0 ? translations : [t('dictionary.noTranslationAvailable')];
+  }
+  return (props.word as LegacyWordData).translation || [];
+});
+
+const wordSenses = computed(() => {
+  if (isNewStructure.value) {
+    return (props.word as DictionaryEntry).senses || [];
+  }
+  return [];
+});
+
+const wordExamples = computed(() => {
+  if (isNewStructure.value) {
+    return flattenExamples((props.word as DictionaryEntry).senses);
+  }
+  return (props.word as LegacyWordData).examples || null;
+});
+
+const wordSynonyms = computed(() => {
+  if (isNewStructure.value) {
+    const entry = props.word as DictionaryEntry;
+    return entry.related?.compounds?.map((c: { entryId: string }) => c.entryId) || null;
+  }
+  return (props.word as LegacyWordData).synonyms;
+});
+
+const wordAntonyms = computed(() => {
+  if (isNewStructure.value) {
+    // В новой структуре антонимов нет, возвращаем null
+    return null;
+  }
+  return (props.word as LegacyWordData).antonyms;
+});
+
+const wordLinks = computed(() => {
+  if (isNewStructure.value) {
+    return (props.word as DictionaryEntry).metadata?.sources || null;
+  }
+  return (props.word as LegacyWordData).links;
+});
+
+const wordAudio = computed(() => {
+  if (isNewStructure.value) {
+    return (props.word as DictionaryEntry).headword.audio || null;
+  }
+  return null;
+});
+
+const wordTopics = computed(() => {
+  if (isNewStructure.value) {
+    return (props.word as DictionaryEntry).metadata?.topics || null;
+  }
+  return null;
+});
 
 const examplesSlider = ref<InstanceType<typeof WordCardSlider> | undefined>();
 const synonymsSlider = ref<InstanceType<typeof WordCardSlider> | undefined>();
 const antonymsSlider = ref<InstanceType<typeof WordCardSlider> | undefined>();
 const linksSlider = ref<InstanceType<typeof WordCardSlider> | undefined>();
 
-watch(isExpanded, (newValue) => {
+/**
+ * Обновляет высоту всех слайдеров
+ * Следует принципу DRY - единая функция для обновления
+ */
+const updateAllSliders = async () => {
+  await nextTick();
+  await Promise.all([
+    examplesSlider.value?.updateHeight(),
+    synonymsSlider.value?.updateHeight(),
+    antonymsSlider.value?.updateHeight(),
+    linksSlider.value?.updateHeight(),
+  ]);
+};
+
+watch(isExpanded, async (newValue) => {
   if (newValue) {
-    nextTick(() => {
-      examplesSlider.value?.updateHeight();
-      synonymsSlider.value?.updateHeight();
-      antonymsSlider.value?.updateHeight();
-      linksSlider.value?.updateHeight();
-    });
+    await updateAllSliders();
   }
 });
 
-const getExampleField = (example: Json | DictionaryExample, field: string): string => {
+/**
+ * Отслеживаем изменения в данных примеров для обновления слайдера
+ * Следует принципу Open/Closed - компонент реагирует на изменения данных
+ */
+watch(
+  wordExamples,
+  async (newExamples) => {
+    if (newExamples && isExpanded.value) {
+      await nextTick();
+      await examplesSlider.value?.updateHeight();
+    }
+  },
+  { deep: true }
+);
+
+/**
+ * Извлекает поле из примера с поддержкой разных структур данных
+ * Следует принципу Single Responsibility - одна функция для получения поля
+ */
+const getExampleField = (
+  example: Json | DictionaryExample | ExampleItem,
+  field: string
+): string => {
   if (!example || typeof example !== 'object') return '';
+
+  // Проверяем наличие поля sentence (новая структура)
+  if ('sentence' in example && typeof example.sentence === 'object') {
+    return getExampleFieldUtil(example as ExampleItem, field as any) || '';
+  }
+
+  // Старая структура - напрямую из полей объекта
   return ((example as Record<string, unknown>)[field] as string) || '';
 };
 

@@ -142,11 +142,13 @@ import { ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useSupabaseClient } from '#imports';
 import type { Database } from '~~/types/supabase';
+import { generateEntryId, generateSenseId } from '../../../utils/dictionary-adapter';
+import { getDictionaryLanguage } from '../../../utils/language-mapping';
 
 const props = defineProps<{
   isOpen: boolean;
   word?: string;
-  editId?: number | null;
+  editId?: string | number | null;
 }>();
 
 const emit = defineEmits<{
@@ -155,7 +157,12 @@ const emit = defineEmits<{
 }>();
 
 const client = useSupabaseClient<Database>();
-const { t } = useI18n();
+const { t, locale } = useI18n();
+
+// Определяем язык словаря на основе текущей локали
+const dictionaryLanguage = computed<'ru' | 'en'>(() => {
+  return getDictionaryLanguage(locale.value);
+});
 
 const form = ref({
   word_th: '',
@@ -204,24 +211,64 @@ const loadWordData = async () => {
   error.value = '';
 
   try {
-    const { data, error: loadError } = await client
-      .from('dictionary')
-      .select('*')
-      .eq('id', props.editId)
-      .single();
+    const isNewStructure = typeof props.editId === 'string';
 
-    if (loadError) throw loadError;
+    if (isNewStructure) {
+      const { data, error: loadError } = await client
+        .from('new_dictionar')
+        .select('*')
+        .eq('entry_id', props.editId)
+        .single();
 
-    if (data) {
-      form.value = {
-        word_th: (data as { word_th?: string | null }).word_th || '',
-        translation: formatArrayToString((data as { translation?: string[] | null }).translation),
-        transcription_en: (data as { transcription_en?: string | null }).transcription_en || '',
-        synonyms: formatArrayToString((data as { synonyms?: string[] | null }).synonyms),
-        antonyms: formatArrayToString((data as { antonyms?: string[] | null }).antonyms),
-        links: formatArrayToString((data as { links?: string[] | null }).links),
-        examples: formatExamplesToString((data as { examples?: unknown }).examples),
-      };
+      if (loadError) throw loadError;
+
+      if (data) {
+        const headword = data.headword as any;
+        const senses = data.senses as any[];
+        const metadata = data.metadata as any;
+
+        const allTranslations: string[] = [];
+        senses.forEach((sense: any) => {
+          sense.translations?.forEach((tb: any) => {
+            // Используем только текущий язык, без fallback
+            if (tb.language === dictionaryLanguage.value) {
+              tb.variants?.forEach((v: any) => {
+                if (v.text) allTranslations.push(v.text);
+              });
+            }
+          });
+        });
+
+        form.value = {
+          word_th: headword.script || '',
+          translation: allTranslations.length > 0 ? allTranslations.join(', ') : '',
+          transcription_en: headword.romanization?.paiboon || headword.romanization?.ipa || '',
+          synonyms: '',
+          antonyms: '',
+          links: metadata?.sources?.join(', ') || '',
+          examples: JSON.stringify(senses[0]?.examples || [], null, 2),
+        };
+      }
+    } else {
+      const { data, error: loadError } = await client
+        .from('dictionary')
+        .select('*')
+        .eq('id', props.editId as number)
+        .single();
+
+      if (loadError) throw loadError;
+
+      if (data) {
+        form.value = {
+          word_th: (data as { word_th?: string | null }).word_th || '',
+          translation: formatArrayToString((data as { translation?: string[] | null }).translation),
+          transcription_en: (data as { transcription_en?: string | null }).transcription_en || '',
+          synonyms: formatArrayToString((data as { synonyms?: string[] | null }).synonyms),
+          antonyms: formatArrayToString((data as { antonyms?: string[] | null }).antonyms),
+          links: formatArrayToString((data as { links?: string[] | null }).links),
+          examples: formatExamplesToString((data as { examples?: unknown }).examples),
+        };
+      }
     }
   } catch (err) {
     error.value = err instanceof Error ? err.message : t('dictionary.error');
@@ -282,24 +329,73 @@ const onSubmit = async () => {
   isSaving.value = true;
 
   try {
-    const examples = parseExamples(form.value.examples);
-    const payload = {
-      word_th: form.value.word_th.trim(),
-      translation: parseArray(form.value.translation),
-      transcription_en: form.value.transcription_en.trim() || null,
-      synonyms: parseArray(form.value.synonyms),
-      antonyms: parseArray(form.value.antonyms),
-      links: parseArray(form.value.links),
-      examples: examples as never,
-    };
-
+    const isNewStructure = typeof props.editId === 'string';
     let saveError;
 
-    if (props.editId) {
-      const result = await client.from('dictionary').update(payload).eq('id', props.editId);
-      saveError = result.error;
+    if (isNewStructure || !props.editId) {
+      const entryId = props.editId || generateEntryId(form.value.word_th.trim());
+      const senseId = generateSenseId(entryId as string, 0);
+
+      const translations = parseArray(form.value.translation);
+      const examples = parseExamples(form.value.examples);
+
+      const newPayload = {
+        entry_id: entryId,
+        headword: {
+          script: form.value.word_th.trim(),
+          romanization: form.value.transcription_en
+            ? { paiboon: form.value.transcription_en.trim() }
+            : undefined,
+        },
+        metadata: {
+          sources: parseArray(form.value.links),
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        senses: [
+          {
+            senseId,
+            definition: {
+              [dictionaryLanguage.value]: translations[0] || '',
+            },
+            translations: [
+              {
+                language: dictionaryLanguage.value,
+                variants: translations.map((text: string) => ({ text, register: 'neutral' })),
+              },
+            ],
+            examples: Array.isArray(examples) ? examples : [],
+          },
+        ],
+        related: {},
+      };
+
+      if (props.editId) {
+        const result = await client
+          .from('new_dictionar')
+          .update(newPayload)
+          .eq('entry_id', props.editId as string);
+        saveError = result.error;
+      } else {
+        const result = await client.from('new_dictionar').insert(newPayload);
+        saveError = result.error;
+      }
     } else {
-      const result = await client.from('dictionary').insert(payload);
+      const examples = parseExamples(form.value.examples);
+      const payload = {
+        word_th: form.value.word_th.trim(),
+        translation: parseArray(form.value.translation),
+        transcription_en: form.value.transcription_en.trim() || null,
+        synonyms: parseArray(form.value.synonyms),
+        antonyms: parseArray(form.value.antonyms),
+        links: parseArray(form.value.links),
+        examples: examples as never,
+      };
+
+      const result = await client
+        .from('dictionary')
+        .update(payload)
+        .eq('id', props.editId as number);
       saveError = result.error;
     }
 

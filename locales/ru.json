@@ -167,7 +167,12 @@
     "saved": "Слово успешно добавлено",
     "saveError": "Ошибка при сохранении",
     "prevSlide": "Предыдущий слайд: {section}",
-    "nextSlide": "Следующий слайд: {section}"
+    "nextSlide": "Следующий слайд: {section}",
+    "languageLabel": "Язык переводов",
+    "noTranslationAvailable": "Перевод на выбранном языке недоступен",
+    "fallbackLanguageUsed": "Показан перевод на английском языке",
+    "showingEnglish": "Отображается на английском",
+    "showingRussian": "Отображается на русском"
   },
   "vocabulary": {
     "title": "Мой словарь",

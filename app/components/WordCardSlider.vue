@@ -37,7 +37,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, nextTick } from 'vue';
+import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue';
 
 const props = defineProps({
   title: {
@@ -61,18 +61,51 @@ const props = defineProps({
 const sliderTrack = ref<HTMLElement | null>(null);
 const currentIndex = ref(0);
 let scrollTimeout: NodeJS.Timeout | null = null;
+let resizeObserver: ResizeObserver | null = null;
 
-const updateSliderHeight = (index: number) => {
+/**
+ * Ожидает загрузку контента перед расчётом высоты
+ */
+const waitForContent = (element: HTMLElement): Promise<void> => {
+  return new Promise((resolve) => {
+    if (element.offsetHeight > 0) {
+      resolve();
+    } else {
+      const checkInterval = setInterval(() => {
+        if (element.offsetHeight > 0) {
+          clearInterval(checkInterval);
+          resolve();
+        }
+      }, 50);
+
+      setTimeout(() => {
+        clearInterval(checkInterval);
+        resolve();
+      }, 1000);
+    }
+  });
+};
+
+/**
+ * Обновляет высоту контейнера на основе текущего слайда
+ * Следует принципу Single Responsibility - одна функция, одна задача
+ */
+const updateSliderHeight = async (index: number) => {
   if (!sliderTrack.value || !sliderTrack.value.children[index]) return;
+
+  await nextTick();
+
   const currentSlide = sliderTrack.value.children[index] as HTMLElement;
+  await waitForContent(currentSlide);
+
   const container = sliderTrack.value.parentElement;
-  if (container) {
+  if (container && currentSlide.offsetHeight > 0) {
     container.style.transition = 'height 0.3s ease';
     container.style.height = `${currentSlide.offsetHeight}px`;
   }
 };
 
-const scrollToSlide = (index: number) => {
+const scrollToSlide = async (index: number) => {
   if (!sliderTrack.value) return;
   const slideWidth = sliderTrack.value.children[0]?.clientWidth || 0;
   const gap = parseInt(getComputedStyle(sliderTrack.value).gap) || 0;
@@ -80,20 +113,22 @@ const scrollToSlide = (index: number) => {
     left: index * (slideWidth + gap),
     behavior: 'smooth',
   });
-  updateSliderHeight(index);
+
+  await nextTick();
+  await updateSliderHeight(index);
 };
 
-const prev = () => {
+const prev = async () => {
   if (currentIndex.value > 0) {
     currentIndex.value--;
-    scrollToSlide(currentIndex.value);
+    await scrollToSlide(currentIndex.value);
   }
 };
 
-const next = () => {
+const next = async () => {
   if (currentIndex.value < props.items.length - 1) {
     currentIndex.value++;
-    scrollToSlide(currentIndex.value);
+    await scrollToSlide(currentIndex.value);
   }
 };
 
@@ -101,23 +136,56 @@ const handleScroll = () => {
   if (!sliderTrack.value) return;
   if (scrollTimeout) clearTimeout(scrollTimeout);
 
-  scrollTimeout = setTimeout(() => {
+  scrollTimeout = setTimeout(async () => {
     if (!sliderTrack.value) return;
     const slideWidth = sliderTrack.value.children[0]?.clientWidth || 0;
     const gap = parseInt(getComputedStyle(sliderTrack.value).gap) || 0;
     const newIndex = Math.round(sliderTrack.value.scrollLeft / (slideWidth + gap));
     currentIndex.value = newIndex;
-    updateSliderHeight(newIndex);
+    await updateSliderHeight(newIndex);
   }, 150);
 };
 
-const updateHeight = () => {
-  updateSliderHeight(currentIndex.value);
+const updateHeight = async () => {
+  await updateSliderHeight(currentIndex.value);
 };
 
-onMounted(() => {
-  nextTick(() => {
+/**
+ * Настраивает ResizeObserver для автоматического отслеживания изменений
+ * Следует принципу DRY - избегаем дублирования логики пересчёта
+ */
+const setupResizeObserver = () => {
+  if (!sliderTrack.value) return;
+
+  resizeObserver = new ResizeObserver(() => {
     updateHeight();
+  });
+
+  Array.from(sliderTrack.value.children).forEach((child) => {
+    resizeObserver?.observe(child);
+  });
+};
+
+/**
+ * Отслеживаем изменения в items для пересчёта высоты
+ */
+watch(
+  () => props.items,
+  async () => {
+    await nextTick();
+    if (resizeObserver) {
+      resizeObserver.disconnect();
+    }
+    setupResizeObserver();
+    await updateHeight();
+  },
+  { deep: true }
+);
+
+onMounted(() => {
+  nextTick(async () => {
+    await updateHeight();
+    setupResizeObserver();
     window.addEventListener('resize', updateHeight);
   });
 });
@@ -125,6 +193,7 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('resize', updateHeight);
   if (scrollTimeout) clearTimeout(scrollTimeout);
+  if (resizeObserver) resizeObserver.disconnect();
 });
 
 defineExpose({

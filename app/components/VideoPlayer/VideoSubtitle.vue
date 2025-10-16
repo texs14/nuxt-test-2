@@ -33,7 +33,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { Token } from '~/types/video.types';
-import InteractiveWord from '~/components/ui/InteractiveWord.vue';
+import InteractiveWord from '~/components/InteractiveWord.vue';
 
 const props = defineProps<{
   thaiTokens: Token[];

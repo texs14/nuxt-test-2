@@ -167,7 +167,12 @@
     "saved": "Word successfully added",
     "saveError": "Error saving word",
     "prevSlide": "Previous slide: {section}",
-    "nextSlide": "Next slide: {section}"
+    "nextSlide": "Next slide: {section}",
+    "languageLabel": "Translation language",
+    "noTranslationAvailable": "Translation not available in selected language",
+    "fallbackLanguageUsed": "Showing translation in Russian",
+    "showingEnglish": "Displaying in English",
+    "showingRussian": "Displaying in Russian"
   },
   "vocabulary": {
     "title": "My Vocabulary",

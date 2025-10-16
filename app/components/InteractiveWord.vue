@@ -12,6 +12,9 @@
     <Teleport :to="teleportTarget">
       <Transition name="interactive-word__popup">
         <div v-if="isOpen" ref="popupRef" class="interactive-word__popup" :style="popupStyle">
+          <!-- <UiButton class="interactive-word__popup_add-btn" type="button" @click="onFetchWord">
+            получить слово из супабазы
+          </UiButton> -->
           <VocabularyWordCard
             v-if="state === 'loaded' && entry"
             :word="entry"
@@ -56,8 +59,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useSupabaseClient } from '#imports';
-import type { Database, Json } from '~~/types/supabase';
+import type { DictionaryEntry } from '../../types/dictionary';
 import AddWordDialog from '~/components/ui/AddWordDialog.vue';
 import VocabularyWordCard from '~/components/VocabularyWordCard.vue';
 
@@ -65,11 +67,11 @@ const props = defineProps<{ word: string }>();
 
 const emit = defineEmits<{ (event: 'open-change', value: boolean): void }>();
 
-const client = useSupabaseClient<Database>();
 const { canModerate } = useUserRole();
+const { t } = useI18n();
 
-type DictionaryRow = Database['public']['Tables']['dictionary']['Row'];
-type DictionaryEntry = DictionaryRow;
+// CRUD composable для работы со словарём
+const dictionaryCrud = useSupabaseCrud({ table: 'new_dictionar' });
 type DictionaryCacheState = Record<string, DictionaryEntry | null>;
 
 const cache = useState<DictionaryCacheState>('dictionary-cache', () => {
@@ -78,36 +80,6 @@ const cache = useState<DictionaryCacheState>('dictionary-cache', () => {
 
 const instanceId = Symbol('interactive-word');
 const activeInstance = useState<symbol | null>('interactive-word-active', () => null);
-
-const mergeStringArrays = (sources: (string[] | null | undefined)[]) => {
-  const unique = new Set<string>();
-  sources.forEach((list) => {
-    if (!Array.isArray(list)) return;
-    list.forEach((value) => {
-      if (typeof value === 'string' && value.trim().length) {
-        unique.add(value);
-      }
-    });
-  });
-  return Array.from(unique);
-};
-
-const mergeJsonArrays = (sources: (Json[] | null | undefined)[]) => {
-  const unique = new Set<string>();
-  const result: Json[] = [];
-  sources.forEach((list) => {
-    if (!Array.isArray(list)) return;
-    list.forEach((value) => {
-      if (!value) return;
-      const key = JSON.stringify(value);
-      if (!unique.has(key)) {
-        unique.add(key);
-        result.push(value);
-      }
-    });
-  });
-  return result.length ? result : null;
-};
 
 const triggerRef = ref<HTMLElement | null>(null);
 const popupRef = ref<HTMLElement | null>(null);
@@ -118,10 +90,8 @@ const isOpen = ref(false);
 const state = ref<'idle' | 'loading' | 'loaded' | 'not-found' | 'error'>('idle');
 const entry = ref<DictionaryEntry | null>(null);
 const isAddDialogOpen = ref(false);
-const editId = ref<number | null>(null);
+const editId = ref<string | null>(null);
 const inVocabulary = ref(false);
-
-const { t } = useI18n();
 
 const getFullscreenElement = (): Element | null => {
   if (!process.client) return null;
@@ -198,6 +168,7 @@ const closePopup = (options?: CloseOptions) => {
   isOpen.value = false;
   state.value = 'idle';
   emit('open-change', false);
+  dictionaryCrud.clearError();
   if (!options?.silent && activeInstance.value === instanceId) {
     activeInstance.value = null;
   }
@@ -220,6 +191,9 @@ const onToggle = async () => {
   emit('open-change', true);
   fullscreenKey.value += 1;
 
+  // Очистка предыдущих ошибок
+  dictionaryCrud.clearError();
+
   const normalizedWord = props.word.trim();
   const cached = cache.value[normalizedWord];
 
@@ -234,19 +208,27 @@ const onToggle = async () => {
 
   try {
     state.value = 'loading';
-    const { data, error } = await client
-      .from('dictionary')
-      .select('*')
-      .eq('word_th', normalizedWord)
-      .order('created_at', { ascending: false });
 
-    if (error) {
-      throw error;
+    // Запрос через useSupabaseCrud
+    const result = await dictionaryCrud.select(
+      { 'headword->>script': normalizedWord },
+      { limit: 1 }
+    );
+
+    // Проверка ошибки
+    if (dictionaryCrud.error.value) {
+      cache.value[normalizedWord] = null;
+      entry.value = null;
+      state.value = 'error';
+      await nextTick();
+      updatePosition();
+      return;
     }
 
-    const rows = (Array.isArray(data) ? data : data ? [data] : []) as DictionaryRow[];
+    // Преобразование результата (массив -> объект)
+    const data = result?.[0];
 
-    if (!rows.length) {
+    if (!data) {
       cache.value[normalizedWord] = null;
       entry.value = null;
       state.value = 'not-found';
@@ -255,37 +237,17 @@ const onToggle = async () => {
       return;
     }
 
-    const translations = mergeStringArrays(rows.map((row) => row.translation));
-    const synonyms = mergeStringArrays(rows.map((row) => row.synonyms));
-    const links = mergeStringArrays(rows.map((row) => row.links));
-    const antonyms = mergeStringArrays(rows.map((row) => row.antonyms));
-    const examples = mergeJsonArrays(rows.map((row) => row.examples));
-
-    const base = rows[0];
-    if (!base) {
-      cache.value[normalizedWord] = null;
-      entry.value = null;
-      state.value = 'not-found';
-      await nextTick();
-      updatePosition();
-      return;
-    }
-
-    const aggregated: DictionaryEntry = {
-      ...base,
-      translation: translations.length ? translations : base.translation,
-      synonyms: synonyms.length ? synonyms : base.synonyms,
-      links: links.length ? links : base.links,
-      antonyms: antonyms.length ? antonyms : base.antonyms,
-      examples: examples ?? base.examples,
-      id: base.id,
-      word_th: base.word_th,
-      created_at: base.created_at,
-      transcription_en: base.transcription_en,
+    // Формирование DictionaryEntry
+    const loadedEntry: DictionaryEntry = {
+      entryId: data.entry_id,
+      headword: data.headword as any,
+      metadata: data.metadata as any,
+      senses: data.senses as any,
+      related: data.related as any,
     };
 
-    cache.value[normalizedWord] = aggregated;
-    entry.value = aggregated;
+    cache.value[normalizedWord] = loadedEntry;
+    entry.value = loadedEntry;
     state.value = 'loaded';
     await checkVocabulary();
     await nextTick();
@@ -330,8 +292,8 @@ const onOpenAddDialog = () => {
 };
 
 const onOpenEditDialog = () => {
-  if (entry.value?.id) {
-    editId.value = entry.value.id;
+  if (entry.value?.entryId) {
+    editId.value = entry.value.entryId;
     isAddDialogOpen.value = true;
   }
 };
@@ -353,10 +315,10 @@ const onWordSaved = async () => {
 };
 
 const checkVocabulary = async () => {
-  if (!entry.value?.id) return;
+  if (!entry.value?.entryId) return;
   try {
     const data = await $fetch('/api/vocabulary/check', {
-      params: { dictionary_id: entry.value.id },
+      params: { entry_id: entry.value.entryId },
     });
     inVocabulary.value = data?.inVocabulary || false;
   } catch {
@@ -365,22 +327,33 @@ const checkVocabulary = async () => {
 };
 
 const onToggleVocabulary = async () => {
-  if (!entry.value?.id) return;
+  if (!entry.value?.entryId) return;
 
   try {
     if (inVocabulary.value) {
-      await $fetch(`/api/vocabulary/${entry.value.id}`, { method: 'DELETE' });
+      await $fetch(`/api/vocabulary/${entry.value.entryId}`, { method: 'DELETE' });
       inVocabulary.value = false;
     } else {
       await $fetch('/api/vocabulary', {
         method: 'POST',
-        body: { dictionary_id: entry.value.id },
+        body: { entry_id: entry.value.entryId },
       });
       inVocabulary.value = true;
     }
   } catch {
     // Ignore errors silently
   }
+};
+
+const onFetchWord = async () => {
+  const normalizedWord = props.word.trim();
+  console.log('Запрос слова:', normalizedWord);
+
+  const result = await dictionaryCrud.select({ 'headword->>script': normalizedWord });
+
+  console.log('Результат из Supabase:', result?.[0]);
+  console.log('Ошибка:', dictionaryCrud.error.value);
+  console.log('Загрузка:', dictionaryCrud.loading.value);
 };
 
 onBeforeUnmount(() => {

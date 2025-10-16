@@ -39,6 +39,36 @@ export interface Database {
         };
         Relationships: [];
       };
+      new_dictionar: {
+        Row: {
+          entry_id: string;
+          headword: Json;
+          metadata: Json | null;
+          senses: Json;
+          related: Json | null;
+          created_at: string | null;
+          updated_at: string | null;
+        };
+        Insert: {
+          entry_id: string;
+          headword: Json;
+          metadata?: Json | null;
+          senses: Json;
+          related?: Json | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Update: {
+          entry_id?: string;
+          headword?: Json;
+          metadata?: Json | null;
+          senses?: Json;
+          related?: Json | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Relationships: [];
+      };
       profiles: {
         Row: {
           id: string;
