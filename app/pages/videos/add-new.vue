@@ -99,13 +99,41 @@
       @loadedmetadata="onMeta"
     />
 
+    <section v-if="uploadedAudioUrl" class="video-upload-form__transcribe">
+      <button
+        class="video-upload-form__button"
+        type="button"
+        :disabled="transcriptionLoading || !uploadedAudioUrl"
+        @click="startTranscription"
+      >
+        {{
+          transcriptionLoading
+            ? t('videos.addNew.transcribeInProgress')
+            : t('videos.addNew.transcribeStart')
+        }}
+      </button>
+      <button
+        class="video-upload-form__button"
+        type="button"
+        :disabled="mockLoading"
+        @click="loadMockTranscription"
+      >
+        {{
+          mockLoading
+            ? t('videos.addNew.transcribeMockInProgress')
+            : t('videos.addNew.transcribeMockLoad')
+        }}
+      </button>
+      <p v-if="transcriptionError" class="video-upload-form__error">{{ transcriptionError }}</p>
+    </section>
+
     <ResembleTranscriptionLoader
       v-if="resembleUuid"
       class="video-upload-form__loader"
       :uuid="resembleUuid"
       @completed="onResembleCompleted"
       @status="(val: string) => (transcriptionStatus = val)"
-      @error="(val: string) => (transcriptionError = val)"
+      @error="onTranscriptionError"
     />
 
     <section class="video-upload-form__editor">
@@ -138,6 +166,8 @@ import type {
   SubtitleText as RawSubtitleText,
   ThaiSentences,
 } from '@/types/video.types';
+import type { ResembleTranscriptionResponse } from '~~/types/resemble';
+import { convertResembleWordsToSubtitles } from '~~/utils/resemble-transcription-adapter';
 
 definePageMeta({
   middleware: 'moderator',
@@ -180,6 +210,8 @@ const uploadedPreviewUrl = ref<string>('');
 const resembleUuid = ref<string>('');
 const transcriptionStatus = ref<string>('');
 const transcriptionError = ref<string>('');
+const transcriptionLoading = ref(false);
+const mockLoading = ref(false);
 
 const editorSubtitles = ref<EditorSubtitleItem[]>([]);
 
@@ -383,6 +415,9 @@ function onVideoChange(e: Event) {
   videoFile.value = files && files[0] ? files[0] : null;
   serverMessage.value = '';
   errorMessage.value = '';
+  resembleUuid.value = '';
+  transcriptionStatus.value = '';
+  transcriptionError.value = '';
   if (videoFile.value) {
     void uploadNow();
   }
@@ -457,9 +492,6 @@ async function uploadNow() {
       if (data?.video?.url) uploadedVideoUrl.value = data.video.url;
       if (data?.audio?.url) uploadedAudioUrl.value = data.audio.url;
       if (data?.preview?.url) uploadedPreviewUrl.value = data.preview.url;
-      if (data?.resemble?.uuid) {
-        resembleUuid.value = String(data.resemble.uuid);
-      }
       if (!newId.value) newId.value = genId();
     } catch {}
   } catch (e: any) {
@@ -469,8 +501,71 @@ async function uploadNow() {
   }
 }
 
+async function startTranscription() {
+  if (!uploadedAudioUrl.value || transcriptionLoading.value) return;
+  transcriptionError.value = '';
+  transcriptionStatus.value = '';
+  resembleUuid.value = '';
+  transcriptionLoading.value = true;
+  try {
+    const res = await fetch('/api/resemble/transcribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ audio_url: uploadedAudioUrl.value }),
+    });
+
+    if (!res.ok) {
+      const message = await res.text().catch(() => '');
+      throw new Error(message || 'Не удалось запустить транскрибацию');
+    }
+
+    const data = (await res.json()) as any;
+    const uuid = data?.uuid ? String(data.uuid) : '';
+    if (!uuid) {
+      throw new Error('Resemble.AI не вернул идентификатор транскрибации');
+    }
+    resembleUuid.value = uuid;
+    transcriptionStatus.value = data?.status ? String(data.status) : '';
+  } catch (error: any) {
+    transcriptionError.value = error?.message || 'Ошибка запуска транскрибации';
+  } finally {
+    transcriptionLoading.value = false;
+  }
+}
+
 function onResembleCompleted(segments: RawSubtitleItem[]) {
   editorSubtitles.value = normalizeEditorSubtitles(segments);
+}
+
+function onTranscriptionError(message: string) {
+  transcriptionError.value = message;
+}
+
+async function loadMockTranscription() {
+  if (mockLoading.value) return;
+  transcriptionError.value = '';
+  mockLoading.value = true;
+  try {
+    const moduleUrl = await import(
+      '../../../transcript-ef2e6cda-bb00-493c-9e0d-a1c36362e96d.json?url'
+    );
+    const response = await fetch(moduleUrl.default);
+    if (!response.ok) {
+      throw new Error(`Не удалось загрузить моковый файл: HTTP ${response.status}`);
+    }
+    const payload = (await response.json()) as ResembleTranscriptionResponse;
+    if (!payload?.words || payload.words.length === 0) {
+      throw new Error('Моковые данные не содержат слов для транскрибации');
+    }
+    resembleUuid.value = payload.uuid || '';
+    transcriptionStatus.value = payload.status || 'completed';
+    const subtitles = convertResembleWordsToSubtitles(payload.words);
+    editorSubtitles.value = normalizeEditorSubtitles(subtitles as unknown as RawSubtitleItem[]);
+  } catch (error: any) {
+    transcriptionError.value = error?.message || 'Ошибка загрузки моковой транскрибации';
+  } finally {
+    mockLoading.value = false;
+  }
 }
 
 function onMeta(e: Event) {

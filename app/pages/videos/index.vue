@@ -9,13 +9,9 @@
     route-prefix="/videos/"
     :loading-message="t('videos.loading')"
     :error-message-prefix="t('videos.error')"
-  >
-    <template #header-actions>
-      <NuxtLink v-if="addNewLink !== '#'" :to="addNewLink" class="btn btn_primary">
-        {{ t('videos.add') }}
-      </NuxtLink>
-    </template>
-  </ContentListPage>
+    :add-new-route="addNewLink"
+    :add-new-button-text="t('videos.add')"
+  />
 </template>
 
 <script setup lang="ts">
@@ -35,7 +31,6 @@ const safeLocalePath = useSafeLocalePath();
 const { canModerate } = useUserRole();
 
 const addNewLink = computed(() => {
-  if (!canModerate.value) return '#';
   return safeLocalePath({ name: 'videos-add-new' });
 });
 

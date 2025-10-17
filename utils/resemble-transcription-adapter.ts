@@ -1,5 +1,5 @@
-import type { ResembleTranscriptionWord } from '~/types/resemble';
-import type { SubtitleItem } from '~/app/types/video.types';
+import type { ResembleTranscriptionWord } from '~~/types/resemble';
+import type { SubtitleItem } from '~~/app/types/video.types';
 
 /**
  * Преобразует массив слов из Resemble.AI транскрибации в SubtitleItem[]
@@ -42,7 +42,7 @@ export function convertResembleWordsToSubtitles(
 
 /**
  * Создает SubtitleItem из массива слов одной фразы
- * Начало фразы = start_time первого слова - 0.5 секунды
+ * Начало фразы = start_time первого слова
  * Конец фразы = end_time последнего слова
  *
  * @param words - Массив слов одной фразы
@@ -55,9 +55,8 @@ function createSubtitleFromWords(words: ResembleTranscriptionWord[], id: number)
 
   return {
     id,
-    // Вычитаем 0.5 секунды от начала, но не уходим в отрицательные значения
-    start: Math.max(0, firstWord.start_time - 0.5),
-    end: lastWord.end_time,
+    start: firstWord!.start_time,
+    end: lastWord!.end_time,
     text: {
       // Объединяем все слова через пробел
       th: words.map((w) => w.text).join(' '),

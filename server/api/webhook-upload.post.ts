@@ -158,39 +158,6 @@ export default defineEventHandler(async (event) => {
     }
 
     // Запускаем транскрибацию через Resemble.AI
-    const resembleProjectUuid = (config as any).resembleProjectUuid;
-    const transcribePayload: Record<string, any> = {
-      audio_url: audioUrl,
-    };
-    if (resembleProjectUuid) {
-      transcribePayload.project_uuid = resembleProjectUuid;
-    }
-
-    let resembleUuid: string | undefined;
-    let resembleStatus = '';
-    try {
-      const transcribeRes = await fetch(`${getRequestURL(event).origin}/api/resemble/transcribe`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(transcribePayload),
-      });
-
-      if (!transcribeRes.ok) {
-        const errorText = await transcribeRes.text().catch(() => '');
-        throw new Error(`Resemble.AI transcription failed: ${errorText || 'unknown error'}`);
-      }
-
-      const transcribeData = (await transcribeRes.json()) as any;
-      resembleUuid = transcribeData?.uuid;
-      resembleStatus = transcribeData?.status || 'queued';
-    } catch (err: any) {
-      throw new Error(`Failed to start Resemble.AI transcription: ${err.message}`);
-    }
-
-    if (!resembleUuid) {
-      throw new Error('Resemble.AI did not return a transcription UUID');
-    }
-
     // Ответ клиенту
     setHeaders(event, { 'content-type': 'application/json; charset=utf-8' });
     setResponseStatus(event, 200);
@@ -207,7 +174,6 @@ export default defineEventHandler(async (event) => {
       video: { bucket: 'Videos', path: videoPath, url: videoUrl },
       audio: { bucket: 'Audios', path: audioPath, url: audioUrl },
       preview: { bucket: 'Videos', path: previewPath, url: previewUrl },
-      resemble: { uuid: resembleUuid, status: resembleStatus },
     });
   } catch (err: any) {
     setResponseStatus(event, 500);

@@ -33,8 +33,9 @@ export default defineEventHandler(async (event) => {
   }
 
   // Подготовка данных для отправки в Resemble AI
+  // API ожидает поле 'url', а не 'audio_url'
   const requestData: Record<string, any> = {
-    audio_url: body.audio_url,
+    url: body.audio_url,
   };
 
   // Добавление опциональных полей
@@ -43,24 +44,35 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    // Отправка запроса к Resemble AI Transcription API
-    const response = await $fetch<ResembleTranscriptionResponse>(
-      'https://f.cluster.resemble.ai/transcribe',
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${resembleKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: requestData,
-      }
-    );
+    // Отправка запроса к Resemble AI Speech-to-Text API
+    const response = await $fetch<any>('https://app.resemble.ai/api/v2/speech-to-text', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${resembleKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: requestData,
+    });
+
+    // Логирование для отладки
+    console.log('Resemble API response:', JSON.stringify(response, null, 2));
+
+    // Проверка структуры ответа - может быть вложен в item
+    const transcriptionData = response.item || response;
+
+    if (!transcriptionData.uuid) {
+      throw createError({
+        statusCode: 500,
+        statusMessage: 'Resemble.AI did not return a transcription UUID',
+        data: { response },
+      });
+    }
 
     // Возврат ответа клиенту
     return {
-      uuid: response.uuid,
-      status: response.status,
-      created_at: response.created_at,
+      uuid: transcriptionData.uuid,
+      status: transcriptionData.status || 'processing',
+      created_at: transcriptionData.created_at,
     };
   } catch (error: any) {
     // Обработка ошибок запроса

@@ -1,5 +1,14 @@
 <template>
   <section class="content-page">
+    <header v-if="title" class="content-page__header">
+      <h1 class="content-page__title">{{ title }}</h1>
+      <div v-if="addNewRoute && canModerate" class="content-page__actions">
+        <NuxtLink :to="addNewRoute" class="btn btn_primary">
+          {{ addNewButtonText }}
+        </NuxtLink>
+      </div>
+    </header>
+
     <div v-if="pageTitle || pageDescription || $slots['page-intro']" class="content-page__intro">
       <div v-if="$slots['page-intro']">
         <slot name="page-intro" />
@@ -50,6 +59,8 @@ interface Props {
   emptyMessage?: string;
   pageTitle?: string;
   pageDescription?: string;
+  addNewRoute?: string;
+  addNewButtonText?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -57,10 +68,13 @@ const props = withDefaults(defineProps<Props>(), {
   emptyMessage: '',
   pageTitle: '',
   pageDescription: '',
+  addNewRoute: '',
+  addNewButtonText: 'Добавить',
 });
 
 const localePath = useLocalePath();
 const { getLocalizedValue, getDuration } = useLocalizedContent();
+const { canModerate } = useUserRole();
 
 const showEmptyState = computed(() => {
   return props.emptyMessage && (!props.items || props.items.length === 0);
@@ -79,4 +93,26 @@ function getItemRoute(item: BaseContentItem): string {
 
 <style scoped lang="scss">
 @use '~/assets/styles/layouts/content-page';
+
+.content-page__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.content-page__title {
+  font-size: 32px;
+  font-weight: 700;
+  margin: 0;
+  color: #111827;
+}
+
+.content-page__actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
 </style>

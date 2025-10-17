@@ -39,7 +39,26 @@ const viewStatus = computed(() => {
   return statusMap[status.value] || status.value || 'ожидание…';
 });
 
-async function poll() {
+function clearTimer() {
+  if (timer.value) {
+    clearInterval(timer.value);
+    timer.value = null;
+  }
+}
+
+function extractPayload(
+  response:
+    | ResembleTranscriptionResponse
+    | (ResembleTranscriptionResponse & { item?: ResembleTranscriptionResponse })
+) {
+  const candidate = (response as any).item;
+  if (candidate && typeof candidate === 'object') {
+    return candidate as ResembleTranscriptionResponse;
+  }
+  return response;
+}
+
+async function fetchTranscription() {
   try {
     const res = await fetch(`/api/resemble/transcription/${encodeURIComponent(props.uuid)}`);
 
@@ -47,61 +66,60 @@ async function poll() {
       throw new Error(`HTTP ${res.status}: ${res.statusText}`);
     }
 
-    const json = (await res.json()) as ResembleTranscriptionResponse;
-    status.value = json.status;
+    const json = (await res.json()) as ResembleTranscriptionResponse & {
+      item?: ResembleTranscriptionResponse;
+    };
+
+    const payload = extractPayload(json);
+    status.value = payload.status;
     emit('status', status.value);
 
     // Если транскрибация завершена
-    if (json.status === 'completed') {
-      if (json.words && json.words.length > 0) {
+    if (payload.status === 'completed') {
+      clearTimer();
+      if (payload.words && payload.words.length > 0) {
         // Преобразуем words в SubtitleItem[] используя утилиту
-        const subtitles = convertResembleWordsToSubtitles(json.words);
-        clear();
+        const subtitles = convertResembleWordsToSubtitles(payload.words);
         emit('completed', subtitles);
       } else {
         error.value = 'Транскрибация завершена, но слова отсутствуют';
         emit('error', error.value);
-        clear();
       }
       return;
     }
 
     // Если произошла ошибка
-    if (json.status === 'failed') {
+    if (payload.status === 'failed') {
+      clearTimer();
       error.value = 'Транскрибация завершилась с ошибкой';
       emit('error', error.value);
-      clear();
     }
   } catch (e: any) {
+    clearTimer();
     error.value = e?.message || 'Ошибка опроса статуса Resemble.AI';
     emit('error', error.value);
-    clear();
   }
 }
 
-function clear() {
-  if (timer.value) {
-    clearInterval(timer.value);
-    timer.value = null;
-  }
+function schedulePolling() {
+  clearTimer();
+  if (!props.uuid) return;
+  timer.value = setInterval(fetchTranscription, props.intervalMs ?? 5000);
+  void fetchTranscription();
 }
 
 onMounted(() => {
-  clear();
-  timer.value = setInterval(poll, props.intervalMs ?? 5000);
-  void poll();
+  schedulePolling();
 });
 
-onBeforeUnmount(() => clear());
+onBeforeUnmount(() => clearTimer());
 
 watch(
   () => props.uuid,
   () => {
-    clear();
-    if (props.uuid) {
-      timer.value = setInterval(poll, props.intervalMs ?? 5000);
-      void poll();
-    }
+    error.value = '';
+    status.value = 'queued';
+    schedulePolling();
   }
 );
 </script>

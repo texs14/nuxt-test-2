@@ -9,17 +9,9 @@
     route-prefix="/lessons/"
     :loading-message="t('common.loading')"
     :empty-message="t('lessons.empty')"
-  >
-    <template #header-actions>
-      <NuxtLink
-        v-if="user && canModerate"
-        :to="localePath('/lessons/add-new')"
-        class="btn btn_primary"
-      >
-        {{ t('lessons.addNew') }}
-      </NuxtLink>
-    </template>
-  </ContentListPage>
+    :add-new-route="localePath('/lessons/add-new')"
+    :add-new-button-text="t('lessons.addNew')"
+  />
 </template>
 
 <script setup lang="ts">

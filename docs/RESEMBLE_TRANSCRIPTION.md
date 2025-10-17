@@ -47,15 +47,15 @@ Resemble.AI используется для автоматической тра�
 
 ```
 1. Пользователь загружает видео
-   ↓
-2. webhook-upload.post.ts извлекает аудио и загружает в Supabase Storage
-   ↓
-3. Отправляется запрос к Resemble.AI через /api/resemble/transcribe
-   ↓
-4. ResembleTranscriptionLoader опрашивает статус через /api/resemble/transcription/[uuid]
-   ↓
-5. При завершении: convertResembleWordsToSubtitles преобразует words в SubtitleItem[]
-   ↓
+  ↓
+2. `webhook-upload.post.ts` извлекает аудио и загружает в Supabase Storage
+  ↓
+3. Пользователь вручную запускает транскрибацию кнопкой (**POST** `/api/resemble/transcribe` → Resemble)
+  ↓
+4. `ResembleTranscriptionLoader` с интервалом опрашивает статус (**GET** `/api/resemble/transcription/[uuid]`)
+  ↓
+5. При статусе `completed` данные преобразуются `convertResembleWordsToSubtitles` в `SubtitleItem[]`
+  ↓
 6. Субтитры отображаются в редакторе и сохраняются в БД
 ```
 
@@ -389,14 +389,16 @@ Cannot find module '~/types/resemble'
 
 ### POST /api/resemble/transcribe
 
-Запускает транскрибацию аудио файла.
+Запускает транскрибацию аудио файла через Resemble.AI Speech-to-Text API.
+
+**Endpoint:** `https://app.resemble.ai/api/v2/speech-to-text`
 
 **Request:**
 
 ```json
 {
   "audio_url": "https://example.com/audio.mp3",
-  "project_uuid": "optional-project-uuid"
+  "project_uuid": "optional-project-id"
 }
 ```
 
@@ -405,25 +407,31 @@ Cannot find module '~/types/resemble'
 ```json
 {
   "uuid": "transcription-uuid",
-  "status": "queued",
-  "created_at": "2025-10-17T06:01:45.906Z"
+  "status": "processing"
 }
 ```
 
-### GET /api/resemble/transcription/[uuid]
+### GET /api/resemble/transcription/:uuid
 
 Получает статус и результат транскрибации.
 
+**Endpoint:** `https://app.resemble.ai/api/v2/speech-to-text/:uuid`
+
 **Response:**
 
 ```json
 {
   "uuid": "transcription-uuid",
-  "text": "full transcription text",
-  "words": [...],
   "status": "completed",
-  "created_at": "2025-10-17T06:01:45.906Z",
-  "updated_at": "2025-10-17T06:03:41.202Z"
+  "text": "Full transcription text",
+  "words": [
+    {
+      "text": "слово",
+      "start_time": 0.5,
+      "end_time": 1.0,
+      "speaker_id": 1
+    }
+  ]
 }
 ```
 

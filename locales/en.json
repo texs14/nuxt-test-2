@@ -52,6 +52,8 @@
       "subtitleLang": "Subtitle language",
       "submitUploading": "Uploading…",
       "submitAgain": "Submit again",
+      "transcribeStart": "Start transcription",
+      "transcribeInProgress": "Transcription in progress…",
       "loadError": "Failed to load entry",
       "networkError": "Network error while uploading file",
       "emptyResponse": "Empty response",

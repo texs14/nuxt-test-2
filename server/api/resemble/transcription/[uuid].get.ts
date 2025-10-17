@@ -29,9 +29,9 @@ export default defineEventHandler(async (event): Promise<ResembleTranscriptionRe
   }
 
   try {
-    // Отправка запроса к Resemble AI API для получения статуса
+    // Отправка запроса к Resemble AI Speech-to-Text API для получения статуса
     const response: ResembleTranscriptionResponse = await $fetch<ResembleTranscriptionResponse>(
-      `https://f.cluster.resemble.ai/transcribe/${encodeURIComponent(uuid)}`,
+      `https://app.resemble.ai/api/v2/speech-to-text/${encodeURIComponent(uuid)}`,
       {
         method: 'GET',
         headers: {
