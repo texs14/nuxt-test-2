@@ -1,9 +1,10 @@
 import type { DictionaryEntry } from '~~/types/dictionary';
 import { createClient } from '@supabase/supabase-js';
 import { serverSupabaseUser } from '#supabase/server';
+import { GEMINI_CONFIG } from '~/config/gemini';
 
 /**
- * Server API endpoint для генерации словарной записи через GPT-4
+ * Server API endpoint для генерации словарной записи через Google Gemini
  * POST /api/dictionary/generate
  */
 
@@ -19,7 +20,7 @@ interface ChatMessage {
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
   const supabaseServiceKey = config.supabaseServiceKey;
-  const openaiKey = config.openaiKey;
+  const geminiKey = config.geminiKey;
 
   // Проверка наличия ключей
   if (!supabaseServiceKey) {
@@ -29,10 +30,10 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  if (!openaiKey) {
+  if (!geminiKey) {
     throw createError({
       statusCode: 500,
-      statusMessage: 'OpenAI API key не настроен',
+      statusMessage: 'Gemini API key не настроен',
     });
   }
 
@@ -97,38 +98,32 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // Генерация записи через GPT-4
+    // Генерация записи через Gemini
     const systemPrompt = createSystemPrompt();
-    const userPrompt = `Создай словарную запись для тайского слова: ${normalizedWord}
-
-Верни результат в формате JSON согласно описанной структуре.`;
+    const userPrompt = `Word: ${normalizedWord}`;
 
     const messages: ChatMessage[] = [
       { role: 'system', content: systemPrompt },
       { role: 'user', content: userPrompt },
     ];
 
-    const openaiResponse = await $fetch<any>('https://api.openai.com/v1/chat/completions', {
+    const geminiResponse = await $fetch<any>('/api/gemini/chat', {
       method: 'POST',
-      headers: {
-        Authorization: `Bearer ${openaiKey}`,
-        'Content-Type': 'application/json',
-      },
       body: {
-        model: 'gpt-4',
         messages,
-        temperature: 0.7,
-        max_tokens: 3000,
+        model: GEMINI_CONFIG.model,
+        temperature: GEMINI_CONFIG.temperature,
+        max_tokens: GEMINI_CONFIG.maxTokens,
       },
       retry: 2,
       retryDelay: 1000,
     });
 
-    const content = openaiResponse.choices?.[0]?.message?.content;
+    const content = geminiResponse.choices?.[0]?.message?.content;
     if (!content) {
       throw createError({
         statusCode: 500,
-        statusMessage: 'Пустой ответ от OpenAI',
+        statusMessage: 'Пустой ответ от Gemini',
       });
     }
 
@@ -141,7 +136,7 @@ export default defineEventHandler(async (event) => {
     } catch {
       throw createError({
         statusCode: 500,
-        statusMessage: 'Ошибка парсинга JSON ответа от GPT-4',
+        statusMessage: 'Ошибка парсинга JSON ответа от Gemini',
       });
     }
 
@@ -227,104 +222,46 @@ export default defineEventHandler(async (event) => {
 });
 
 /**
- * Создает системный промпт для GPT-4
+ * Создает системный промпт для Gemini
  */
 function createSystemPrompt(): string {
-  return `Ты — эксперт по тайскому языку. Твоя задача — создать подробную словарную запись для тайского слова.
+  return `Thai dictionary expert. Return ONLY valid JSON.
 
-ВАЖНО: Ответ должен быть ТОЛЬКО в формате JSON, без дополнительного текста.
-
-Структура ответа должна строго соответствовать следующему TypeScript интерфейсу:
-
+Schema:
 {
-  "entryId": "string (латиница, основанная на romanization)",
+  "entryId": "str",
   "headword": {
-    "script": "тайское слово",
-    "romanization": {
-      "paiboon": "романизация по системе Paiboon",
-      "ipa": "IPA транскрипция"
-    },
-    "partOfSpeech": "noun | verb | adjective | adverb | etc.",
-    "morphology": {
-      "syllableCount": число_слогов,
-      "tone": "тон слова"
-    }
+    "script": "thai",
+    "romanization": {"paiboon": "str", "ipa": "str"},
+    "partOfSpeech": "str",
+    "morphology": {"syllableCount": num, "tone": "str"}
   },
   "metadata": {
-    "frequency": {
-      "spoken": 1-5,
-      "written": 1-5
-    },
-    "topics": ["массив тематик"],
-    "sources": ["Thai National Corpus 2024"]
+    "frequency": {"spoken": 1-5, "written": 1-5},
+    "topics": ["arr"],
+    "sources": ["Thai National Corpus 2024"],
+    "createdAt": "ISO",
+    "updatedAt": "ISO"
   },
-  "senses": [
-    {
-      "senseId": "entryId-значение",
-      "definition": {
-        "th": "определение на тайском",
-        "en": "definition in English",
-        "ru": "определение на русском"
-      },
-      "usageLabels": ["common", "formal", "etc."],
-      "translations": [
-        {
-          "language": "en",
-          "variants": [
-            {
-              "text": "English translation",
-              "register": "neutral",
-              "frequency": 1-5
-            }
-          ]
-        },
-        {
-          "language": "ru",
-          "variants": [
-            {
-              "text": "Русский перевод",
-              "register": "нейтр.",
-              "frequency": 1-5
-            }
-          ]
-        }
-      ],
-      "examples": [
-        {
-          "exampleId": "senseId-ex1",
-          "sentence": {
-            "th": "пример на тайском",
-            "en": "example in English",
-            "ru": "пример на русском"
-          },
-          "notes": ["пояснения к примеру"]
-        }
-      ]
-    }
-  ],
-  "related": {
-    "compounds": [
-      {
-        "entryId": "составное_слово",
-        "relationType": "compound",
-        "gloss": {
-          "en": "English gloss",
-          "ru": "русская глосса"
-        }
-      }
-    ]
-  }
+  "senses": [{
+    "senseId": "str",
+    "definition": {"th": "str", "en": "str", "ru": "str"},
+    "usageLabels": ["arr"],
+    "translations": [
+      {"language": "en", "variants": [{"text": "str", "register": "str", "frequency": 1-5}]},
+      {"language": "ru", "variants": [{"text": "str", "register": "str", "frequency": 1-5}]}
+    ],
+    "examples": [{"exampleId": "str", "sentence": {"th": "str", "en": "str", "ru": "str"}, "notes": ["arr"]}]
+  }],
+  "related": {"compounds": [{"entryId": "str", "relationType": "str", "gloss": {"en": "str", "ru": "str"}}]}
 }
 
-Требования:
-1. Все переводы должны быть точными и реальными
-2. Добавь 2-3 значения (senses) если слово многозначное
-3. Для каждого значения добавь 2-3 примера использования
-4. Включи синонимы в related.compounds если они есть
-5. Транскрипция должна быть точной (IPA и Paiboon)
-6. Не добавляй поле "audio" - оно будет заполнено автоматически
-7. Не добавляй поле "media" в examples
-8. Используй ISO даты для createdAt и updatedAt`;
+Rules:
+1. All senses if polysemous
+2. 1-3 examples per sense (max 10 total)
+3. Accurate Paiboon + IPA
+4. Include synonyms in compounds if exist
+5. Omit "audio" and "media" fields`;
 }
 
 /**

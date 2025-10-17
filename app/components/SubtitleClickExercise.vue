@@ -576,7 +576,6 @@ function addToHistory(isCorrect: boolean) {
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
-    min-height: 60px;
     padding: 16px;
     border: 2px dashed #cbd5f5;
     border-radius: 10px;

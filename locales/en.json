@@ -172,7 +172,42 @@
     "noTranslationAvailable": "Translation not available in selected language",
     "fallbackLanguageUsed": "Showing translation in Russian",
     "showingEnglish": "Displaying in English",
-    "showingRussian": "Displaying in Russian"
+    "showingRussian": "Displaying in Russian",
+    "batchProcess": {
+      "addToDictionary": "Add words to dictionary",
+      "processing": "Processing...",
+      "loader": {
+        "title": "Processing words",
+        "currentWord": "Current word",
+        "progress": "Progress",
+        "stats": {
+          "total": "Total words",
+          "processed": "Processed",
+          "added": "Added",
+          "skipped": "Skipped",
+          "errors": "Errors"
+        },
+        "cancel": "Cancel",
+        "close": "Close",
+        "complete": "Processing complete!",
+        "processingWord": "Processing: {word}",
+        "percentComplete": "{percent}% complete"
+      },
+      "messages": {
+        "success": "Successfully added {count} words",
+        "allExists": "All words already in dictionary",
+        "partialSuccess": "Added {added} of {total} words",
+        "cancelled": "Processing cancelled",
+        "error": "Processing error",
+        "noWords": "No words to add"
+      },
+      "errors": {
+        "unauthorized": "Authorization required",
+        "forbidden": "Insufficient permissions",
+        "networkError": "Network error",
+        "serverError": "Server error"
+      }
+    }
   },
   "vocabulary": {
     "title": "My Vocabulary",

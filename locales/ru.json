@@ -172,7 +172,42 @@
     "noTranslationAvailable": "Перевод на выбранном языке недоступен",
     "fallbackLanguageUsed": "Показан перевод на английском языке",
     "showingEnglish": "Отображается на английском",
-    "showingRussian": "Отображается на русском"
+    "showingRussian": "Отображается на русском",
+    "batchProcess": {
+      "addToDictionary": "Добавить слова в словарь",
+      "processing": "Обработка...",
+      "loader": {
+        "title": "Обработка слов",
+        "currentWord": "Текущее слово",
+        "progress": "Прогресс",
+        "stats": {
+          "total": "Всего слов",
+          "processed": "Обработано",
+          "added": "Добавлено",
+          "skipped": "Пропущено",
+          "errors": "Ошибок"
+        },
+        "cancel": "Отменить",
+        "close": "Закрыть",
+        "complete": "Обработка завершена!",
+        "processingWord": "Обработка: {word}",
+        "percentComplete": "{percent}% завершено"
+      },
+      "messages": {
+        "success": "Успешно добавлено {count} слов",
+        "allExists": "Все слова уже в словаре",
+        "partialSuccess": "Добавлено {added} из {total} слов",
+        "cancelled": "Обработка отменена",
+        "error": "Ошибка обработки",
+        "noWords": "Нет слов для добавления"
+      },
+      "errors": {
+        "unauthorized": "Требуется авторизация",
+        "forbidden": "Недостаточно прав",
+        "networkError": "Ошибка сети",
+        "serverError": "Ошибка сервера"
+      }
+    }
   },
   "vocabulary": {
     "title": "Мой словарь",

@@ -580,19 +580,37 @@ watch(isOpen, (value) => {
   &__word {
     background: none;
     border: none;
-    padding: 0;
+    padding: 2px 0;
     margin: 0;
     cursor: pointer;
     color: inherit;
     font: inherit;
     line-height: inherit;
-    border-radius: 4px;
-    transition: background-color 0.2s ease;
+    border-radius: 6px;
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 6px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      opacity: 0;
+      transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: -1;
+    }
 
     &:hover,
     &:focus-visible {
-      background-color: rgba(255, 255, 255, 0.2);
+      color: #fff;
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
       outline: none;
+
+      &::before {
+        opacity: 1;
+      }
     }
   }
 
