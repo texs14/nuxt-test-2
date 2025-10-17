@@ -68,6 +68,7 @@ export default defineNuxtConfig({
       apiKey: process.env.TRANSGATE_KEY,
     },
     resembleKey: process.env.RESEMBLE_KEY,
+    resembleProjectUuid: process.env.RESEMBLE_PROJECT_UUID,
     geminiKey: process.env.GEMINI_KEY,
     supabaseServiceKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
     public: {

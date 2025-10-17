@@ -101,3 +101,50 @@ export interface ResembleTTSResult {
   /** Частота дискретизации */
   sampleRate: number;
 }
+
+/**
+ * Статус транскрибации
+ */
+export type ResembleTranscriptionStatus = 'queued' | 'processing' | 'completed' | 'failed';
+
+/**
+ * Слово из результата транскрибации с временными метками
+ */
+export interface ResembleTranscriptionWord {
+  /** Текст слова */
+  text: string;
+  /** Время начала в секундах */
+  start_time: number;
+  /** Время окончания в секундах */
+  end_time: number;
+  /** ID говорящего */
+  speaker_id: number;
+}
+
+/**
+ * Параметры запроса транскрибации
+ */
+export interface ResembleTranscriptionRequest {
+  /** URL аудио файла для транскрибации */
+  audio_url: string;
+  /** UUID проекта (опционально) */
+  project_uuid?: string;
+}
+
+/**
+ * Ответ от API транскрибации
+ */
+export interface ResembleTranscriptionResponse {
+  /** UUID задачи транскрибации */
+  uuid: string;
+  /** Полный текст транскрибации */
+  text: string;
+  /** Массив слов с временными метками и speaker_id */
+  words: ResembleTranscriptionWord[];
+  /** Статус обработки */
+  status: ResembleTranscriptionStatus;
+  /** Дата создания задачи */
+  created_at: string;
+  /** Дата последнего обновления */
+  updated_at: string;
+}

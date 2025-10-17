@@ -83,6 +83,15 @@
       @loadedmetadata="onMeta"
     />
 
+    <ResembleTranscriptionLoader
+      v-if="resembleUuid"
+      class="lesson-upload-form__loader"
+      :uuid="resembleUuid"
+      @completed="onResembleCompleted"
+      @status="(val: string) => (transcriptionStatus = val)"
+      @error="(val: string) => (transcriptionError = val)"
+    />
+
     <section class="lesson-upload-form__editor">
       <LessonExerciseEditor v-model="exercises" />
     </section>
@@ -151,6 +160,9 @@ useHead(() => ({
 const uploadedVideoUrl = ref<string>('');
 const uploadedAudioUrl = ref<string>('');
 const uploadedPreviewUrl = ref<string>('');
+const resembleUuid = ref<string>('');
+const transcriptionStatus = ref<string>('');
+const transcriptionError = ref<string>('');
 const editorSubtitles = ref<SubtitleItem[]>([]);
 
 interface ExerciseItem {
@@ -435,6 +447,9 @@ async function uploadNow() {
       if (data?.video?.url) uploadedVideoUrl.value = data.video.url;
       if (data?.audio?.url) uploadedAudioUrl.value = data.audio.url;
       if (data?.preview?.url) uploadedPreviewUrl.value = data.preview.url;
+      if (data?.resemble?.uuid) {
+        resembleUuid.value = String(data.resemble.uuid);
+      }
       if (!newId.value) newId.value = genId();
     } catch {}
   } catch (e: any) {
@@ -442,6 +457,10 @@ async function uploadNow() {
   } finally {
     isUploading.value = false;
   }
+}
+
+function onResembleCompleted(segments: SubtitleItem[]) {
+  editorSubtitles.value = normalizeEditorSubtitles(segments);
 }
 
 function onMeta(e: Event) {
@@ -666,5 +685,9 @@ async function saveLesson() {
   display: flex;
   gap: 8px;
   align-items: center;
+}
+
+.lesson-upload-form__loader {
+  margin-top: 16px;
 }
 </style>

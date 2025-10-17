@@ -99,13 +99,13 @@
       @loadedmetadata="onMeta"
     />
 
-    <TranscriptionLoader
-      v-if="transgateJobId"
-      class="video-upload-form__tg"
-      :job-id="transgateJobId"
-      @completed="onTgCompleted"
-      @status="(val: string) => (tgStatus = val)"
-      @error="(val: string) => (tgError = val)"
+    <ResembleTranscriptionLoader
+      v-if="resembleUuid"
+      class="video-upload-form__loader"
+      :uuid="resembleUuid"
+      @completed="onResembleCompleted"
+      @status="(val: string) => (transcriptionStatus = val)"
+      @error="(val: string) => (transcriptionError = val)"
     />
 
     <section class="video-upload-form__editor">
@@ -177,9 +177,9 @@ useHead(() => ({
 const uploadedVideoUrl = ref<string>('');
 const uploadedAudioUrl = ref<string>('');
 const uploadedPreviewUrl = ref<string>('');
-const transgateJobId = ref<string>('');
-const tgStatus = ref<string>('');
-const tgError = ref<string>('');
+const resembleUuid = ref<string>('');
+const transcriptionStatus = ref<string>('');
+const transcriptionError = ref<string>('');
 
 const editorSubtitles = ref<EditorSubtitleItem[]>([]);
 
@@ -457,8 +457,8 @@ async function uploadNow() {
       if (data?.video?.url) uploadedVideoUrl.value = data.video.url;
       if (data?.audio?.url) uploadedAudioUrl.value = data.audio.url;
       if (data?.preview?.url) uploadedPreviewUrl.value = data.preview.url;
-      if (data?.transgate?.job_id) {
-        transgateJobId.value = String(data.transgate.job_id);
+      if (data?.resemble?.uuid) {
+        resembleUuid.value = String(data.resemble.uuid);
       }
       if (!newId.value) newId.value = genId();
     } catch {}
@@ -469,7 +469,7 @@ async function uploadNow() {
   }
 }
 
-function onTgCompleted(segments: RawSubtitleItem[]) {
+function onResembleCompleted(segments: RawSubtitleItem[]) {
   editorSubtitles.value = normalizeEditorSubtitles(segments);
 }
 
@@ -680,7 +680,7 @@ async function saveVideo() {
 .video-upload-form__player {
   margin-top: 8px;
 }
-.video-upload-form__tg {
+.video-upload-form__loader {
   margin-top: 16px;
 }
 .video-upload-form__editor {

@@ -154,42 +154,41 @@ export default defineEventHandler(async (event) => {
       audioReachable = false;
     }
     if (!audioReachable) {
-      throw new Error('Audio URL is not publicly accessible for Transgate');
+      throw new Error('Audio URL is not publicly accessible for Resemble.AI');
     }
 
-    // Запускаем транскрибацию в Transgate по URL аудио (тайский язык) с фолбэками по language
-    const tgKey = (config as any).transgate?.apiKey;
-    if (!tgKey) throw new Error('Transgate API ключ не найден');
-    const tgEndpoint = 'https://transgate.ai/api/v1/transcriptions/url';
-    const payloads: Array<Record<string, any>> = [
-      { audio_url: audioUrl, language: 'th' },
-      { audio_url: audioUrl, language: 'th' },
-      { audio_url: audioUrl },
-    ];
+    // Запускаем транскрибацию через Resemble.AI
+    const resembleProjectUuid = (config as any).resembleProjectUuid;
+    const transcribePayload: Record<string, any> = {
+      audio_url: audioUrl,
+    };
+    if (resembleProjectUuid) {
+      transcribePayload.project_uuid = resembleProjectUuid;
+    }
 
-    let jobId: string | number | undefined;
-    let transgate = '';
-    let lastErrorText = '';
-    for (const body of payloads) {
-      const res = await fetch(tgEndpoint, {
+    let resembleUuid: string | undefined;
+    let resembleStatus = '';
+    try {
+      const transcribeRes = await fetch(`${getRequestURL(event).origin}/api/resemble/transcribe`, {
         method: 'POST',
-        headers: {
-          Authorization: `Bearer ${tgKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(transcribePayload),
       });
-      if (res.ok) {
-        const data = (await res.json().catch(() => ({}))) as any;
-        jobId = data?.job_id;
-        transgate = data;
-        if (jobId) break;
-      } else {
-        lastErrorText = await res.text().catch(() => '');
+
+      if (!transcribeRes.ok) {
+        const errorText = await transcribeRes.text().catch(() => '');
+        throw new Error(`Resemble.AI transcription failed: ${errorText || 'unknown error'}`);
       }
+
+      const transcribeData = (await transcribeRes.json()) as any;
+      resembleUuid = transcribeData?.uuid;
+      resembleStatus = transcribeData?.status || 'queued';
+    } catch (err: any) {
+      throw new Error(`Failed to start Resemble.AI transcription: ${err.message}`);
     }
-    if (!jobId) {
-      throw new Error(`Transgate start failed. Last response: ${lastErrorText || 'unknown error'}`);
+
+    if (!resembleUuid) {
+      throw new Error('Resemble.AI did not return a transcription UUID');
     }
 
     // Ответ клиенту
@@ -208,9 +207,7 @@ export default defineEventHandler(async (event) => {
       video: { bucket: 'Videos', path: videoPath, url: videoUrl },
       audio: { bucket: 'Audios', path: audioPath, url: audioUrl },
       preview: { bucket: 'Videos', path: previewPath, url: previewUrl },
-      transgate: { job_id: jobId, data: transgate },
-      // ! Webhook пока не нужен
-      // webhook: { status: webhookRes.status, ok: webhookRes.ok, body: webhookText }
+      resemble: { uuid: resembleUuid, status: resembleStatus },
     });
   } catch (err: any) {
     setResponseStatus(event, 500);

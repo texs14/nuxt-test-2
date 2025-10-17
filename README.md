@@ -1,4 +1,4 @@
-﻿# Nuxt Minimal Starter
+# Nuxt Minimal Starter
 
 Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
 
@@ -74,6 +74,42 @@ bun run preview
 
 Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
 
+## Транскрибация видео (Resemble.AI)
+
+Платформа использует Resemble.AI для автоматической транскрибации видео с определением говорящих (speaker diarization).
+
+### Основные возможности
+
+- Автоматическая транскрибация тайского языка
+- Определение нескольких говорящих
+- Автоматическое создание субтитров с группировкой по спикерам
+- Временные метки для каждого слова
+
+### Настройка
+
+1. Получите API ключ на [Resemble.AI](https://resemble.ai)
+2. Добавьте в `.env`:
+   ```bash
+   RESEMBLE_KEY=your-api-key
+   RESEMBLE_PROJECT_UUID=your-project-uuid  # Опционально
+   ```
+3. Перезапустите сервер разработки
+
+### Использование
+
+1. Перейдите на страницу `/videos/add-new` или `/lessons/add-new`
+2. Загрузите видео файл
+3. Транскрибация запустится автоматически
+4. После завершения субтитры появятся в редакторе
+
+### Документация
+
+Подробная документация доступна в [docs/RESEMBLE_TRANSCRIPTION.md](docs/RESEMBLE_TRANSCRIPTION.md):
+
+- Архитектура системы
+- Формат данных API
+- Алгоритм разбивки по speaker_id
+- Troubleshooting
 
 ## РђРІС‚РѕСЂРёР·Р°С†РёСЏ (Supabase)
 
@@ -90,18 +126,18 @@ Check out the [deployment documentation](https://nuxt.com/docs/getting-started/d
         redirectOptions: {
           login: '/login',
           callback: '/confirm',
-          exclude: ['/', '/videos', '/videos/**']
-        }
+          exclude: ['/', '/videos', '/videos/**'],
+        },
       },
       runtimeConfig: {
         public: {
           supabase: {
             url: process.env.SUPABASE_URL,
-            key: process.env.SUPABASE_KEY
-          }
-        }
-      }
-    })
+            key: process.env.SUPABASE_KEY,
+          },
+        },
+      },
+    });
     ```
   - РџРµСЂРµРјРµРЅРЅС‹Рµ РѕРєСЂСѓР¶РµРЅРёСЏ С‡РёС‚Р°СЋС‚СЃСЏ РёР· `.env`: `SUPABASE_URL`, `SUPABASE_KEY`.
 
@@ -109,44 +145,51 @@ Check out the [deployment documentation](https://nuxt.com/docs/getting-started/d
   - РљР°СЃС‚РѕРјРЅРѕРµ middleware Р·Р°С‰РёС‰Р°РµС‚ С‚РѕР»СЊРєРѕ С‚Рµ СЃС‚СЂР°РЅРёС†С‹, РіРґРµ СѓРєР°Р·Р°РЅР° РјРµС‚Р° `requiresAuth: true`.
   - РџСѓР±Р»РёС‡РЅС‹Рµ РјР°СЂС€СЂСѓС‚С‹ РЅРµ СЂРµРґРёСЂРµРєС‚СЏС‚СЃСЏ: `'/', '/login', '/register', '/confirm'`.
   - РџРµСЂРµРґ СЂРµРґРёСЂРµРєС‚РѕРј РЅР° `/login` РёСЃС…РѕРґРЅС‹Р№ РїСѓС‚СЊ СЃРѕС…СЂР°РЅСЏРµС‚СЃСЏ РІ cookie С‡РµСЂРµР· `useSupabaseCookieRedirect()`.
+
     ```ts
     export default defineNuxtRouteMiddleware((to) => {
-      const user = useSupabaseUser()
-      const redirectInfo = useSupabaseCookieRedirect()
+      const user = useSupabaseUser();
+      const redirectInfo = useSupabaseCookieRedirect();
 
-      const publicPaths = new Set<string>(['/', '/login', '/register', '/confirm'])
-      if (publicPaths.has(to.path) || to.meta?.requiresAuth === false) return
+      const publicPaths = new Set<string>(['/', '/login', '/register', '/confirm']);
+      if (publicPaths.has(to.path) || to.meta?.requiresAuth === false) return;
 
       if (to.meta?.requiresAuth && !user.value) {
-        redirectInfo.path.value = to.fullPath
-        return navigateTo('/login')
+        redirectInfo.path.value = to.fullPath;
+        return navigateTo('/login');
       }
-    })
+    });
     ```
 
 - РЎС‚СЂР°РЅРёС†С‹
   - `app/pages/login.vue` вЂ” С„РѕСЂРјР° РІС…РѕРґР° РїРѕ eвЂ‘mail (OTP/magic link). РСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ `supabase.auth.signInWithOtp`:
+
     ```ts
-    const supabase = useSupabaseClient()
+    const supabase = useSupabaseClient();
     const signInWithOtp = async () => {
       await supabase.auth.signInWithOtp({
         email: email.value,
-        options: { emailRedirectTo: `${window.location.origin}/confirm` }
-      })
-    }
+        options: { emailRedirectTo: `${window.location.origin}/confirm` },
+      });
+    };
     ```
+
     РЎС‚СЂР°РЅРёС†Р° РїРѕРјРµС‡РµРЅР° РєР°Рє РїСѓР±Р»РёС‡РЅР°СЏ: `definePageMeta({ requiresAuth: false })`.
 
   - `app/pages/confirm.vue` вЂ” РѕР±СЂР°Р±РѕС‚РєР° РєРѕР»Р»Р±СЌРєР° РїРѕСЃР»Рµ РІС…РѕРґР°. Р–РґС‘С‚ РїРѕСЏРІР»РµРЅРёСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ Рё РІРѕР·РІСЂР°С‰Р°РµС‚ РЅР° СЃРѕС…СЂР°РЅС‘РЅРЅС‹Р№ РјР°СЂС€СЂСѓС‚:
     ```ts
-    const user = useSupabaseUser()
-    const redirectInfo = useSupabaseCookieRedirect()
-    watch(user, () => {
-      if (user.value) {
-        const path = redirectInfo.pluck()
-        return navigateTo(path || '/')
-      }
-    }, { immediate: true })
+    const user = useSupabaseUser();
+    const redirectInfo = useSupabaseCookieRedirect();
+    watch(
+      user,
+      () => {
+        if (user.value) {
+          const path = redirectInfo.pluck();
+          return navigateTo(path || '/');
+        }
+      },
+      { immediate: true }
+    );
     ```
     РўРѕР¶Рµ РїСѓР±Р»РёС‡РЅР°СЏ: `definePageMeta({ requiresAuth: false })`.
 
@@ -169,15 +212,16 @@ Check out the [deployment documentation](https://nuxt.com/docs/getting-started/d
 Р”РѕР±Р°РІСЊС‚Рµ РІ РєРѕРјРїРѕРЅРµРЅС‚ СЃС‚СЂР°РЅРёС†С‹:
 
 ```ts
-definePageMeta({ requiresAuth: true })
+definePageMeta({ requiresAuth: true });
 ```
 
 ### РџСЂРёРјРµСЂС‹
 
 - Р’С‹Р№С‚Рё РёР· Р°РєРєР°СѓРЅС‚Р°:
+
   ```ts
-  const supabase = useSupabaseClient()
-  await supabase.auth.signOut()
+  const supabase = useSupabaseClient();
+  await supabase.auth.signOut();
   ```
 
 - РќР°РІРёРіР°С†РёСЏ (BEMвЂ‘РєР»Р°СЃСЃС‹ РёСЃРїРѕР»СЊР·СѓСЋС‚СЃСЏ РІ СЃС‚РёР»СЏС… РєРѕРјРїРѕРЅРµРЅС‚РѕРІ, РЅР°РїСЂРёРјРµСЂ, РІ `app/components/NavPanel.vue`).

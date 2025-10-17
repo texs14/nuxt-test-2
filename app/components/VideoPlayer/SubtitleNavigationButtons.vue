@@ -1,7 +1,11 @@
 <template>
   <div v-if="!restrictedRange">
     <IconButton
-      :class="['subtitle-nav-btn', 'subtitle-nav-btn_prev', { 'subtitle-nav-btn_visible': visible }]"
+      :class="[
+        'subtitle-nav-btn',
+        'subtitle-nav-btn_prev',
+        { 'subtitle-nav-btn_visible': visible },
+      ]"
       variant="nav"
       :disabled="!hasPrev"
       aria-label="Назад по субтитрам"
@@ -10,7 +14,11 @@
       <ChevronLeftIcon :size="20" />
     </IconButton>
     <IconButton
-      :class="['subtitle-nav-btn', 'subtitle-nav-btn_next', { 'subtitle-nav-btn_visible': visible }]"
+      :class="[
+        'subtitle-nav-btn',
+        'subtitle-nav-btn_next',
+        { 'subtitle-nav-btn_visible': visible },
+      ]"
       variant="nav"
       :disabled="!hasNext"
       aria-label="Вперёд по субтитрам"
