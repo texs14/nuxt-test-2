@@ -40,6 +40,33 @@
       <h2 class="video-page__subtitle">{{ t('videos.detail.editVideo') }}</h2>
 
       <div class="video-page__editor-form">
+        <section v-if="uploadedAudioUrl && areSubtitlesEmpty" class="video-page__transcribe">
+          <button
+            class="video-page__transcribe-button"
+            type="button"
+            :disabled="transcriptionLoading || !uploadedAudioUrl || !!resembleUuid"
+            @click="startTranscription"
+          >
+            {{
+              transcriptionLoading
+                ? t('videos.detail.transcribeInProgress')
+                : t('videos.detail.transcribeStart')
+            }}
+          </button>
+          <p v-if="transcriptionError" class="video-page__transcribe-error">
+            {{ transcriptionError }}
+          </p>
+        </section>
+
+        <ResembleTranscriptionLoader
+          v-if="resembleUuid"
+          class="video-page__loader"
+          :uuid="resembleUuid"
+          @completed="onResembleCompleted"
+          @status="(val: string) => (transcriptionStatus = val)"
+          @error="onTranscriptionError"
+        />
+
         <SubtitleEditor v-model="editorSubtitles" />
 
         <VideoMetaForm
@@ -84,6 +111,7 @@ import type {
   ThaiSentences,
 } from '@/types/video.types';
 import SubtitleClickExercise from '~/components/SubtitleClickExercise.vue';
+import ResembleTranscriptionLoader from '~/components/ResembleTranscriptionLoader.vue';
 const route = useRoute();
 const {
   select: selectVideo,
@@ -229,6 +257,40 @@ const saveSuccess = ref(false);
 const saveError = ref('');
 const saveId = ref<string | number>('');
 
+const uploadedAudioUrl = ref<string>('');
+const resembleUuid = ref<string>('');
+const transcriptionStatus = ref<string>('');
+const transcriptionError = ref<string>('');
+const transcriptionLoading = ref(false);
+
+function hasSubtitleContent(value: unknown): boolean {
+  if (!value) return false;
+  if (typeof value === 'string') return value.trim().length > 0;
+  if (
+    typeof value === 'object' &&
+    value !== null &&
+    'sentences' in (value as Record<string, any>)
+  ) {
+    const sentences = (value as ThaiSentences).sentences || [];
+    return sentences.some((sentence: unknown) => {
+      if (!Array.isArray(sentence)) return false;
+      return sentence.some((word: unknown) => typeof word === 'string' && word.trim().length > 0);
+    });
+  }
+  return false;
+}
+
+const areSubtitlesEmpty = computed(() => {
+  if (!editorSubtitles.value.length) return true;
+  return editorSubtitles.value.every((item: EditorSubtitleItem | undefined) => {
+    if (!item) return true;
+    const text = item.text;
+    if (!text) return true;
+    if (typeof text === 'string') return !hasSubtitleContent(text);
+    return !Object.values(text || {}).some((field) => hasSubtitleContent(field));
+  });
+});
+
 function startLoadingTimeout() {
   loadingTimedOut.value = false;
   if (loadingTimeout) clearTimeout(loadingTimeout);
@@ -247,7 +309,7 @@ function clearLoadingTimeout() {
 
 startLoadingTimeout();
 
-watch(pendingVideo, (isPending) => {
+watch(pendingVideo, (isPending: boolean) => {
   if (isPending) {
     startLoadingTimeout();
   } else {
@@ -255,7 +317,7 @@ watch(pendingVideo, (isPending) => {
   }
 });
 
-watch(video, (newVideo) => {
+watch(video, (newVideo: VideoItem | null) => {
   if (newVideo) {
     clearLoadingTimeout();
   }
@@ -298,7 +360,7 @@ function handleExerciseRangeChange(range: PlaybackRange | null) {
   exerciseRange.value = range;
 }
 
-watch(showExercise, (value) => {
+watch(showExercise, (value: boolean) => {
   if (!value) exerciseRange.value = null;
 });
 
@@ -439,6 +501,10 @@ function toggleEditMode() {
     editorSubtitles.value = normalizeEditorSubtitles(
       (video.value.subtitles as RawSubtitleItem[]) || []
     );
+    // Используем video_url для транскрибации - Resemble AI поддерживает видео файлы
+    if (video.value.video_url) {
+      uploadedAudioUrl.value = String(video.value.video_url);
+    }
     saveSuccess.value = false;
     saveError.value = '';
     saveId.value = idParam.value;
@@ -492,6 +558,48 @@ async function saveChanges() {
     savingChanges.value = false;
   }
 }
+
+async function startTranscription() {
+  if (!uploadedAudioUrl.value || transcriptionLoading.value) return;
+  transcriptionError.value = '';
+  transcriptionStatus.value = '';
+  resembleUuid.value = '';
+  transcriptionLoading.value = true;
+  try {
+    const res = await fetch('/api/resemble/transcribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ audio_url: uploadedAudioUrl.value }),
+    });
+
+    if (!res.ok) {
+      const message = await res.text().catch(() => '');
+      throw new Error(message || 'Не удалось запустить транскрибацию');
+    }
+
+    const data = (await res.json()) as any;
+    const uuid = data?.uuid ? String(data.uuid) : '';
+    if (!uuid) {
+      throw new Error('Resemble.AI не вернул идентификатор транскрибации');
+    }
+    resembleUuid.value = uuid;
+    transcriptionStatus.value = data?.status ? String(data.status) : '';
+  } catch (error: any) {
+    transcriptionError.value = error?.message || 'Ошибка запуска транскрибации';
+  } finally {
+    transcriptionLoading.value = false;
+  }
+}
+
+function onResembleCompleted(segments: RawSubtitleItem[]) {
+  editorSubtitles.value = normalizeEditorSubtitles(segments);
+  resembleUuid.value = '';
+}
+
+function onTranscriptionError(message: string) {
+  transcriptionError.value = message;
+  resembleUuid.value = '';
+}
 </script>
 
 <style scoped lang="scss">
@@ -507,6 +615,46 @@ async function saveChanges() {
     display: flex;
     flex-direction: column;
     gap: 24px;
+  }
+
+  &__transcribe {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  &__transcribe-button {
+    appearance: none;
+    border: none;
+    background: #2563eb;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.2s;
+
+    &:hover:not(:disabled) {
+      background: #1d4ed8;
+    }
+
+    &:disabled {
+      background: #93c5fd;
+      cursor: not-allowed;
+    }
+  }
+
+  &__transcribe-error {
+    color: #b91c1c;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    padding: 10px;
+    border-radius: 8px;
+    margin: 0;
+  }
+
+  &__loader {
+    margin-bottom: 8px;
   }
 }
 </style>

@@ -41,28 +41,43 @@ export interface Database {
       };
       video_items: {
         Row: {
-          id: number;
-          title: Json | string;
+          id: string;
+          title: Json | string | null;
           description: Json | string | null;
           level: string | null;
           preview_url: string | null;
           duration: Json | null;
+          video_url: string | null;
+          subtitles: Json | null;
+          status: 'moderation' | 'approved' | 'rejected';
+          created_at: string | null;
+          updated_at: string | null;
         };
         Insert: {
-          id?: number;
-          title: Json | string;
+          id: string;
+          title?: Json | string | null;
           description?: Json | string | null;
           level?: string | null;
           preview_url?: string | null;
           duration?: Json | null;
+          video_url?: string | null;
+          subtitles?: Json | null;
+          status?: 'moderation' | 'approved' | 'rejected';
+          created_at?: string | null;
+          updated_at?: string | null;
         };
         Update: {
-          id?: number;
-          title?: Json | string;
+          id?: string;
+          title?: Json | string | null;
           description?: Json | string | null;
           level?: string | null;
           preview_url?: string | null;
           duration?: Json | null;
+          video_url?: string | null;
+          subtitles?: Json | null;
+          status?: 'moderation' | 'approved' | 'rejected';
+          created_at?: string | null;
+          updated_at?: string | null;
         };
         Relationships: [];
       };

@@ -8,6 +8,7 @@
           class="video-card__thumb_image"
         />
         <span class="video-card__level">{{ level }}</span>
+        <StatusBadge v-if="canModerate && status" :status="status" class="video-card__status" />
       </div>
       <div class="video-card__body">
         <h3 class="video-card__title">{{ displayTitle }}</h3>
@@ -28,6 +29,7 @@ const props = defineProps<{
   title?: Title | string | Record<string, any> | null;
   level?: string | null;
   thumbnailUrl?: string | null;
+  status?: 'moderation' | 'approved' | 'rejected';
 }>();
 
 const defaultThumb = '/favicon.ico';
@@ -90,6 +92,12 @@ const editLink = computed(() => {
     font-size: 12px;
     padding: 4px 8px;
     border-radius: 8px;
+  }
+
+  &__status {
+    position: absolute;
+    top: 8px;
+    left: 8px;
   }
 
   &__body {

@@ -34,9 +34,15 @@ export default defineEventHandler(async (event) => {
 
   // Подготовка данных для отправки в Resemble AI
   // API ожидает поле 'url', а не 'audio_url'
+  // Resemble AI поддерживает как аудио, так и видео файлы
   const requestData: Record<string, any> = {
     url: body.audio_url,
   };
+
+  console.log('[Resemble] Transcription request:', {
+    url: body.audio_url,
+    hasProjectUuid: !!body.project_uuid,
+  });
 
   // Добавление опциональных полей
   if (body.project_uuid) {

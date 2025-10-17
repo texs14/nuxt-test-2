@@ -34,13 +34,18 @@ const addNewLink = computed(() => {
   return safeLocalePath({ name: 'videos-add-new' });
 });
 
+// Используем useLazyAsyncData чтобы запрос выполнялся на клиенте
+// где доступен токен авторизации для корректной работы RLS политик
 const {
   data: items,
   pending: asyncPending,
   error: asyncError,
-} = await useAsyncData<VideoItem[]>('video-items', async () => {
+} = useLazyAsyncData<VideoItem[]>('video-items', async () => {
+  // Фильтрация по статусу происходит на уровне RLS политик в БД
+  // Обычные пользователи увидят только approved видео
+  // Модераторы и админы увидят все видео
   const result = await select(undefined, {
-    columns: 'id, title, description, level, preview_url, duration',
+    columns: 'id, title, description, level, preview_url, duration, status',
     orderBy: { column: 'id', ascending: true },
   });
 
@@ -55,6 +60,7 @@ const {
     level: item.level,
     preview_url: item.preview_url,
     duration: item.duration,
+    status: item.status,
   })) as VideoItem[];
 });
 

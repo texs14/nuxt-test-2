@@ -31,7 +31,9 @@
       "edit": "Edit",
       "cancelEdit": "Cancel",
       "editVideo": "Edit video",
-      "saveError": "Save error: {error}"
+      "saveError": "Save error: {error}",
+      "transcribeStart": "Start transcription",
+      "transcribeInProgress": "Transcription in progress…"
     },
     "exercise": {
       "start": "Start exercise",
@@ -60,7 +62,17 @@
       "uploadError": "Upload error",
       "missingId": "ID not found",
       "missingVideoUrl": "Missing video URL",
-      "saveError": "Save error"
+      "saveError": "Save error",
+      "approve": "Approve video",
+      "approving": "Approving...",
+      "approveSuccess": "Video successfully approved",
+      "transcribeMockLoad": "Load mock transcription",
+      "transcribeMockInProgress": "Loading mock transcription…"
+    },
+    "status": {
+      "moderation": "Under review",
+      "approved": "Published",
+      "rejected": "Rejected"
     }
   },
   "comments": {

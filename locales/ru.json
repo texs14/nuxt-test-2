@@ -31,7 +31,9 @@
       "edit": "Редактировать",
       "cancelEdit": "Отмена",
       "editVideo": "Редактировать видео",
-      "saveError": "Ошибка сохранения: {error}"
+      "saveError": "Ошибка сохранения: {error}",
+      "transcribeStart": "Запустить транскрибацию",
+      "transcribeInProgress": "Транскрибация выполняется…"
     },
     "exercise": {
       "start": "Начать упражнение",
@@ -62,7 +64,15 @@
       "uploadError": "Ошибка отправки",
       "missingId": "ID не найден",
       "missingVideoUrl": "Нет ссылки на видео",
-      "saveError": "Ошибка сохранения"
+      "saveError": "Ошибка сохранения",
+      "approve": "Одобрить видео",
+      "approving": "Одобрение...",
+      "approveSuccess": "Видео успешно одобрено"
+    },
+    "status": {
+      "moderation": "На модерации",
+      "approved": "Опубликовано",
+      "rejected": "Отклонено"
     }
   },
   "comments": {

@@ -99,6 +99,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { normalizeThaiEditorValue } from '~/composables/shared/useThaiTextProcessing';
 
 interface SubtitleText {
   th?: string;
@@ -157,40 +158,6 @@ const toNumber = (v: string) => {
   const n = Number(v);
   return isNaN(n) ? 0 : n;
 };
-
-function sanitizeThaiSpacing(text: string): string {
-  if (!text) return '';
-  // РЈРґР°Р»СЏРµРј РїСЂРѕР±РµР»С‹ РјРµР¶РґСѓ С‚Р°Р№СЃРєРёРјРё Р±СѓРєРІР°РјРё
-  let out = text;
-  const re = /([\u0E00-\u0E7F])\s+([\u0E00-\u0E7F])/g;
-  for (let i = 0; i < 5; i++) {
-    const next = out.replace(re, '$1$2');
-    if (next === out) break;
-    out = next;
-  }
-  return out;
-}
-
-function segmentThaiWords(text: string): string[] {
-  const normalized = text.replace(/\s+/gu, ' ').trim();
-  if (!normalized) return [];
-
-  const words = normalized.split(' ').filter(Boolean);
-  if (words.length > 1) return words;
-
-  return [normalized];
-}
-
-function normalizeThaiEditorValue(text: string): string {
-  if (!text) return '';
-  const cleaned = text
-    .replace(/\r?\n/gu, ' ')
-    .replace(/\u00A0/gu, ' ')
-    .replace(/\t+/gu, ' ')
-    .replace(/ {4,}/gu, '   ')
-    .trim();
-  return cleaned;
-}
 
 function addRow() {
   rows.value = [

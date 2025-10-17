@@ -12,33 +12,33 @@ export default defineEventHandler(async (event) => {
 
     const body = await readBody<any>(event);
     const allowedLevels = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
-    if (
-      !body ||
-      !body.id ||
-      !body.preview_url ||
-      !body.video_url ||
-      !body.subtitles ||
-      !body.title ||
-      !body.description ||
-      !body.level ||
-      !body.duration
-    ) {
+
+    // Минимальные требования: только video_url обязателен
+    if (!body || !body.video_url) {
       setResponseStatus(event, 400);
       return {
-        error:
-          'Некорректное тело запроса: требуются поля id, preview_url, video_url, title, description, level, duration, subtitles',
+        error: 'Некорректное тело запроса: требуется поле video_url',
       };
     }
-    if (!allowedLevels.includes(body.level)) {
+
+    // Проверка level если передан
+    if (body.level && !allowedLevels.includes(body.level)) {
       setResponseStatus(event, 400);
       return { error: `Недопустимое значение level. Разрешены: ${allowedLevels.join(', ')}` };
     }
 
-    const title = typeof body.title === 'object' ? body.title : { ru: String(body.title || '') };
-    const description =
-      typeof body.description === 'object'
+    const title = body.title
+      ? typeof body.title === 'object'
+        ? body.title
+        : { ru: String(body.title) }
+      : { ru: 'Видео без названия', th: '', en: '' };
+
+    const description = body.description
+      ? typeof body.description === 'object'
         ? body.description
-        : { ru: String(body.description || '') };
+        : { ru: String(body.description) }
+      : { ru: '', th: '', en: '' };
+
     const seconds = Number(body.duration?.seconds ?? 0);
     const hhmmss = (total: number) => {
       const s = Math.max(0, Math.floor(total));
@@ -51,17 +51,27 @@ export default defineEventHandler(async (event) => {
       const ss = (s % 60).toString().padStart(2, '0');
       return `${hh}:${mm}:${ss}`;
     };
-    const duration = { seconds, text: hhmmss(seconds) };
+    const duration = seconds > 0 ? { seconds, text: hhmmss(seconds) } : null;
+
+    // Генерация ID если не передан
+    const generateId = () => {
+      try {
+        return crypto.randomUUID();
+      } catch {
+        return 'vid_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+      }
+    };
 
     const payload = {
-      id: String(body.id),
-      preview_url: String(body.preview_url),
+      id: body.id ? String(body.id) : generateId(),
+      preview_url: body.preview_url ? String(body.preview_url) : null,
       video_url: String(body.video_url),
       title,
       description,
-      level: String(body.level),
+      level: body.level ? String(body.level) : 'A1',
       duration,
-      subtitles: body.subtitles,
+      subtitles: body.subtitles || [],
+      status: body.status || 'moderation',
       comments_json_legacy: [] as any[],
     };
 

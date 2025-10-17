@@ -14,6 +14,7 @@ export interface BaseContentItem {
 export interface VideoItem extends BaseContentItem {
   id: string | number;
   duration?: Json | null;
+  status?: 'moderation' | 'approved' | 'rejected';
 }
 
 export interface LessonItem extends BaseContentItem {
