@@ -11,8 +11,6 @@
 
     <div class="subtitle-editor__table">
       <div class="subtitle-editor__row subtitle-editor__row_head">
-        <!-- <div class="subtitle-editor__cell subtitle-editor__cell_time">{{ t('editor.start') }}</div>
-        <div class="subtitle-editor__cell subtitle-editor__cell_time">{{ t('editor.end') }}</div> -->
         <div class="subtitle-editor__cell subtitle-editor__cell_text">{{ t('editor.textTH') }}</div>
         <div class="subtitle-editor__cell subtitle-editor__cell_tools">
           {{ t('editor.actions') }}
@@ -64,6 +62,7 @@
           >
             <div class="subtitle-editor__more_inner">
               <div class="subtitle-editor__cell_text_item">
+                <label for="ru">RU</label>
                 <textarea
                   class="subtitle-editor__textarea"
                   rows="2"
@@ -72,12 +71,27 @@
                 />
               </div>
               <div class="subtitle-editor__cell_text_item">
+                <label for="en">EN</label>
                 <textarea
                   class="subtitle-editor__textarea"
                   rows="2"
                   :value="row.text?.en || ''"
                   @input="onUpdateText(idx, 'en', ($event.target as HTMLTextAreaElement).value)"
                 />
+              </div>
+              <div class="subtitle-editor__translate-block">
+                <button
+                  class="subtitle-editor__btn subtitle-editor__btn_translate"
+                  type="button"
+                  :disabled="!row.text?.th || translatingMap[idx]"
+                  @click="onTranslate(idx)"
+                >
+                  <span v-if="translatingMap[idx]">{{ t('editor.translating') }}</span>
+                  <span v-else>{{ t('editor.translate') }}</span>
+                </button>
+                <span v-if="translationError && translatingMap[idx]" class="subtitle-editor__error">
+                  {{ translationError }}
+                </span>
               </div>
             </div>
           </div>
@@ -100,6 +114,7 @@
 import { ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { normalizeThaiEditorValue } from '~/composables/shared/useThaiTextProcessing';
+import { useSubtitleTranslation } from '~/composables/useSubtitleTranslation';
 
 interface SubtitleText {
   th?: string;
@@ -133,8 +148,18 @@ const rows = ref<RequiredSubtitleItem[]>(props.modelValue.map((s, i) => normaliz
 
 const { t } = useI18n();
 
-// РљР°СЂС‚Р° СЂР°Р·РІС‘СЂРЅСѓС‚РѕСЃС‚Рё РґР»СЏ RU/EN РїРѕ РєР»СЋС‡Сѓ СЃС‚СЂРѕРєРё
+// Композабл для перевода субтитров
+const {
+  translateSubtitle,
+  loading: translationLoading,
+  error: translationError,
+} = useSubtitleTranslation();
+
+// Карта развёрнутости для RU/EN по ключу строки
 const expandedMap = ref<Record<string, boolean>>({});
+
+// Карта состояния загрузки перевода для каждой строки
+const translatingMap = ref<Record<number, boolean>>({});
 
 function rowKey(row: RequiredSubtitleItem, idx: number): string {
   return String(row.id ?? idx);
@@ -208,6 +233,31 @@ function onStartBlur() {
 
   rows.value = sorted;
   emit('update:modelValue', rows.value);
+}
+
+async function onTranslate(idx: number) {
+  const row = rows.value[idx];
+  if (!row) return;
+
+  const thaiText = row.text?.th;
+
+  if (!thaiText || !thaiText.trim()) {
+    return;
+  }
+
+  translatingMap.value[idx] = true;
+
+  try {
+    const result = await translateSubtitle(thaiText);
+
+    if (result) {
+      // Обновляем переводы через существующий метод
+      onUpdateText(idx, 'en', result.en);
+      onUpdateText(idx, 'ru', result.ru);
+    }
+  } finally {
+    translatingMap.value[idx] = false;
+  }
 }
 
 const a = {
@@ -365,5 +415,33 @@ const b = {
   padding-top: 6px;
   display: grid;
   gap: 8px;
+}
+
+.subtitle-editor__translate-block {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+}
+
+.subtitle-editor__btn_translate {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  color: #1e40af;
+
+  &:hover:not(:disabled) {
+    background: #dbeafe;
+    border-color: #93c5fd;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.subtitle-editor__error {
+  color: #dc2626;
+  font-size: 12px;
 }
 </style>

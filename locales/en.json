@@ -113,7 +113,9 @@
     "textRU": "Text (RU)",
     "textEN": "Text (EN)",
     "actions": "Actions",
-    "delete": "Delete"
+    "delete": "Delete",
+    "translate": "Translate",
+    "translating": "Translating..."
   },
   "profile": {
     "title": "Profile",

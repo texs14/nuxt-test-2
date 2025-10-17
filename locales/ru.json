@@ -113,7 +113,9 @@
     "textRU": "Текст (RU)",
     "textEN": "Текст (EN)",
     "actions": "Действия",
-    "delete": "Удалить"
+    "delete": "Удалить",
+    "translate": "Перевести",
+    "translating": "Переводится..."
   },
   "profile": {
     "title": "Профиль",
