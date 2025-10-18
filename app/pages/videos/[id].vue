@@ -31,9 +31,11 @@
       <NuxtLink v-if="canStartExercise" :to="exerciseLink" class="btn btn_success">
         {{ t('videos.exercise.startPage') }}
       </NuxtLink>
-      <UiButton v-if="canModerate" class="btn btn_primary" type="button" @click="toggleEditMode">
-        {{ isEditMode ? t('videos.detail.cancelEdit') : t('videos.detail.edit') }}
-      </UiButton>
+      <ClientOnly>
+        <UiButton v-if="canModerate" class="btn btn_primary" type="button" @click="toggleEditMode">
+          {{ isEditMode ? t('videos.detail.cancelEdit') : t('videos.detail.edit') }}
+        </UiButton>
+      </ClientOnly>
     </template>
 
     <template v-if="isEditMode" #editor>
@@ -317,7 +319,7 @@ watch(pendingVideo, (isPending: boolean) => {
   }
 });
 
-watch(video, (newVideo: VideoItem | null) => {
+watch(video, (newVideo) => {
   if (newVideo) {
     clearLoadingTimeout();
   }

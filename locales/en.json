@@ -79,6 +79,7 @@
     "title": "Comments",
     "loading": "Loading comments…",
     "error": "Error",
+    "empty": "No comments yet",
     "anonymous": "Anonymous"
   },
   "subtitleExercise": {

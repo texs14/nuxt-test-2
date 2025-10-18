@@ -102,6 +102,7 @@ import {
   getTextForLocale,
   getSelectedText,
 } from '~/composables/subtitles/useSubtitleText';
+import DictionaryProcessLoader from './DictionaryProcessLoader.vue';
 
 const props = defineProps<{
   subtitle: NormalizedSubtitle;
