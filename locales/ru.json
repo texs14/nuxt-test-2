@@ -114,8 +114,13 @@
     "textEN": "Текст (EN)",
     "actions": "Действия",
     "delete": "Удалить",
-    "translate": "Перевести",
-    "translating": "Переводится..."
+    "translateRow": "Перевести",
+    "translateAll": "Перевести все",
+    "translating": "Перевод...",
+    "translationProgress": "Переведено {current} из {total}",
+    "translationComplete": "Перевод завершен",
+    "translationError": "Ошибка перевода",
+    "translationEmptyText": "Нет текста для перевода"
   },
   "profile": {
     "title": "Профиль",

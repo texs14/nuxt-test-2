@@ -3,6 +3,22 @@
     <header class="subtitle-editor__head">
       <h2 class="subtitle-editor__title">{{ t('editor.title') }}</h2>
       <div class="subtitle-editor__actions">
+        <TranslateButton
+          v-if="canTranslateAll"
+          size="normal"
+          :loading="isTranslating"
+          :disabled="isTranslating"
+          @click="handleTranslateAll"
+        >
+          {{
+            isTranslating && translationProgress
+              ? t('editor.translationProgress', {
+                  current: translationProgress.current,
+                  total: translationProgress.total,
+                })
+              : t('editor.translateAll')
+          }}
+        </TranslateButton>
         <button class="subtitle-editor__btn" type="button" @click="addRow">
           {{ t('editor.addRow') }}
         </button>
@@ -79,19 +95,18 @@
                   @input="onUpdateText(idx, 'en', ($event.target as HTMLTextAreaElement).value)"
                 />
               </div>
-              <div class="subtitle-editor__translate-block">
-                <button
-                  class="subtitle-editor__btn subtitle-editor__btn_translate"
-                  type="button"
-                  :disabled="!row.text?.th || translatingMap[idx]"
-                  @click="onTranslate(idx)"
-                >
-                  <span v-if="translatingMap[idx]">{{ t('editor.translating') }}</span>
-                  <span v-else>{{ t('editor.translate') }}</span>
-                </button>
-                <span v-if="translationError && translatingMap[idx]" class="subtitle-editor__error">
-                  {{ translationError }}
-                </span>
+
+              <TranslateButton
+                size="small"
+                :loading="isTranslatingId(row.id ?? idx)"
+                :disabled="!row.text?.th || isTranslating"
+                @click="handleTranslateRow(idx)"
+              >
+                {{ t('editor.translateRow') }}
+              </TranslateButton>
+
+              <div v-if="translationError" class="subtitle-editor__error">
+                {{ t('editor.translationError') }}: {{ translationError }}
               </div>
             </div>
           </div>
@@ -111,7 +126,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { normalizeThaiEditorValue } from '~/composables/shared/useThaiTextProcessing';
 import { useSubtitleTranslation } from '~/composables/useSubtitleTranslation';
@@ -148,18 +163,19 @@ const rows = ref<RequiredSubtitleItem[]>(props.modelValue.map((s, i) => normaliz
 
 const { t } = useI18n();
 
-// Композабл для перевода субтитров
+// Composable для перевода субтитров
 const {
-  translateSubtitle,
-  loading: translationLoading,
+  isTranslating,
+  translatingIds,
+  translationProgress,
   error: translationError,
+  translateSubtitle,
+  translateBatch,
+  isTranslatingId,
 } = useSubtitleTranslation();
 
-// Карта развёрнутости для RU/EN по ключу строки
+// РљР°СЂС‚Р° СЂР°Р·РІС‘СЂРЅСѓС‚РѕСЃС‚Рё РґР»СЏ RU/EN РїРѕ РєР»СЋС‡Сѓ СЃС‚СЂРѕРєРё
 const expandedMap = ref<Record<string, boolean>>({});
-
-// Карта состояния загрузки перевода для каждой строки
-const translatingMap = ref<Record<number, boolean>>({});
 
 function rowKey(row: RequiredSubtitleItem, idx: number): string {
   return String(row.id ?? idx);
@@ -235,29 +251,54 @@ function onStartBlur() {
   emit('update:modelValue', rows.value);
 }
 
-async function onTranslate(idx: number) {
+// Проверка, есть ли субтитры для перевода
+const canTranslateAll = computed(() => {
+  return rows.value.some((row) => row.text?.th?.trim());
+});
+
+// Обработчик перевода одной строки
+async function handleTranslateRow(idx: number) {
   const row = rows.value[idx];
-  if (!row) return;
-
-  const thaiText = row.text?.th;
-
-  if (!thaiText || !thaiText.trim()) {
+  if (!row) {
     return;
   }
 
-  translatingMap.value[idx] = true;
-
-  try {
-    const result = await translateSubtitle(thaiText);
-
-    if (result) {
-      // Обновляем переводы через существующий метод
-      onUpdateText(idx, 'en', result.en);
-      onUpdateText(idx, 'ru', result.ru);
-    }
-  } finally {
-    translatingMap.value[idx] = false;
+  const thaiText = row.text?.th;
+  if (!thaiText?.trim()) {
+    return;
   }
+
+  const result = await translateSubtitle(thaiText);
+
+  if (result) {
+    // Обновляем RU и EN переводы
+    onUpdateText(idx, 'ru', result.ru);
+    onUpdateText(idx, 'en', result.en);
+  }
+}
+
+// Обработчик массового перевода
+async function handleTranslateAll() {
+  const subtitlesToTranslate = rows.value
+    .map((row, idx) => ({
+      id: row.id ?? idx,
+      th: row.text?.th || '',
+      index: idx,
+    }))
+    .filter((item) => item.th.trim());
+
+  if (subtitlesToTranslate.length === 0) {
+    return;
+  }
+
+  await translateBatch(subtitlesToTranslate, (id, result) => {
+    // Находим индекс строки по ID
+    const subtitle = subtitlesToTranslate.find((s) => s.id === id);
+    if (subtitle) {
+      onUpdateText(subtitle.index, 'ru', result.ru);
+      onUpdateText(subtitle.index, 'en', result.en);
+    }
+  });
 }
 
 const a = {
@@ -360,6 +401,7 @@ const b = {
   border-radius: 8px;
   resize: vertical;
   font-size: 18px;
+  box-sizing: border-box;
 }
 
 /* РЎС‚РµРє С‚РµРєСЃС‚РѕРІС‹С… РїРѕР»РµР№ */
@@ -417,31 +459,12 @@ const b = {
   gap: 8px;
 }
 
-.subtitle-editor__translate-block {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 0;
-}
-
-.subtitle-editor__btn_translate {
-  background: #eff6ff;
-  border-color: #bfdbfe;
-  color: #1e40af;
-
-  &:hover:not(:disabled) {
-    background: #dbeafe;
-    border-color: #93c5fd;
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-}
-
 .subtitle-editor__error {
-  color: #dc2626;
+  padding: 8px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  color: #b91c1c;
   font-size: 12px;
 }
 </style>

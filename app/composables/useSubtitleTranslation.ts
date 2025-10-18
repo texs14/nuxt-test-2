@@ -3,101 +3,163 @@
  * Использует Gemini API через useGemini
  */
 
-import type { GeminiChatMessage } from './useGemini';
-
-export interface TranslationResult {
-  en: string;
+interface TranslationResult {
   ru: string;
+  en: string;
+}
+
+interface SubtitleTranslationItem {
+  id: string | number;
+  th: string;
+}
+
+interface TranslationProgress {
+  current: number;
+  total: number;
 }
 
 export function useSubtitleTranslation() {
-  const { chatJSON, loading, error, clearError } = useGemini();
+  const { chatJSON, loading: geminiLoading, error: geminiError } = useGemini();
+
+  const isTranslating = ref(false);
+  const translatingIds = ref<Set<string | number>>(new Set());
+  const translationProgress = ref<TranslationProgress | null>(null);
+  const error = ref<string | null>(null);
+
+  // Кеш переводов для оптимизации
+  const translationCache = new Map<string, TranslationResult>();
 
   /**
-   * Переводит текст с тайского на английский и русский
-   * @param thaiText - текст на тайском языке
-   * @returns объект с переводами на английский и русский
+   * Переводит один текст с тайского на русский и английский
+   * Использует один запрос к Gemini API
    */
   async function translateSubtitle(thaiText: string): Promise<TranslationResult | null> {
-    if (!thaiText || !thaiText.trim()) {
+    if (!thaiText?.trim()) {
+      error.value = 'Пустой текст для перевода';
       return null;
     }
 
-    const messages: GeminiChatMessage[] = [
-      {
-        role: 'system',
-        content: `You are a professional translator specializing in Thai to English and Russian translations. 
-Your task is to translate Thai text accurately while preserving the meaning and context.
-Always respond with a JSON object containing "en" and "ru" fields with the translations.`,
-      },
-      {
-        role: 'user',
-        content: `Translate the following Thai text to English and Russian. Return ONLY a JSON object with "en" and "ru" fields:
+    // Проверка кеша
+    const cached = translationCache.get(thaiText);
+    if (cached) {
+      return cached;
+    }
 
-Thai text: ${thaiText}
+    error.value = null;
 
-Response format:
-{
-  "en": "English translation here",
-  "ru": "Russian translation here"
-}`,
-      },
-    ];
+    try {
+      const messages = [
+        {
+          role: 'system' as const,
+          content:
+            'Ты профессиональный переводчик с тайского языка. Переводи точно, сохраняя смысл и контекст. Отвечай ТОЛЬКО в формате JSON.',
+        },
+        {
+          role: 'user' as const,
+          content: `Переведи следующий тайский текст на русский и английский языки:
+"${thaiText}"
 
-    const result = await chatJSON<TranslationResult>(messages, {
-      temperature: 0.3, // Низкая температура для более точного перевода
-      max_tokens: 500,
-    });
+Формат ответа:
+{"ru": "русский перевод", "en": "english translation"}`,
+        },
+      ];
 
-    return result;
+      const result = await chatJSON<TranslationResult>(messages);
+
+      if (!result || !result.ru || !result.en) {
+        error.value = 'Некорректный формат ответа от API';
+        return null;
+      }
+
+      // Сохраняем в кеш
+      translationCache.set(thaiText, result);
+
+      return result;
+    } catch (err: any) {
+      error.value = err.message || 'Ошибка при переводе';
+      return null;
+    }
   }
 
   /**
-   * Пакетный перевод нескольких субтитров за один запрос
-   * @param thaiTexts - массив текстов на тайском
-   * @returns массив переводов
+   * Переводит массив субтитров последовательно
+   * Обновляет прогресс после каждого перевода
    */
-  async function translateBatch(thaiTexts: string[]): Promise<TranslationResult[] | null> {
-    const validTexts = thaiTexts.filter((text) => text && text.trim());
-
-    if (validTexts.length === 0) {
-      return null;
+  async function translateBatch(
+    subtitles: SubtitleTranslationItem[],
+    onProgress?: (id: string | number, result: TranslationResult) => void
+  ): Promise<void> {
+    if (!subtitles.length) {
+      return;
     }
 
-    const messages: GeminiChatMessage[] = [
-      {
-        role: 'system',
-        content: `You are a professional translator specializing in Thai to English and Russian translations.
-Translate each Thai text accurately while preserving meaning and context.
-Always respond with a JSON array of objects, each containing "en" and "ru" fields.`,
-      },
-      {
-        role: 'user',
-        content: `Translate the following Thai texts to English and Russian. Return ONLY a JSON array:
+    isTranslating.value = true;
+    translationProgress.value = { current: 0, total: subtitles.length };
+    error.value = null;
 
-${validTexts.map((text, i) => `${i + 1}. ${text}`).join('\n')}
+    try {
+      for (let i = 0; i < subtitles.length; i++) {
+        const subtitle = subtitles[i];
+        if (!subtitle) {
+          continue;
+        }
 
-Response format:
-[
-  { "en": "English translation 1", "ru": "Russian translation 1" },
-  { "en": "English translation 2", "ru": "Russian translation 2" }
-]`,
-      },
-    ];
+        translatingIds.value.add(subtitle.id);
 
-    const result = await chatJSON<TranslationResult[]>(messages, {
-      temperature: 0.3,
-      max_tokens: 2000,
-    });
+        const result = await translateSubtitle(subtitle.th);
 
-    return result;
+        translatingIds.value.delete(subtitle.id);
+
+        if (result && onProgress) {
+          onProgress(subtitle.id, result);
+        }
+
+        translationProgress.value.current = i + 1;
+
+        // Задержка между запросами для предотвращения rate limiting
+        if (i < subtitles.length - 1) {
+          await new Promise((resolve) => setTimeout(resolve, 500));
+        }
+      }
+    } finally {
+      isTranslating.value = false;
+      translatingIds.value.clear();
+      translationProgress.value = null;
+    }
+  }
+
+  /**
+   * Проверяет, переводится ли конкретный субтитр
+   */
+  function isTranslatingId(id: string | number): boolean {
+    return translatingIds.value.has(id);
+  }
+
+  /**
+   * Очистка ошибки
+   */
+  function clearError() {
+    error.value = null;
+  }
+
+  /**
+   * Очистка кеша переводов
+   */
+  function clearCache() {
+    translationCache.clear();
   }
 
   return {
+    isTranslating: readonly(isTranslating),
+    translatingIds: readonly(translatingIds),
+    translationProgress: readonly(translationProgress),
+    error: readonly(error),
+    geminiLoading: readonly(geminiLoading),
+    geminiError: readonly(geminiError),
     translateSubtitle,
     translateBatch,
-    loading,
-    error,
+    isTranslatingId,
     clearError,
+    clearCache,
   };
 }

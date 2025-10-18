@@ -84,9 +84,9 @@
     </div>
 
     <div class="auth-register__actions">
-      <UiButton type="submit" :disabled="loading" block>
+      <UIButton type="submit" :disabled="loading" block>
         {{ t('register.submit') }}
-      </UiButton>
+      </UIButton>
     </div>
 
     <p v-if="message" class="auth-register__status auth-register__status_success">{{ message }}</p>

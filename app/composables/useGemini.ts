@@ -5,7 +5,7 @@
 
 import { GEMINI_DEFAULT_CONFIG } from '~/config/gemini';
 
-export interface GeminiChatMessage {
+interface GeminiChatMessage {
   role: 'system' | 'user' | 'assistant';
   content: string;
 }

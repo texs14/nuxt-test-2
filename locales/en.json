@@ -114,8 +114,13 @@
     "textEN": "Text (EN)",
     "actions": "Actions",
     "delete": "Delete",
-    "translate": "Translate",
-    "translating": "Translating..."
+    "translateRow": "Translate",
+    "translateAll": "Translate all",
+    "translating": "Translating...",
+    "translationProgress": "Translated {current} of {total}",
+    "translationComplete": "Translation complete",
+    "translationError": "Translation error",
+    "translationEmptyText": "No text to translate"
   },
   "profile": {
     "title": "Profile",

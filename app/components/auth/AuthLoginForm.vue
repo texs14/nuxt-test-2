@@ -24,11 +24,11 @@
     </div>
 
     <div class="auth-login__actions">
-      <UiButton type="submit" :loading="loading" :disabled="loading" block>
+      <UIButton type="submit" :loading="loading" :disabled="loading" block>
         {{ t('auth.login.submit') }}
-      </UiButton>
+      </UIButton>
       <!-- 
-      <UiButton
+      <UIButton
         variant="google"
         type="button"
         :loading="loading"
@@ -37,11 +37,11 @@
         @click="signInGoogle"
       >
         {{ t('auth.login.google') }}
-      </UiButton> -->
+      </UIButton> -->
 
-      <UiButton v-if="registerLink !== '#'" variant="ghost" :to="registerLink" size="sm">
+      <UIButton v-if="registerLink !== '#'" variant="ghost" :to="registerLink" size="sm">
         {{ t('auth.login.register') }}
-      </UiButton>
+      </UIButton>
     </div>
 
     <p v-if="message" class="auth-login__status auth-login__status_success">{{ message }}</p>

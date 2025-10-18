@@ -15,10 +15,12 @@
 ## Обзор
 
 Система автоматически генерирует аудио произношение для слов в словаре `new_dictionar`, если:
+
 - Поле `headword->audio` пустое, null или undefined
 - Или массив `audio` не содержит валидного `base64`
 
 **Workflow:**
+
 1. Пользователь открывает слово через `InteractiveWord.vue`
 2. Система проверяет наличие аудио
 3. При отсутствии аудио показывается кнопка "Синтезировать аудио"
@@ -29,25 +31,29 @@
 ### Компоненты
 
 **1. `utils/audio-manager.ts`**
-   - Helper функции для работы с `MediaAsset[]`
-   - Проверка наличия валидного аудио
-   - Создание и обновление аудио объектов
-   - Конвертация Blob ↔ base64
+
+- Helper функции для работы с `MediaAsset[]`
+- Проверка наличия валидного аудио
+- Создание и обновление аудио объектов
+- Конвертация Blob ↔ base64
 
 **2. `server/api/dictionary/update-audio.ts`**
-   - Server endpoint для обновления JSONB поля
-   - Использует Supabase Service Key для обхода RLS
-   - Атомарное обновление массива `headword->audio`
+
+- Server endpoint для обновления JSONB поля
+- Использует Supabase Service Key для обхода RLS
+- Атомарное обновление массива `headword->audio`
 
 **3. `app/composables/useAudioSynthesis.ts`**
-   - Composable для синтеза и сохранения аудио
-   - Интегрируется с `useResembleTTS`
-   - Управление состоянием процесса
+
+- Composable для синтеза и сохранения аудио
+- Интегрируется с `useResembleTTS`
+- Управление состоянием процесса
 
 **4. `app/components/InteractiveWord.vue`**
-   - UI для отображения и синтеза аудио
-   - Автоматическая проверка при открытии слова
-   - Индикация процесса и ошибок
+
+- UI для отображения и синтеза аудио
+- Автоматическая проверка при открытии слова
+- Индикация процесса и ошибок
 
 ### Структура данных
 
@@ -78,7 +84,7 @@ RESEMBLE_KEY=your_resemble_api_key
 В `InteractiveWord.vue` укажите UUID голоса:
 
 ```typescript
-const { synthesizeById, /* ... */ } = useAudioSynthesis({
+const { synthesizeById /* ... */ } = useAudioSynthesis({
   voiceUuid: 'YOUR_THAI_VOICE_UUID', // <-- Замените на реальный UUID
   sampleRate: 44100,
   outputFormat: 'wav',
@@ -86,6 +92,7 @@ const { synthesizeById, /* ... */ } = useAudioSynthesis({
 ```
 
 **Как получить Voice UUID:**
+
 1. Зайдите в [Resemble AI Dashboard](https://app.resemble.ai/voices)
 2. Выберите или создайте тайский голос
 3. Скопируйте UUID из URL или настроек голоса
@@ -109,13 +116,10 @@ runtimeConfig: {
 ```vue
 <template>
   <div v-if="needsSynthesis(entry)">
-    <UiButton 
-      @click="onSynthesizeAudio"
-      :disabled="isSynthesizing"
-    >
+    <UIButton @click="onSynthesizeAudio" :disabled="isSynthesizing" type="button">
       {{ isSynthesizing ? getSynthesisStatusText() : 'Синтезировать аудио' }}
-    </UiButton>
-    
+    </UIButton>
+
     <div v-if="synthesisError">{{ synthesisError }}</div>
   </div>
 </template>
@@ -135,11 +139,11 @@ const { synthesizeById, isSynthesizing, synthesisError } = useAudioSynthesis({
 });
 
 // Синтез аудио для конкретного слова
-const entry = { entryId: 'word-123', headword: { script: 'สวัสดี', /* ... */ } };
+const entry = { entryId: 'word-123', headword: { script: 'สวัสดี' /* ... */ } };
 
 if (!hasValidAudio(entry.headword)) {
   const success = await synthesizeById(entry.entryId, entry.headword);
-  
+
   if (success) {
     console.log('Аудио успешно синтезировано и сохранено');
   } else {
@@ -158,9 +162,9 @@ if (!hasValidAudio(entry.headword)) {
 
 ```typescript
 interface AudioSynthesisOptions {
-  voiceUuid?: string;      // UUID голоса Resemble AI (обязательно)
-  sampleRate?: number;     // Частота дискретизации (по умолчанию: 44100)
-  outputFormat?: 'wav' | 'mp3';  // Формат аудио (по умолчанию: 'wav')
+  voiceUuid?: string; // UUID голоса Resemble AI (обязательно)
+  sampleRate?: number; // Частота дискретизации (по умолчанию: 44100)
+  outputFormat?: 'wav' | 'mp3'; // Формат аудио (по умолчанию: 'wav')
 }
 ```
 
@@ -205,20 +209,22 @@ isValidBase64(str: string): boolean
 **Method:** `PATCH`
 
 **Request Body:**
+
 ```typescript
 {
-  entryId: string;  // ID словарной записи
-  audio: MediaAsset;  // Новый аудио объект
+  entryId: string; // ID словарной записи
+  audio: MediaAsset; // Новый аудио объект
 }
 ```
 
 **Response:**
+
 ```typescript
 {
   success: boolean;
   data: {
     entryId: string;
-    headword: Headword;  // Обновленный headword
+    headword: Headword; // Обновленный headword
   }
 }
 ```
@@ -231,23 +237,15 @@ isValidBase64(str: string): boolean
 <script setup lang="ts">
 const entry = ref<DictionaryEntry | null>(null);
 
-const { 
-  synthesizeById, 
-  isSynthesizing, 
-  synthesisError, 
-  needsSynthesis 
-} = useAudioSynthesis({
+const { synthesizeById, isSynthesizing, synthesisError, needsSynthesis } = useAudioSynthesis({
   voiceUuid: 'thai-voice-uuid-here',
 });
 
 const handleSynthesize = async () => {
   if (!entry.value) return;
-  
-  const success = await synthesizeById(
-    entry.value.entryId, 
-    entry.value.headword
-  );
-  
+
+  const success = await synthesizeById(entry.value.entryId, entry.value.headword);
+
   if (success) {
     // Перезагрузить данные из базы
     await loadEntry();
@@ -257,10 +255,7 @@ const handleSynthesize = async () => {
 
 <template>
   <div v-if="entry && needsSynthesis(entry)">
-    <button 
-      @click="handleSynthesize" 
-      :disabled="isSynthesizing"
-    >
+    <button @click="handleSynthesize" :disabled="isSynthesizing">
       {{ isSynthesizing ? 'Синтез...' : 'Озвучить' }}
     </button>
     <p v-if="synthesisError">{{ synthesisError }}</p>
@@ -277,20 +272,20 @@ async function synthesizeMultipleWords(entries: DictionaryEntry[]) {
   });
 
   const wordsToSynthesize = entries.filter(needsSynthesis);
-  
+
   for (const entry of wordsToSynthesize) {
     console.log(`Синтез: ${entry.headword.script}`);
-    
+
     const success = await synthesizeById(entry.entryId, entry.headword);
-    
+
     if (success) {
       console.log(`✓ ${entry.headword.script}`);
     } else {
       console.error(`✗ ${entry.headword.script}`);
     }
-    
+
     // Пауза между запросами
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
   }
 }
 ```
@@ -309,14 +304,14 @@ const { data } = await supabase
 
 if (data) {
   const headword = data.headword as Headword;
-  
+
   if (!hasValidAudio(headword)) {
     console.log('Аудио отсутствует, запускаем синтез...');
-    
+
     const { synthesizeById } = useAudioSynthesis({
       voiceUuid: 'thai-voice-uuid',
     });
-    
+
     await synthesizeById(data.entry_id, headword);
   } else {
     console.log('Аудио уже существует');
@@ -338,13 +333,15 @@ const { synthesizeById } = useAudioSynthesis({
 
 ### Ошибка: "Resemble API key не настроен"
 
-**Решение:** 
+**Решение:**
+
 1. Проверьте наличие `RESEMBLE_KEY` в `.env`
 2. Перезапустите dev сервер
 
 ### Ошибка: "Запись с entry_id не найдена"
 
 **Причины:**
+
 - Неверный `entry_id`
 - Запись удалена из базы
 
@@ -353,11 +350,13 @@ const { synthesizeById } = useAudioSynthesis({
 ### Ошибка синтеза: "Ошибка при обращении к Resemble AI API"
 
 **Причины:**
+
 - Неверный API ключ
 - Проблемы с сетью
 - Превышен лимит запросов
 
 **Решение:**
+
 1. Проверьте валидность `RESEMBLE_KEY`
 2. Проверьте логи: `server/api/resemble/synthesize.ts`
 3. Проверьте квоты в [Resemble Dashboard](https://app.resemble.ai)
@@ -365,6 +364,7 @@ const { synthesizeById } = useAudioSynthesis({
 ### Аудио не сохраняется в базу
 
 **Решение:**
+
 1. Проверьте `SUPABASE_SERVICE_ROLE_KEY` в `.env`
 2. Убедитесь, что таблица `new_dictionar` существует
 3. Проверьте структуру `headword` JSONB поля
@@ -372,6 +372,7 @@ const { synthesizeById } = useAudioSynthesis({
 ### Кнопка "Синтезировать" не отображается
 
 **Причины:**
+
 - Аудио уже существует в `headword->audio`
 - Состояние `state !== 'loaded'`
 
@@ -380,11 +381,13 @@ const { synthesizeById } = useAudioSynthesis({
 ## Лучшие практики
 
 1. **Всегда указывайте Voice UUID**
+
    ```typescript
    const tts = useAudioSynthesis({ voiceUuid: 'your-uuid' });
    ```
 
 2. **Обрабатывайте ошибки**
+
    ```typescript
    if (!success) {
      alert(synthesisError.value);
@@ -392,6 +395,7 @@ const { synthesizeById } = useAudioSynthesis({
    ```
 
 3. **Показывайте прогресс пользователю**
+
    ```vue
    <div v-if="isSynthesizing">
      {{ progress }} - {{ getSynthesisStatusText() }}
