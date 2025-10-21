@@ -32,9 +32,9 @@
         {{ t('videos.exercise.startPage') }}
       </NuxtLink>
       <ClientOnly>
-        <UiButton v-if="canModerate" class="btn btn_primary" type="button" @click="toggleEditMode">
+        <UButton v-if="canModerate" class="btn btn_primary" type="button" @click="toggleEditMode">
           {{ isEditMode ? t('videos.detail.cancelEdit') : t('videos.detail.edit') }}
-        </UiButton>
+        </UButton>
       </ClientOnly>
     </template>
 

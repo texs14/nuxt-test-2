@@ -6,6 +6,7 @@ export default defineNuxtConfig({
     '~/assets/styles/layouts/content-page.scss',
     '~/assets/styles/components/buttons.scss',
     '~/assets/styles/components/badges.scss',
+    '~/assets/styles/main.css',
   ],
   modules: [
     '@nuxtjs/supabase',

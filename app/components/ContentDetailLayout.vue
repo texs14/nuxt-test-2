@@ -12,7 +12,12 @@
         <slot name="header-actions" />
       </PageHeader>
 
-      <div class="content-detail__content">
+      <div
+        :class="[
+          'content-detail__content',
+          { 'content-detail__content_editor-hidden': !$slots.editor },
+        ]"
+      >
         <div v-if="$slots.player" class="content-detail__player">
           <slot name="player" />
         </div>
@@ -59,7 +64,7 @@ withDefaults(defineProps<Props>(), {
 
 <style scoped lang="scss">
 .content-detail {
-  max-width: 900px;
+  max-width: 1440x;
   margin: 0 auto;
   padding: 24px;
 
@@ -78,13 +83,38 @@ withDefaults(defineProps<Props>(), {
   }
 
   &__content {
-    display: flex;
-    flex-direction: column;
+    display: grid;
     gap: 24px;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas:
+      'editor player'
+      'description description'
+      'actions actions'
+      'comments comments';
+
+    @media (max-width: 1024px) {
+      grid-template-columns: 1fr;
+      grid-template-areas:
+        'editor'
+        'player'
+        'description'
+        'actions'
+        'comments';
+    }
+
+    &_editor-hidden {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas:
+        'player'
+        'description'
+        'actions'
+        'comments';
+    }
   }
 
   &__player {
-    margin: 0 auto;
+    grid-area: player;
+    margin: 0;
     max-width: 100%;
   }
 
@@ -96,6 +126,7 @@ withDefaults(defineProps<Props>(), {
   }
 
   &__description {
+    grid-area: description;
     background: #f9fafb;
     padding: 20px;
     border-radius: 12px;
@@ -104,18 +135,21 @@ withDefaults(defineProps<Props>(), {
   }
 
   &__actions {
+    grid-area: actions;
     display: flex;
     gap: 12px;
     flex-wrap: wrap;
   }
 
   &__editor {
+    grid-area: editor;
     padding: 24px;
     background: #f9fafb;
     border-radius: 12px;
   }
 
   &__comments {
+    grid-area: comments;
     margin-top: 8px;
   }
 }

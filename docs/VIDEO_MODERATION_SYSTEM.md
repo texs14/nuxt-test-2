@@ -40,6 +40,10 @@ ALTER COLUMN duration DROP NOT NULL,
 ALTER COLUMN subtitles DROP NOT NULL,
 ALTER COLUMN preview_url DROP NOT NULL,
 ALTER COLUMN video_url DROP NOT NULL;
+
+-- Добавлена колонка для хранения ссылок на объекты Storage
+ALTER TABLE public.video_items
+ADD COLUMN IF NOT EXISTS storage_refs JSONB NOT NULL DEFAULT '{}'::jsonb;
 ```
 
 ### Таблица `profiles`
@@ -172,6 +176,32 @@ USING (
 - `404` - видео не найдено
 - `403` - нет прав (при попытке изменить status не-админом)
 
+### DELETE `/api/video-items/[id]`
+
+**Описание:** Удаление видео вместе с файлами в Supabase Storage.
+
+**Доступ:** Только администраторы (совпадает с RLS политикой `video_items_delete_policy`).
+
+**Алгоритм:**
+- Получить запись по `id`, убедиться что существует и содержит `storage_refs` с путями в бакетах.
+- Для каждого найденного объекта (`video`, `preview`, `audio`) вызвать `supabase.storage.from(bucket).remove([path])`.
+- После успешного удаления файлов удалить строку из `video_items`.
+- При ошибках на этапе Storage вернуть `500` и не удалять запись, чтобы избежать «битых» ссылок.
+
+**Ответ:**
+
+```json
+{
+  "ok": true,
+  "id": "uuid"
+}
+```
+
+**Ошибки:**
+- `404` — видео не найдено
+- `403` — нет прав
+- `500` — ошибка удаления файлов Storage (логируется с деталями бакета и пути)
+
 ### POST `/api/video-items/[id]/approve`
 
 **Описание:** Одобрение видео (изменение статуса на `approved`)
@@ -191,6 +221,22 @@ USING (
 - `401` - не авторизован
 - `403` - нет прав (не админ)
 - `404` - видео не найдено
+
+## Хранилище и ссылки на объекты
+
+- Видео и превью загружаются в бакет Supabase Storage `Videos`:
+  - Файлы видео: `uploads/videos/<hash>.mp4`
+  - Превью-кадры: `uploads/previews/<hash>.jpg`
+- Аудио-треки извлекаются и сохраняются в бакете `Audios` по пути `uploads/audios/<hash>.mp3`.
+- Для безопасного удаления добавляется колонка `storage_refs JSONB` (по умолчанию `{}`), которая хранит исходные пути к объектам Storage:
+
+```json
+{
+  "video": { "bucket": "Videos", "path": "uploads/videos/<hash>.mp4" },
+  "preview": { "bucket": "Videos", "path": "uploads/previews/<hash>.jpg" },
+  "audio": { "bucket": "Audios", "path": "uploads/audios/<hash>.mp3" }
+}
+```
 
 ## Frontend
 

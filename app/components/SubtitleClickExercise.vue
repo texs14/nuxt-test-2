@@ -14,7 +14,7 @@
       <div v-if="isMounted" class="click-exercise__result">
         <template v-if="collectedSlots.length > 0">
           <div v-for="slot in collectedSlots" :key="slot.index" class="click-exercise__result-slot">
-            {{ slot.text }}
+            <InteractiveWord :word="slot.text" />
           </div>
         </template>
         <template v-else>
@@ -54,6 +54,7 @@
 <script setup lang="ts">
 import { computed, ref, watch, onMounted, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
+import InteractiveWord from './InteractiveWord.vue';
 
 interface ThaiSentences {
   sentences: (string | null | undefined)[][];
@@ -575,7 +576,7 @@ function addToHistory(isCorrect: boolean) {
   &__result {
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 6px;
     padding: 16px;
     border: 2px dashed #cbd5f5;
     border-radius: 10px;
@@ -583,11 +584,9 @@ function addToHistory(isCorrect: boolean) {
   }
 
   &__result-slot {
-    padding: 8px 14px;
-    border: 2px solid #16a34a;
-    border-radius: 10px;
+    padding: 4px 6px;
     background: #dcfce7;
-    font-size: 18px;
+    font-size: 26px;
     color: #000;
   }
 
@@ -602,6 +601,7 @@ function addToHistory(isCorrect: boolean) {
     border: 1px solid #94a3b8;
     border-radius: 10px;
     background: #fff;
+    font-size: 28px;
     cursor: pointer;
     user-select: none;
     transition:

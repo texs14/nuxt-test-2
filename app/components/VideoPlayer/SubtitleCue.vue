@@ -123,7 +123,7 @@ const getThaiWords = (subtitle: NormalizedSubtitle): string[] => {
 // Проверка прав доступа
 const supabase = useSupabaseClient();
 const user = useSupabaseUser();
-const canAddToDictionary = ref(false);
+const canAddToDictionary = ref(true);
 
 // Batch processing
 const { isProcessing, processBatch, cancel, currentWord, progress, totalWords, stats } =

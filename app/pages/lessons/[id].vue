@@ -35,9 +35,9 @@
       <NuxtLink :to="localePath(`/lessons/exercise/${lesson?.id}`)" class="btn btn_success">
         {{ t('lessons.detail.startExercise') }}
       </NuxtLink>
-      <UIButton v-if="canModerate" class="btn btn_primary" type="button" @click="toggleEditMode">
+      <UButton v-if="canModerate" class="btn btn_primary" type="button" @click="toggleEditMode">
         {{ isEditMode ? t('lessons.detail.cancelEdit') : t('lessons.detail.edit') }}
-      </UIButton>
+      </UButton>
     </template>
 
     <template v-if="isEditMode" #editor>

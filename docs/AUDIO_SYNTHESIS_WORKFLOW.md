@@ -37,19 +37,37 @@
 - Создание и обновление аудио объектов
 - Конвертация Blob ↔ base64
 
-**2. `server/api/dictionary/update-audio.ts`**
+**2. `app/composables/useResembleTTS.ts`**
 
-- Server endpoint для обновления JSONB поля
-- Использует Supabase Service Key для обхода RLS
-- Атомарное обновление массива `headword->audio`
+- Обертка над Resemble AI API
+- Поддержка выбора голосов, частоты и формата
+- Возвращает Blob, URL и временные метки
 
 **3. `app/composables/useAudioSynthesis.ts`**
 
 - Composable для синтеза и сохранения аудио
 - Интегрируется с `useResembleTTS`
-- Управление состоянием процесса
+- Управляет прогрессом (`checking → synthesizing → saving → done`)
 
-**4. `app/components/InteractiveWord.vue`**
+**4. `server/api/resemble/synthesize.ts`**
+
+- Серверный proxy для Resemble AI
+- Валидация обязательных параметров
+- Централизованная обработка ошибок и логирование
+
+**5. `server/api/dictionary/update-audio.ts`**
+
+- Обновление JSONB поля словаря
+- Использует Supabase Service Key для обхода RLS
+- Атомарное обновление массива `headword->audio`
+
+**6. `server/api/dictionary/synthesize-audio.post.ts`**
+
+- Полный цикл: синтез через Resemble → обновление записи
+- Подходит для batch-задач или cron-процессов
+- Возвращает сгенерированный `MediaAsset`
+
+**7. `app/components/InteractiveWord.vue`**
 
 - UI для отображения и синтеза аудио
 - Автоматическая проверка при открытии слова
@@ -64,7 +82,7 @@
   base64: "data:audio/wav;base64,UklGRiQAAABXQVZF...",
   type: "word",
   speaker: "resemble_ai_thai",
-  license: "generated",
+  license: "generated" | "CC-BY",
   url?: "https://..."  // опционально
 }
 ```
@@ -77,6 +95,7 @@
 
 ```env
 RESEMBLE_KEY=your_resemble_api_key
+RESEMBLE_PROJECT_UUID=optional_project_uuid
 ```
 
 ### 2. Voice UUID для тайского языка
@@ -97,6 +116,8 @@ const { synthesizeById /* ... */ } = useAudioSynthesis({
 2. Выберите или создайте тайский голос
 3. Скопируйте UUID из URL или настроек голоса
 
+Для централизованного хранения рекомендуется записать значение в `.env` и прокинуть через runtime config (см. пример в `nuxt.config.ts`).
+
 ### 3. Supabase Service Key
 
 В `nuxt.config.ts` должен быть настроен service key:
@@ -104,8 +125,18 @@ const { synthesizeById /* ... */ } = useAudioSynthesis({
 ```typescript
 runtimeConfig: {
   supabaseServiceKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
+  public: {
+    supabase: {
+      url: process.env.SUPABASE_URL,
+      key: process.env.SUPABASE_KEY,
+    },
+  },
 }
 ```
+
+### 4. Resemble Project UUID (опционально)
+
+Если вы используете проекты Resemble AI, сохраните `RESEMBLE_PROJECT_UUID` в `.env` и доступ к нему через `useRuntimeConfig().resembleProjectUuid`. Это позволяет группировать сессии синтеза и управлять квотами.
 
 ## Использование
 
@@ -116,9 +147,9 @@ runtimeConfig: {
 ```vue
 <template>
   <div v-if="needsSynthesis(entry)">
-    <UIButton @click="onSynthesizeAudio" :disabled="isSynthesizing" type="button">
+    <UButton @click="onSynthesizeAudio" :disabled="isSynthesizing" type="button">
       {{ isSynthesizing ? getSynthesisStatusText() : 'Синтезировать аудио' }}
-    </UIButton>
+    </UButton>
 
     <div v-if="synthesisError">{{ synthesisError }}</div>
   </div>
@@ -132,7 +163,7 @@ import { useAudioSynthesis } from '~/composables/useAudioSynthesis';
 import { hasValidAudio } from '~/utils/audio-manager';
 
 // В компоненте
-const { synthesizeById, isSynthesizing, synthesisError } = useAudioSynthesis({
+const { synthesizeAndSave, synthesizeById, isSynthesizing, synthesisError } = useAudioSynthesis({
   voiceUuid: 'your-thai-voice-uuid',
   sampleRate: 44100,
   outputFormat: 'wav',
@@ -142,7 +173,7 @@ const { synthesizeById, isSynthesizing, synthesisError } = useAudioSynthesis({
 const entry = { entryId: 'word-123', headword: { script: 'สวัสดี' /* ... */ } };
 
 if (!hasValidAudio(entry.headword)) {
-  const success = await synthesizeById(entry.entryId, entry.headword);
+  const success = await synthesizeAndSave(entry);
 
   if (success) {
     console.log('Аудио успешно синтезировано и сохранено');
@@ -228,6 +259,51 @@ isValidBase64(str: string): boolean
   }
 }
 ```
+
+### Server API (`/api/dictionary/synthesize-audio`)
+
+**Method:** `POST`
+
+**Request Body:**
+
+```typescript
+{
+  entryId: string;
+  text: string;
+  voiceUuid?: string;
+}
+```
+
+**Response:**
+
+```typescript
+{
+  success: boolean;
+  audio: MediaAsset;
+}
+```
+
+Используйте этот endpoint, если хотите запустить синтез из серверных задач (batch, cron, миграции) без необходимости собирать `MediaAsset` вручную.
+
+### Server API (`/api/resemble/synthesize`)
+
+**Method:** `POST`
+
+Проксирует запрос в Resemble AI и ожидает `ResembleSynthesizeRequest`:
+
+```typescript
+{
+  voice_uuid: string;
+  data: string; // SSML
+  sample_rate?: number;
+  output_format?: 'wav' | 'mp3';
+  precision?: 'PCM_16' | 'PCM_24' | 'PCM_32' | 'MULAW';
+  project_uuid?: string;
+  title?: string;
+}
+```
+
+Возвращает `ResembleSynthesizeResponse` с raw `audio_content` (base64) и временными метками. Этот endpoint используется `useResembleTTS` и может быть вызван вручную для кастомных сценариев.
 
 ## Примеры
 

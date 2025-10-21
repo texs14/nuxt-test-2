@@ -42,7 +42,7 @@
       <button
         class="file-upload__button"
         type="submit"
-        :disabled="!videoFile || isUploading"
+        :disabled="!videoFile || isUploading || isUploading"
       >
         {{ uploadButtonText }}
       </button>

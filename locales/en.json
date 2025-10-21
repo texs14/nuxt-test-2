@@ -383,6 +383,9 @@
       "copyright": "© 2024 Learn Thai. All rights reserved.",
       "privacy": "Privacy policy",
       "terms": "Terms of service"
+    },
+    "common": {
+      "loading": "Загрузка..."
     }
   }
 }

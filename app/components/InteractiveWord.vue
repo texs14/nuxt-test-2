@@ -14,7 +14,7 @@
         <div v-if="isOpen" ref="popupRef" class="interactive-word__popup" :style="popupStyle">
           <div v-if="state === 'loaded' && entry" class="interactive-word__audio-controls">
             <!-- Кнопка воспроизведения, если аудио уже есть -->
-            <UiButton
+            <UButton
               v-if="hasValidAudio(entry.headword)"
               class="interactive-word__popup_add-btn"
               type="button"
@@ -22,10 +22,10 @@
               @click="isPlayingAudio ? onStopAudio() : onPlayAudio()"
             >
               {{ isPlayingAudio ? '⏸ Остановить' : '▶ Воспроизвести аудио' }}
-            </UiButton>
+            </UButton>
 
             <!-- Кнопка синтеза, если аудио отсутствует -->
-            <UiButton
+            <UButton
               v-if="
                 needsSynthesis({
                   entryId: entry.entryId,
@@ -39,7 +39,7 @@
               @click="onSynthesizeAudio"
             >
               {{ isSynthesizing ? getSynthesisStatusText() : 'Синтезировать аудио' }}
-            </UiButton>
+            </UButton>
             <div v-if="synthesisError" class="interactive-word__synthesis-error">
               {{ synthesisError }}
             </div>

@@ -1,7 +1,6 @@
 <template>
   <section class="content-page">
-    <header v-if="title" class="content-page__header">
-      <h1 class="content-page__title">{{ title }}</h1>
+    <header v-if="canModerate" class="content-page__header">
       <div v-if="addNewRoute && canModerate" class="content-page__actions">
         <NuxtLink :to="addNewRoute" class="btn btn_primary">
           {{ addNewButtonText }}
@@ -100,7 +99,6 @@ function getItemRoute(item: BaseContentItem): string {
   align-items: center;
   margin-bottom: 32px;
   padding-bottom: 16px;
-  border-bottom: 2px solid #e5e7eb;
 }
 
 .content-page__title {

@@ -1,172 +1,122 @@
-# Структура VideoPlayer после рефакторинга
+# Структура VideoPlayer
 
 ```
 app/
 ├── components/
+│   ├── VideoPlayer.vue                 — главный контейнер плеера
 │   ├── VideoPlayer/
-│   │   ├── VideoPlayer.vue              (~290 строк) - главный контейнер
-│   │   ├── VideoPlayerCore.vue          (~50 строк) - <video> элемент
-│   │   ├── VideoSubtitle.vue            (~80 строк) - субтитры поверх видео
-│   │   ├── SubtitleNavigationButtons.vue (~60 строк) - кнопки prev/next
-│   │   ├── SubtitleTrack.vue            (~35 строк) - список субтитров
-│   │   └── SubtitleCue.vue              (~90 строк) - элемент субтитра
-│   │
+│   │   ├── DictionaryProcessLoader.vue — модальное окно пакетного добавления слов
+│   │   ├── SubtitleCue.vue              — элемент списка субтитров
+│   │   ├── SubtitleNavigationButtons.vue — кнопки перехода по субтитрам
+│   │   ├── SubtitleTrack.vue            — список субтитров в аккордеоне
+│   │   ├── VideoPlayerCore.vue          — оболочка `<video>` ивентов
+│   │   └── VideoSubtitle.vue            — вывод активных субтитров поверх видео
+│   ├── VideoControls.vue               — панель управления поверх видео
 │   ├── VideoControls/
-│   │   ├── VideoControls.vue            (~50 строк) - контейнер контролов
-│   │   ├── PlayButton.vue               (~25 строк) - play/pause
-│   │   ├── VideoTimeline.vue            (~120 строк) - timeline с drag
-│   │   ├── VolumeControl.vue            (~95 строк) - громкость
-│   │   └── FullscreenButton.vue         (~20 строк) - fullscreen
-│   │
-│   └── ui/
-│       ├── IconButton.vue               (~45 строк) - базовая кнопка
-│       ├── InteractiveWord.vue          (существующий)
-│       └── icons/
-│           ├── PlayIcon.vue             (~20 строк)
-│           ├── PauseIcon.vue            (~20 строк)
-│           ├── ChevronLeftIcon.vue      (~20 строк)
-│           ├── ChevronRightIcon.vue     (~20 строк)
-│           ├── VolumeIcon.vue           (~15 строк)
-│           └── FullscreenIcon.vue       (~20 строк)
-│
+│   │   ├── FullscreenButton.vue
+│   │   ├── PlayButton.vue
+│   │   ├── VideoTimeline.vue
+│   │   └── VolumeControl.vue
+│   └── InteractiveWord.vue             — обёртка над словарём для подсветки слов
 ├── composables/
 │   ├── subtitles/
-│   │   ├── useSubtitleNormalization.ts  (~35 строк)
-│   │   ├── useSubtitleText.ts           (~65 строк)
-│   │   ├── useSubtitleTokenization.ts   (~55 строк)
-│   │   ├── useActiveSubtitle.ts         (~30 строк)
-│   │   └── useSubtitleNavigation.ts     (~160 строк)
-│   │
+│   │   ├── useActiveSubtitle.ts
+│   │   ├── useSubtitleNavigation.ts
+│   │   ├── useSubtitleNormalization.ts
+│   │   ├── useSubtitleText.ts
+│   │   └── useSubtitleTokenization.ts
 │   ├── video/
-│   │   ├── useVideoPlayback.ts          (~115 строк)
-│   │   ├── useRestrictedRange.ts        (~95 строк)
-│   │   ├── useFullscreen.ts             (~60 строк)
-│   │   └── useVideoKeyboard.ts          (~35 строк)
-│   │
+│   │   ├── useFullscreen.ts
+│   │   ├── useRestrictedRange.ts
+│   │   ├── useVideoKeyboard.ts
+│   │   └── useVideoPlayback.ts
 │   ├── controls/
-│   │   ├── useTimelineDrag.ts           (~85 строк)
-│   │   └── usePopupVisibility.ts        (~60 строк)
-│   │
-│   └── shared/
-│       └── useAutoHide.ts               (~60 строк)
-│
+│   │   ├── usePopupVisibility.ts
+│   │   └── useTimelineDrag.ts
+│   ├── shared/
+│   │   └── useAutoHide.ts
+│   └── useDictionaryBatch.ts
 ├── types/
-│   └── video.types.ts                   (~50 строк)
-│
-├── utils/
-│   └── time.ts                          (~20 строк)
-│
-└── assets/
-    └── styles/
-        └── video-player-variables.scss  (~65 строк)
+│   └── video.types.ts
+└── utils/
+    └── time.ts
 ```
 
-## Статистика
+## Основные контейнеры
 
-### Старая структура
-- VideoPlayer.vue: 871 строка
-- VideoControls.vue: 373 строки
-- **Итого: 1244 строки в 2 файлах**
+- **`VideoPlayer.vue`** Обрабатывает весь жизненный цикл воспроизведения, управляет `UAccordion` из `@nuxt/ui`, пробрасывает события в контролы и субтитры.
+- **`VideoControls.vue`** Визуальная панель с использованием `UIButton` и вложенных контролов; отвечает за взаимодействия play/pause, fullscreen и seek.
+- **`InteractiveWord.vue`** Базовый компонент выделения слов, используемый в субтитрах и карточках.
 
-### Новая структура
-- Компоненты: ~960 строк в 17 файлах
-- Composables: ~760 строк в 13 файлах
-- Типы и утилиты: ~70 строк в 2 файлах
-- Стили: ~65 строк в 1 файле
-- **Итого: ~1855 строк в 33 файлах**
+## Подкомпоненты `VideoPlayer/`
 
-### Анализ
+- **`VideoPlayerCore.vue`** Хранит ссылку на `<video>`, реализует `defineExpose` для доступа из контейнера.
+- **`VideoSubtitle.vue`** Форматирует активные токены, использует `InteractiveWord` для тайских слов, отображает вторую строку перевода.
+- **`SubtitleNavigationButtons.vue`** Управляет кнопками prev/next, основан на `IconButton` и реагирует на `visible` из `useAutoHide`.
+- **`SubtitleTrack.vue`** Рендерит аккордеон субтитров, делегирует клик `SubtitleCue`.
+- **`SubtitleCue.vue`** Показывает диапазон времени, тексты на нескольких языках, инициирует пакетное добавление слов через `useDictionaryBatch` и управляет `DictionaryProcessLoader`.
+- **`DictionaryProcessLoader.vue`** Отвечает за UI прогресса пакетной обработки слов, отображает переходные состояния и действия `cancel/close`.
 
-Хотя общее количество строк увеличилось на ~49%, это дало:
+## Подкомпоненты `VideoControls/`
 
-1. **Модульность**: 33 независимых модуля вместо 2 монолитов
-2. **Переиспользуемость**: 13 composables доступны для других компонентов
-3. **Поддерживаемость**: средний размер файла ~56 строк против 622
-4. **Тестируемость**: каждый модуль тестируется отдельно
-5. **Читаемость**: четкая структура и разделение ответственности
+- **`PlayButton.vue`** Кнопка play/pause на `IconButton`, работает через событие `toggle`.
+- **`VideoTimeline.vue`** Интерфейс перемотки с `useTimelineDrag`, отображает текущую и общую длительность через `formatTime`.
+- **`VolumeControl.vue`** Вертикальный слайдер, использует `usePopupVisibility` для управления popover и эмитит `set-volume`.
+- **`FullscreenButton.vue`** Прокидывает событие `toggle` в `useFullscreen` контейнера.
 
-### Размер основных компонентов
+## Используемые composables
 
-| Компонент | До | После | Изменение |
-|-----------|-------|--------|-----------|
-| VideoPlayer | 871 | 290 | -67% |
-| VideoControls | 373 | 50 | -87% |
+- **Видео**: `useVideoPlayback`, `useRestrictedRange`, `useFullscreen`, `useVideoKeyboard` — управляют состоянием воспроизведения, ограниченными диапазонами и горячими клавишами.
+- **Субтитры**: `useSubtitleNormalization`, `useSubtitleText`, `useActiveSubtitle`, `useSubtitleNavigation`, `useSubtitleTokenization` — нормализуют данные, выбирают активные строки, формируют токены и двигают курсор.
+- **Контролы**: `useTimelineDrag`, `usePopupVisibility` — отвечают за drag timeline и отображение попапа громкости.
+- **Общее**: `useAutoHide` — управляет видимостью панели управления; `useDictionaryBatch` orchestrирует пакетную отправку слов в словарь.
+
+## Поток данных и события
+
+- **`VideoPlayer.vue`** подписывается на события `<video>` (`timeupdate`, `play`, `pause`) и синхронизирует `useVideoPlayback`.
+- **`handleSeek`** обрабатывает перемотку, используя `useRestrictedRange` для ограничения диапазонов.
+- **`controlsAutoHide`** контролирует появление `VideoControls` и `SubtitleNavigationButtons`.
+- **`SubtitleCue.vue`** инициирует модальное окно словаря и взаимодействует с Supabase (`useSupabaseClient`, `useSupabaseUser`) для проверки ролей.
 
 ## Зависимости между модулями
 
 ```
 VideoPlayer.vue
-├── VideoPlayerCore.vue
-├── VideoSubtitle.vue
+├── VideoPlayer/VideoPlayerCore.vue
+├── VideoPlayer/VideoSubtitle.vue
 │   └── InteractiveWord.vue
-├── SubtitleNavigationButtons.vue
-│   ├── IconButton.vue
-│   ├── ChevronLeftIcon.vue
-│   └── ChevronRightIcon.vue
-├── SubtitleTrack.vue
-│   └── SubtitleCue.vue
+├── VideoPlayer/SubtitleNavigationButtons.vue
+│   └── IconButton.vue
+├── VideoPlayer/SubtitleTrack.vue
+│   └── VideoPlayer/SubtitleCue.vue
+│       ├── InteractiveWord.vue
+│       ├── VideoPlayer/DictionaryProcessLoader.vue
+│       └── useDictionaryBatch
 ├── VideoControls.vue
-│   ├── PlayButton.vue
-│   │   ├── IconButton.vue
-│   │   ├── PlayIcon.vue
-│   │   └── PauseIcon.vue
-│   ├── VideoTimeline.vue
+│   ├── UIButton.vue
+│   ├── VideoControls/PlayButton.vue
+│   │   └── IconButton.vue
+│   ├── VideoControls/VideoTimeline.vue
 │   │   └── useTimelineDrag
-│   ├── VolumeControl.vue
+│   ├── VideoControls/VolumeControl.vue
 │   │   ├── IconButton.vue
-│   │   ├── VolumeIcon.vue
 │   │   └── usePopupVisibility
-│   └── FullscreenButton.vue
-│       ├── IconButton.vue
-│       └── FullscreenIcon.vue
+│   └── VideoControls/FullscreenButton.vue
+│       └── IconButton.vue
+├── useVideoPlayback
+├── useRestrictedRange
+├── useFullscreen
+├── useVideoKeyboard
 ├── useSubtitleNormalization
 ├── useSubtitleText
 ├── useSubtitleTokenization
 ├── useActiveSubtitle
 ├── useSubtitleNavigation
-├── useVideoPlayback
-├── useRestrictedRange
-├── useFullscreen
-├── useVideoKeyboard
 └── useAutoHide
 ```
 
-## Преимущества структуры
+## Расширение
 
-### 1. Четкое разделение
-- **Компоненты** - только представление
-- **Composables** - бизнес-логика
-- **Types** - типизация
-- **Utils** - чистые функции
-- **Styles** - переменные и миксины
-
-### 2. Легко найти код
-- Нужна навигация по субтитрам? → `composables/subtitles/useSubtitleNavigation.ts`
-- Нужна кнопка play? → `components/VideoControls/PlayButton.vue`
-- Нужна иконка? → `components/ui/icons/`
-
-### 3. Простое тестирование
-Каждый файл тестируется независимо:
-```typescript
-// tests/composables/subtitles/useSubtitleNavigation.spec.ts
-import { useSubtitleNavigation } from '~/composables/subtitles/useSubtitleNavigation';
-// ...тесты
-```
-
-### 4. Легкое расширение
-Добавить новую функцию:
-1. Создать новый composable
-2. Импортировать в нужном компоненте
-3. Использовать
-
-Пример - добавление picture-in-picture:
-```typescript
-// composables/video/usePictureInPicture.ts
-export const usePictureInPicture = (videoRef) => {
-  // логика
-}
-
-// VideoPlayer.vue
-import { usePictureInPicture } from '~/composables/video/usePictureInPicture';
-const pip = usePictureInPicture(videoRef);
-```
+- **Добавление новой функции**: создать composable или UI-компонент, зарегистрировать его в контейнере (`VideoPlayer.vue` или `VideoControls.vue`), использовать существующие токи данных.
+- **Подключение новой команды управления**: расширить `VideoControls.vue`, обновить `useVideoKeyboard`/`useVideoPlayback`, прописать события в контейнере.
+- **Новые форматы субтитров**: дополнить преобразование в `useSubtitleNormalization` и типы в `app/types/video.types.ts`.

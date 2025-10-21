@@ -368,6 +368,9 @@ const b = {
 .subtitle-editor__table {
   display: grid;
   gap: 8px;
+
+  max-height: 500px;
+  overflow: auto;
 }
 .subtitle-editor__row {
   display: grid;

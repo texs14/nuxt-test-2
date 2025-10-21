@@ -29,7 +29,7 @@
 
       <div
         class="video-player__overlay"
-        :class="{ 'video-player__overlay_visible': controlsAutoHide.visible.value }"
+        :class="{ 'video-player__overlay_visible': overlayVisible }"
       >
         <div class="video-player__controls">
           <VideoControls
@@ -57,19 +57,30 @@
       />
     </div>
 
-    <SubtitleTrack
-      :subtitles="normalization.normalizedSubtitles.value"
-      :active-index="activeSubtitleData.activeIndex.value"
-      :show-all-langs="showAllLangs"
-      :locale="selectedLocale"
-      @seek-to="navigation.seekTo"
-    />
+    <!-- class="video-player__accordion" -->
+    <UAccordion
+      :items="subtitlesAccordionItems"
+      :default-value="subtitlesAccordionValue"
+      :unmount-on-hide="false"
+    >
+      <template #body="{ item }">
+        <SubtitleTrack
+          v-if="item.value === subtitlesAccordionValue"
+          :subtitles="normalization.normalizedSubtitles.value"
+          :active-index="activeSubtitleData.activeIndex.value"
+          :show-all-langs="showAllLangs"
+          :locale="selectedLocale"
+          @seek-to="navigation.seekTo"
+        />
+      </template>
+    </UAccordion>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import type { AccordionItem } from '@nuxt/ui';
 import type { SubtitleItem, PlaybackRange, Locale } from '~/types/video.types';
 import VideoPlayerCore from './VideoPlayer/VideoPlayerCore.vue';
 import VideoSubtitle from './VideoPlayer/VideoSubtitle.vue';
@@ -128,6 +139,18 @@ const restrictedRangeData = useRestrictedRange(
   playback.isPlaying
 );
 const normalization = useSubtitleNormalization(computed(() => props.subtitles));
+const subtitlesAccordionValue = 'subtitles';
+const subtitlesAccordionLabel = computed(() => {
+  if (locale.value === 'ru') return 'Субтитры';
+  if (locale.value === 'en') return 'subtitles';
+  return 'Subtitles';
+});
+const subtitlesAccordionItems = computed<AccordionItem[]>(() => [
+  {
+    value: subtitlesAccordionValue,
+    label: subtitlesAccordionLabel.value,
+  },
+]);
 const activeSubtitleData = useActiveSubtitle(
   normalization.normalizedSubtitles,
   playback.currentTime
@@ -202,6 +225,8 @@ const thaiTokens = tokenization.tokens;
 const controlsHideTimeline = computed(
   () => props.hideTimeline ?? !!restrictedRangeData.restrictedRange.value
 );
+
+const overlayVisible = computed(() => controlsAutoHide.visible.value || !playback.isPlaying.value);
 
 // Event handlers
 const handleTimeUpdate = (e: Event) => {
@@ -296,11 +321,12 @@ watch(
     display: flex;
     gap: 8px;
     position: absolute;
-    right: 0;
-    left: 0;
-    bottom: 0;
-    pointer-events: auto;
+    inset: 0;
     z-index: 9999;
+    pointer-events: none;
+
+    width: 100%;
+    height: 100%;
   }
 }
 </style>

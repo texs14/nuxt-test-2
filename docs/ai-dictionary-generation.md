@@ -21,23 +21,24 @@
 ### Файлы
 
 **Composables:**
+
 - `app/composables/useGemini.ts` - базовый composable для работы с Google Gemini API
 - `app/composables/useDictionaryAI.ts` - генерация словарных записей через Gemini
 
 **Server API Endpoints:**
+
 - `server/api/gemini/chat.post.ts` - прокси для Google Gemini API
 - `server/api/dictionary/generate.post.ts` - генерация и сохранение словарных записей
 - `server/api/dictionary/synthesize-audio.post.ts` - синтез аудио для словарных записей
 
 **UI Components:**
+
 - `app/components/ui/GenerationProgress.vue` - компонент прогресса генерации
 - `app/components/InteractiveWord.vue` - модифицирован для вызова генерации
 
 ## Настройка
 
 ### 1. Переменные окружения
-
-Создайте файл `.env` на основе `.env.example`:
 
 ```bash
 # Google Gemini
@@ -244,7 +245,7 @@ ORDER BY created_at DESC
 LIMIT 10;
 
 -- Записи с аудио
-SELECT entry_id, 
+SELECT entry_id,
        headword->>'script' as word,
        jsonb_array_length(headword->'audio') as audio_count
 FROM new_dictionar

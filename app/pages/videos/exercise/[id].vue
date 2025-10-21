@@ -202,7 +202,7 @@ function handleFragmentEnded() {
 
   &__player {
     margin: auto;
-    width: 60%;
+    width: 30%;
   }
 }
 </style>
