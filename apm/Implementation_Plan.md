@@ -204,6 +204,24 @@ Task 3.8: Replace existing SubtitleEditor component - Agent_SubtitleEditor_Opera
 - Replace `SubtitleEditor.vue` with new timeline-based implementation or rename old to `SubtitleEditorTable.vue` (archive) and create new `SubtitleEditor.vue` wrapper routing to timeline version
 - Update any pages using SubtitleEditor (videos/add-new, lessons/add-new) and verify timeline editor works in production context
 
+Task 3.9: Subtitle edit panel persistence & translation controls - Agent_SubtitleEditor_Operations - Depends on Task 3.3 output
+1. Ensure `SubtitleEditPanel.vue` write operations update parent subtitle array and surface dirty state so timeline reflects saved edits immediately.
+2. Integrate debounced persistence hook (ties into existing save pipeline) to prepare subtitle payload for Supabase update when panel save triggered.
+3. Add Translate buttons alongside English and Russian textareas that invoke `useSubtitleTranslation.ts` Gemini helper to translate from current Thai text, with loading and error states.
+4. Cache translation responses per subtitle to avoid duplicate API calls and allow manual post-translation edits without overriding user changes unless reconfirmed.
+
+Task 3.10: Subtitle block edge resizing interactions - Agent_SubtitleEditor_Timeline - Depends on Task 3.1 and Task 3.2 outputs
+1. Add draggable resize handles to `SubtitleBlock.vue` leading/trailing edges with keyboard-accessible focus states using BEM modifiers.
+2. Update drag logic to support horizontal resizing by adjusting start/end times while honoring minimum duration constraints from Task 3.4.
+3. Emit granular `timing-change` updates during resize to synchronize playback cursor and edit panel preview.
+4. Prevent handles from moving past adjacent subtitles or beyond video duration, surfacing toast warnings when constraints hit.
+
+Task 3.11: Timeline snapping & collision handling - Agent_SubtitleEditor_Timeline - Depends on Task 3.10 output
+1. Implement collision detection during drag/resize that snaps subtitles flush with neighbors when drop occurs within configurable epsilon (e.g., 0.1s).
+2. Auto-resolve overlaps by shifting the moving block to end exactly where previous block ends (or vice versa) while maintaining chronological order.
+3. Provide visual feedback (snap guides, color change) when a block will snap, and finalize updated timings via existing `timing-change` event.
+4. Update timeline state management to re-run collision checks after each drop to ensure no gaps or overlaps persist.
+
 Phase 4: Exercise Feature Enhancements - Agent_UIEnhancements
 
 Task 4.1: Reset exercise functionality - Agent_UIEnhancements

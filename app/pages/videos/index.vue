@@ -119,9 +119,9 @@ const error = computed<Error | null>(() => {
 });
 
 function openDeleteModal(item: BaseContentItem) {
-  selectedVideo.value = { 
-    id: String(item.id), 
-    title: getLocalizedValue(item.title) 
+  selectedVideo.value = {
+    id: String(item.id),
+    title: getLocalizedValue(item.title),
   };
   showDeleteModal.value = true;
 }

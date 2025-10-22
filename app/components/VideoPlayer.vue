@@ -58,7 +58,7 @@
     </div>
 
     <!-- class="video-player__accordion" -->
-    <UAccordion
+    <!-- <UAccordion
       :items="subtitlesAccordionItems"
       :default-value="subtitlesAccordionValue"
       :unmount-on-hide="false"
@@ -73,7 +73,7 @@
           @seek-to="navigation.seekTo"
         />
       </template>
-    </UAccordion>
+    </UAccordion> -->
   </div>
 </template>
 
@@ -289,6 +289,12 @@ watch(
     activeSubtitleData.lastSubtitle.value = null;
   }
 );
+
+// Expose playback state and methods for parent component integration
+defineExpose({
+  playback,
+  videoRef,
+});
 </script>
 
 <style scoped lang="scss">
@@ -322,7 +328,7 @@ watch(
     gap: 8px;
     position: absolute;
     inset: 0;
-    z-index: 9999;
+    z-index: 100;
     pointer-events: none;
 
     width: 100%;

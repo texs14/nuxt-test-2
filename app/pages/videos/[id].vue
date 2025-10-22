@@ -16,10 +16,12 @@
     <template #player>
       <VideoPlayer
         v-if="video?.video_url"
+        ref="videoPlayerRef"
         :src="video.video_url"
         :subtitles="subs"
         :restricted-range="exerciseRange"
         :hide-timeline="showExercise"
+        @ready="onVideoReady"
       />
     </template>
 
@@ -69,7 +71,17 @@
           @error="onTranscriptionError"
         />
 
-        <SubtitleEditor v-model="editorSubtitles" />
+        <SubtitleEditor
+          v-model="editorSubtitles"
+          :duration="videoDuration || 100"
+          :current-time="videoCurrentTime"
+          :save-status="autoSave.status.value"
+          :last-saved-at="autoSave.lastSavedAt.value"
+          :is-saving="autoSave.isSaving.value"
+          @time-click="handleTimelineClick"
+          @subtitle-select="handleSubtitleSelect"
+          @manual-save="handleManualSave"
+        />
 
         <VideoMetaForm
           :title="editTitle"
@@ -114,6 +126,9 @@ import type {
 } from '@/types/video.types';
 import SubtitleClickExercise from '~/components/SubtitleClickExercise.vue';
 import ResembleTranscriptionLoader from '~/components/ResembleTranscriptionLoader.vue';
+import SubtitleEditor from '~/components/SubtitleTimeline/SubtitleEditor.vue';
+import { useSubtitleEditorSync } from '~/composables/useSubtitleEditorSync';
+import { useSubtitleAutoSave } from '~/composables/useSubtitleAutoSave';
 const route = useRoute();
 const {
   select: selectVideo,
@@ -264,6 +279,162 @@ const resembleUuid = ref<string>('');
 const transcriptionStatus = ref<string>('');
 const transcriptionError = ref<string>('');
 const transcriptionLoading = ref(false);
+
+// Video player integration for subtitle editor
+const videoPlayerRef = ref<InstanceType<typeof VideoPlayer> | null>(null);
+const videoDuration = ref<number>(0);
+const videoCurrentTime = ref<number>(0);
+const videoIsPlaying = ref<boolean>(false);
+
+// Video ready handler
+const onVideoReady = () => {
+  const player = videoPlayerRef.value;
+  console.log('onVideoReady called', player);
+
+  if (player?.playback) {
+    console.log('Player playback exists', {
+      duration: player.playback.duration.value,
+      currentTime: player.playback.currentTime.value,
+    });
+
+    // Set initial duration (might be 0 initially)
+    videoDuration.value = player.playback.duration.value;
+
+    // Watch playback state for editor sync
+    watch(
+      () => player.playback.currentTime.value,
+      (time) => {
+        videoCurrentTime.value = time;
+      },
+      { immediate: true }
+    );
+
+    watch(
+      () => player.playback.duration.value,
+      (dur) => {
+        console.log('Duration changed to:', dur);
+        if (dur > 0) {
+          videoDuration.value = dur;
+        }
+      },
+      { immediate: true }
+    );
+
+    watch(
+      () => player.playback.isPlaying.value,
+      (playing) => {
+        videoIsPlaying.value = playing;
+      },
+      { immediate: true }
+    );
+
+    // Fallback: If duration is still 0, poll the video element
+    if (videoDuration.value === 0) {
+      let attempts = 0;
+      const maxAttempts = 50; // 5 seconds max
+      const checkDuration = () => {
+        attempts++;
+        const videoEl = player.videoRef;
+        if (videoEl && videoEl.duration && !isNaN(videoEl.duration) && videoEl.duration > 0) {
+          console.log('Setting duration from polling:', videoEl.duration);
+          videoDuration.value = videoEl.duration;
+        } else if (attempts < maxAttempts) {
+          // Try again in 100ms
+          setTimeout(checkDuration, 100);
+        } else {
+          console.error('Failed to get video duration after', maxAttempts, 'attempts');
+        }
+      };
+      setTimeout(checkDuration, 100);
+    }
+  } else {
+    console.error('Player or playback not available');
+  }
+};
+
+// Setup subtitle editor sync when in edit mode
+const editorSync = computed(() => {
+  const player = videoPlayerRef.value;
+  if (!player?.playback || !player?.videoRef) return null;
+
+  return useSubtitleEditorSync({
+    videoRef: player.videoRef,
+    currentTime: player.playback.currentTime,
+    duration: player.playback.duration,
+    isPlaying: player.playback.isPlaying,
+    seekToTime: player.playback.seekToTime,
+    pause: player.playback.pause,
+    play: player.playback.play,
+  });
+});
+
+// Timeline event handlers
+const handleTimelineClick = (time: number) => {
+  editorSync.value?.handleTimelineClick(time);
+};
+
+const handleSubtitleSelect = (subtitle: EditorSubtitleItem) => {
+  editorSync.value?.handleSubtitleSelect(subtitle);
+};
+
+// Auto-save integration
+const autoSave = useSubtitleAutoSave({
+  itemId: computed(() => idParam.value),
+  itemType: 'video',
+  transformPayload: buildSubtitlesPayload,
+});
+
+// Watch subtitle changes and trigger auto-save
+watch(
+  editorSubtitles,
+  (newSubtitles) => {
+    if (isEditMode.value && newSubtitles.length >= 0) {
+      autoSave.queueSave(newSubtitles);
+    }
+  },
+  { deep: true }
+);
+
+// Manual save handler
+const handleManualSave = async () => {
+  try {
+    await autoSave.saveNow(editorSubtitles.value);
+  } catch (error) {
+    console.error('Manual save failed:', error);
+  }
+};
+
+// Beforeunload warning for unsaved changes
+onBeforeUnmount(() => {
+  if (autoSave.hasUnsaved()) {
+    const confirmLeave = window.confirm(
+      'You have unsaved changes. Are you sure you want to leave?'
+    );
+    if (!confirmLeave) {
+      // Note: Modern browsers may not respect this
+      return false;
+    }
+  }
+});
+
+// Browser beforeunload event
+if (import.meta.client) {
+  const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+    if (autoSave.hasUnsaved()) {
+      e.preventDefault();
+      e.returnValue = '';
+      return '';
+    }
+  };
+
+  onMounted(() => {
+    window.addEventListener('beforeunload', handleBeforeUnload);
+  });
+
+  onBeforeUnmount(() => {
+    window.removeEventListener('beforeunload', handleBeforeUnload);
+  });
+}
 
 function hasSubtitleContent(value: unknown): boolean {
   if (!value) return false;

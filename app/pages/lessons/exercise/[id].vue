@@ -187,6 +187,9 @@ useHead(() => ({
 
 <style scoped lang="scss">
 .exercise-page {
+  max-width: 1440px;
+  width: 100%;
+  margin: auto;
   &__state {
     color: #666;
     padding: 20px;

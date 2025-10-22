@@ -84,32 +84,35 @@ withDefaults(defineProps<Props>(), {
   }
 
   &__content {
-    display: grid;
+    display: flex;
+    flex-direction: column;
     gap: 24px;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    grid-template-areas:
-      'editor player'
-      'description description'
-      'actions actions'
-      'comments comments';
+    // display: grid;
+    // gap: 24px;
+    // grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    // grid-template-areas:
+    //   'editor player'
+    //   'description description'
+    //   'actions actions'
+    //   'comments comments';
 
     @media (max-width: 1024px) {
-      grid-template-columns: 1fr;
-      grid-template-areas:
-        'editor'
-        'player'
-        'description'
-        'actions'
-        'comments';
+      // grid-template-columns: 1fr;
+      // grid-template-areas:
+      //   'editor'
+      //   'player'
+      //   'description'
+      //   'actions'
+      //   'comments';
     }
 
     &_editor-hidden {
-      grid-template-columns: minmax(0, 1fr);
-      grid-template-areas:
-        'player'
-        'description'
-        'actions'
-        'comments';
+      // grid-template-columns: minmax(0, 1fr);
+      // grid-template-areas:
+      //   'player'
+      //   'description'
+      //   'actions'
+      //   'comments';
     }
   }
 
