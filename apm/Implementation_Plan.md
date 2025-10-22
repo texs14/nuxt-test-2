@@ -1,62 +1,157 @@
-Phase 1: Video Deletion System - Agent_Backend, Agent_VideoManagement
+# Thai Language Learning Platform – Implementation Plan
 
-Task 1.1: Server API for atomic video deletion - Agent_Backend
-1. Set up Supabase Storage client and import necessary MCP tools
-2. Create POST endpoint at `/server/api/videos/delete.post.ts` that accepts `{ id: string, type: 'video' | 'lesson' }`
-3. Extract video_url/preview_url from DB record to get Storage file paths
-4. Delete files from Storage bucket using extracted paths (handle "file not found" gracefully)
-5. Delete DB row from appropriate table (video_items or lesson_items) only if Storage deletion succeeded
+**Memory Strategy:** dynamic-md  
+**Last Modification:** Phase 2 completion - Manager Agent 1 (2025-10-22)  
+**Project Overview:** Nuxt 3-based Thai language learning platform MVP with video player, interactive subtitle-based exercises, AI-powered dictionary, and multi-language support. Core features include video deletion system, subtitle timeline editor, exercise enhancements, upload improvements, and UX fixes. Built with Supabase backend, Nuxt UI components, and BEM CSS methodology.
 
-Task 1.2: Confirmation modal component - Agent_VideoManagement - Depends on Task 1.1 output by Agent_Backend
-- Create `~/components/modals/DeleteConfirmationModal.vue` using Nuxt UI `UModal` component with props for title, message, confirmText, cancelText
-- Implement confirm/cancel event emissions and loading state for confirm action
-- Style with BEM methodology following existing modal patterns in codebase
+---
 
-Task 1.3: Integrate deletion in video list - Agent_VideoManagement - Depends on Task 1.2 output
-- Add delete button (UIButton with danger variant) to each video item in `/pages/videos/index.vue`
-- Integrate `DeleteConfirmationModal` with video title/ID state management
-- Call `/api/videos/delete` endpoint on confirmation, handle loading state
-- Display success toast and refresh video list on successful deletion, show error toast on failure
+## Phase 1: Video Deletion System
 
-Task 1.4: Integrate deletion in lesson list - Agent_VideoManagement - Depends on Task 1.2 output
-- Add delete button (UIButton with danger variant) to each lesson item in `/pages/lessons/index.vue`
-- Integrate `DeleteConfirmationModal` with lesson title/ID state management
-- Call `/api/videos/delete` endpoint with `type: 'lesson'` on confirmation, handle loading state
-- Display success toast and refresh lesson list on successful deletion, show error toast on failure
+### Task 1.1 – Server API for atomic video deletion │ Agent_Backend
 
-Phase 2: Database Security & Optimization - Agent_Backend
+- **Objective:** Create server-side API endpoint that atomically deletes video records from Supabase database and corresponding files from Supabase Storage, ensuring transactional integrity for both video_items and lesson_items tables.
+- **Output:** Working POST endpoint at `/server/api/videos/delete.post.ts` that accepts video/lesson ID and type, performs atomic deletion with comprehensive error handling, and returns success/failure status.
+- **Guidance:** Use Supabase MCP tools for database and Storage operations. Implement transactional logic: Storage deletion must succeed before DB deletion. Handle edge cases gracefully (file not found, permission errors). Ensure endpoint works for both video_items and lesson_items tables via type parameter.
 
-Task 2.1: Enable RLS on dictionary table - Agent_Backend
-- Create migration to enable RLS on public.dictionary table using `ALTER TABLE dictionary ENABLE ROW LEVEL SECURITY;`
-- Add policies for authenticated users: SELECT policy for public read access, INSERT/UPDATE/DELETE policies restricted to authenticated users
-- Test policies by querying dictionary table as authenticated and anonymous users via MCP
+1. **Setup Supabase Clients:** Import and configure Supabase Storage client using MCP tools. Verify access to both database operations and Storage bucket management capabilities.
+2. **Create API Endpoint:** Implement POST endpoint at `/server/api/videos/delete.post.ts` accepting request body `{ id: string, type: 'video' | 'lesson' }`. Set up TypeScript types for request/response.
+3. **Extract File Paths:** Query appropriate table (video_items or lesson_items based on type) to retrieve video_url and preview_url fields. Parse Storage file paths from full URLs.
+4. **Delete Storage Files:** Use Supabase Storage API to delete video file and preview/thumbnail from bucket. Handle "file not found" errors gracefully (file may already be deleted). Log deletion attempts and results.
+5. **Delete Database Record:** Only if Storage deletion succeeds (or files don't exist), delete row from video_items or lesson_items table. If Storage deletion fails with permission/network error, return error without deleting DB record to maintain data integrity.
 
-Task 2.2: Add RLS policies to new_dictionar_duplicate - Agent_Backend
-- Query new_dictionar_duplicate table via MCP to check if it contains data or is referenced by application code
-- If table is unused (comment says "duplicate"), create migration to drop it and resolve the warning
-- If table is active, create RLS policies matching those from new_dictionar table (SELECT for public, authenticated-only for mutations)
+---
 
-Task 2.3: Fix security definer view - Agent_Backend
-1. Inspect video_with_comments view definition and identify why SECURITY DEFINER is used
-2. Check if view/function is actively used in application code via grep search
-3. Determine remediation: either remove SECURITY DEFINER and rely on RLS policies, or redesign to use SECURITY INVOKER with proper permissions
-4. Apply chosen solution via migration and verify view access patterns work correctly
+### Task 1.2 – Confirmation modal component │ Agent_VideoManagement
 
-Task 2.4: Fix function search_path issues (10 functions) - Agent_Backend
-- Review Supabase security advisor remediation link for search_path fix pattern: `ALTER FUNCTION function_name() SET search_path = public, pg_temp;`
-- Create migration with ALTER statements for all 10 affected functions: get_video_with_comments, trigger_set_timestamp, handle_new_user_role, set_updated_at, try_cast_uuid, try_cast_timestamptz, search_dictionary_by_topic, search_dictionary_by_script, migrate_dictionary_to_new, handle_updated_at
-- Apply migration via MCP and verify functions still work correctly
-- Re-run security advisors check to confirm all function search_path warnings resolved
+- **Objective:** Create reusable confirmation modal component using Nuxt UI library that prompts users before permanent deletion actions, supporting customizable messages and handling loading states during async operations.
+- **Output:** Vue component `~/components/modals/DeleteConfirmationModal.vue` with props for customization (title, message, button text), event emissions (confirm, cancel), and loading state management for integration with deletion workflows.
+- **Guidance:** Depends on: Task 1.1 Output by Agent_Backend. Use Nuxt UI `UModal` component as base. Follow BEM CSS methodology for styling. Ensure modal matches existing design patterns in codebase for consistency. Component should be generic enough for reuse beyond video deletion.
 
-Task 2.5: Relocate citext extension - Agent_Backend
-- Attempt to create migration that moves citext extension: `CREATE SCHEMA IF NOT EXISTS extensions; ALTER EXTENSION citext SET SCHEMA extensions;`
-- If migration fails due to permissions, document the manual step for user to execute in Supabase SQL Editor
-- Verify profiles table (which uses citext for email/username) still functions correctly after relocation
+- **Modal Component Structure:** Create `~/components/modals/DeleteConfirmationModal.vue` using Nuxt UI `UModal` component. Define props interface with TypeScript: `title: string`, `message: string`, `confirmText: string` (default "Delete"), `cancelText: string` (default "Cancel"), `loading: boolean` (default false).
+- **Event Handling:** Implement event emissions using Vue 3 Composition API: `emit('confirm')` on confirm button click, `emit('cancel')` on cancel button click or modal close. Disable confirm button and show loading spinner when `loading` prop is true.
+- **Styling & Design:** Apply BEM methodology following existing modal patterns. Use Nuxt UI button variants: danger variant for confirm (red), default variant for cancel. Ensure proper spacing, focus management, and accessibility (keyboard navigation, aria labels).
 
-Task 2.6: Configure Auth security settings - Agent_Backend
-- Guide user to Supabase Dashboard → Project Settings → Authentication → Security tab
-- Instruct user to enable "Leaked Password Protection" toggle (integrates HaveIBeenPwned.org checking)
-- Instruct user to review MFA options and enable at least one additional method (TOTP, SMS, or WebAuthn) beyond current configuration
+---
+
+### Task 1.3 – Integrate deletion in video list │ Agent_VideoManagement
+
+- **Objective:** Integrate complete video deletion workflow into videos list page, connecting delete button UI, confirmation modal, API endpoint, and user feedback mechanisms for seamless deletion experience.
+- **Output:** Fully functional delete feature on `/pages/videos/index.vue` where users can delete videos with confirmation, see loading states during deletion, receive success/error feedback via toasts, and see list refresh automatically.
+- **Guidance:** Depends on: Task 1.2 Output. Wire DeleteConfirmationModal component with video list UI. Call `/api/videos/delete` endpoint from Task 1.1. Handle all async states (loading, success, error). Use Nuxt UI toast notifications for feedback. Ensure list data refreshes after successful deletion.
+
+- **Add Delete Button:** Add delete button to each video item in `/pages/videos/index.vue` using UIButton component with danger variant (red styling). Position button in video card actions area following existing layout patterns.
+- **Modal Integration:** Import and integrate `DeleteConfirmationModal` component. Manage modal visibility state with reactive ref. Pass video title and ID to modal state for display in confirmation message.
+- **API Call Logic:** On modal confirm event, call `/api/videos/delete` endpoint with video ID and `type: 'video'`. Manage loading state during API call, passing to modal component to disable buttons and show spinner.
+- **Feedback & Refresh:** Display Nuxt UI success toast on successful deletion with message "Video deleted successfully". Display error toast on failure with error message. After success, refresh video list by re-fetching data from Supabase to reflect deletion.
+
+---
+
+### Task 1.4 – Integrate deletion in lesson list │ Agent_VideoManagement
+
+- **Objective:** Integrate complete lesson deletion workflow into lessons list page, mirroring video deletion implementation pattern for consistency while adapting to lesson-specific context and data structures.
+- **Output:** Fully functional delete feature on `/pages/lessons/index.vue` with same UX as video deletion: confirmation modal, loading states, toast feedback, and automatic list refresh after successful deletion.
+- **Guidance:** Depends on: Task 1.2 Output. Follow identical integration pattern as Task 1.3 but for lessons context. Use same DeleteConfirmationModal component. Call same API endpoint with `type: 'lesson'` parameter. Ensure consistency in UX across video and lesson deletion workflows.
+
+- **Add Delete Button:** Add delete button to each lesson item in `/pages/lessons/index.vue` using UIButton component with danger variant. Position button in lesson card actions area matching layout pattern from videos page.
+- **Modal Integration:** Import and integrate `DeleteConfirmationModal` component (already created in Task 1.2). Manage modal visibility state. Pass lesson title and ID to modal state for confirmation message display.
+- **API Call Logic:** On modal confirm event, call `/api/videos/delete` endpoint with lesson ID and `type: 'lesson'` parameter. Manage loading state during API call, passing to modal to disable buttons and show spinner.
+- **Feedback & Refresh:** Display Nuxt UI success toast on successful deletion: "Lesson deleted successfully". Display error toast on failure. After success, refresh lesson list by re-fetching data from Supabase to show updated list without deleted lesson.
+
+---
+
+## Phase 1: Video Deletion System Summary
+> **Delivered:** Tasks 1.1, 1.2, 1.3, 1.4  
+> **Agents:** Agent_Backend, Agent_VideoManagement  
+> **Key Outputs:** Atomic deletion API (`/server/api/videos/delete.post.ts`), reusable confirmation modal component, video/lesson list integrations with moderator permissions, toast notifications, and list refresh  
+> **Technical Notes:** Transactional integrity maintained (Storage deletion before DB), graceful handling of external URLs and missing files, UX pattern ready for reuse across content types
+
+---
+
+## Phase 2: Database Security & Optimization
+
+### Task 2.1 – Enable RLS on dictionary table │ Agent_Backend
+
+- **Objective:** Address critical ERROR-level security finding by enabling Row Level Security on public.dictionary table and creating appropriate RLS policies for authenticated user access control.
+- **Output:** RLS-enabled dictionary table with working policies: public SELECT access for all users, INSERT/UPDATE/DELETE restricted to authenticated users only. Migration file applied via MCP with verification tests confirming policy enforcement.
+- **Guidance:** Use Supabase MCP tools for migration creation and application. Follow standard RLS policy patterns for public read, authenticated write. Test with both authenticated and anonymous user contexts to verify policy correctness. Document any edge cases discovered during testing.
+
+- **Enable RLS Migration:** Create database migration to enable Row Level Security on public.dictionary table using SQL command `ALTER TABLE dictionary ENABLE ROW LEVEL SECURITY;`. Store migration in supabase/migrations/ directory following existing naming convention.
+- **Create Access Policies:** Add RLS policies in same migration: (1) SELECT policy named "Public read access" with expression `true` allowing all users to read dictionary entries, (2) INSERT/UPDATE/DELETE policies restricted to authenticated users with expression `auth.uid() IS NOT NULL`.
+- **Test and Verify:** Apply migration via Supabase MCP tools. Test policies by querying dictionary table as authenticated user (should have full CRUD) and as anonymous user (should have SELECT only). Verify that anonymous INSERT/UPDATE/DELETE attempts are denied.
+
+---
+
+### Task 2.2 – Add RLS policies to new_dictionar_duplicate │ Agent_Backend
+
+- **Objective:** Resolve INFO-level security warning for new_dictionar_duplicate table which has RLS enabled but no policies defined, by either dropping unused table or creating appropriate policies if table is active.
+- **Output:** Resolved security warning through migration that either drops unused new_dictionar_duplicate table OR creates RLS policies matching new_dictionar table structure if table is determined to be active and necessary.
+- **Guidance:** Investigate first before taking action. Use MCP to query table for data presence and grep codebase for references. Table comment indicates it's a duplicate which suggests it should be dropped. If dropping, ensure no dependencies exist. If keeping, policies must match primary dictionary table.
+
+- **Investigation:** Query new_dictionar_duplicate table contents via Supabase MCP to check if table contains any data rows. Use grep search across codebase (`app/`, `server/`) to find any references to table name in code or queries.
+- **Decision Point:** Based on investigation results, determine action: (A) If table is empty and unreferenced (likely case based on "duplicate" comment), create migration to drop table safely. (B) If table contains data or is referenced, create RLS policies instead.
+- **Remediation:** Execute chosen solution: Drop migration: `DROP TABLE IF EXISTS public.new_dictionar_duplicate;` OR Policy migration: Create SELECT (public), INSERT/UPDATE/DELETE (authenticated only) policies matching new_dictionar table structure. Apply via MCP and verify warning resolves.
+
+---
+
+### Task 2.3 – Fix security definer view │ Agent_Backend
+
+- **Objective:** Address ERROR-level security issue where public.video_with_comments view uses SECURITY DEFINER property, which enforces view creator's permissions rather than querying user's permissions, creating potential security risk.
+- **Output:** Remediated view design with either SECURITY DEFINER removed in favor of RLS policies, or redesigned to use SECURITY INVOKER with proper permission model. Migration applied and view functionality verified to work correctly with new security model.
+- **Guidance:** Investigation required to understand current view usage and why SECURITY DEFINER was chosen. Multiple valid remediation paths exist depending on view requirements. Prefer removing SECURITY DEFINER if RLS policies on underlying tables can enforce correct permissions. Verify related function get_video_with_comments also follows secure pattern.
+
+1. **Inspect Current Implementation:** Use Supabase MCP to retrieve full view definition for video_with_comments including SECURITY DEFINER clause. Examine which tables view joins and what permissions are required. Check if associated function get_video_with_comments also has security implications.
+2. **Check Active Usage:** Use grep search to find where view is used in application code (`app/`, `server/`). Determine if view is actively queried or if it's legacy code that can be removed. Document usage patterns found.
+3. **Design Remediation:** Based on findings, choose solution: (A) Remove SECURITY DEFINER and rely on RLS policies if underlying tables (video_items, comments) have proper RLS, OR (B) Redesign to use SECURITY INVOKER with explicit permission checks, OR (C) Remove view entirely if not actively used and rewrite queries directly.
+4. **Apply and Verify:** Create migration implementing chosen solution. Apply via MCP. Test view queries with different user permission levels to verify correct security enforcement. Confirm ERROR-level security advisor warning is resolved.
+
+---
+
+### Task 2.4 – Fix function search_path issues (10 functions) │ Agent_Backend
+
+- **Objective:** Address 10 WARN-level security findings where database functions lack explicit search_path settings, creating potential security vulnerabilities. Apply documented remediation pattern to all affected functions in single migration.
+- **Output:** Migration file with ALTER FUNCTION statements for all 10 functions setting explicit search_path to `public, pg_temp`. All functions verified to work correctly post-fix. Security advisor warnings confirmed resolved after re-running checks.
+- **Guidance:** Repetitive pattern fix across all functions. Follow Supabase security advisor documentation for exact ALTER FUNCTION syntax. Batch all 10 functions into single migration for efficiency. Verify critical functions (triggers, auth handlers) still operate correctly after search_path restriction.
+
+- **Review Remediation Pattern:** Access Supabase security advisor remediation link to confirm fix pattern: `ALTER FUNCTION function_name() SET search_path = public, pg_temp;`. Understand that this prevents search_path hijacking attacks by explicitly setting allowed schemas.
+- **Create Batch Migration:** Generate migration file with ALTER FUNCTION statements for all 10 affected functions: get_video_with_comments, trigger_set_timestamp, handle_new_user_role, set_updated_at, try_cast_uuid, try_cast_timestamptz, search_dictionary_by_topic, search_dictionary_by_script, migrate_dictionary_to_new, handle_updated_at. Include comments in migration identifying which security warning each ALTER resolves.
+- **Apply and Test:** Apply migration via Supabase MCP. Test critical functionality that depends on these functions: auth triggers (handle_new_user_role), timestamp triggers (trigger_set_timestamp, set_updated_at, handle_updated_at), dictionary search functions. Verify all work correctly with restricted search_path.
+- **Verify Resolution:** Re-run Supabase security advisors check via MCP (`get_advisors` with type `security`). Confirm all 10 function search_path WARN-level findings are now resolved and no longer appear in advisor output.
+
+---
+
+### Task 2.5 – Relocate citext extension │ Agent_Backend
+
+- **Objective:** Address WARN-level security finding by moving citext extension from public schema to dedicated extensions schema, following PostgreSQL and Supabase best practices for extension management.
+- **Output:** Migration that relocates citext extension to extensions schema, OR documented manual step for user to execute if migration permissions are insufficient. Verified that profiles table (which uses citext for email/username fields) continues functioning correctly after relocation.
+- **Guidance:** Extension management may require elevated permissions not available via MCP migration tools. Prepare for both automatic migration and user-guided fallback scenarios. Critical to verify profiles table functionality as email/username columns depend on citext type. If manual step required, provide clear SQL for user execution.
+
+- **Attempt Automated Migration:** Create migration attempting to relocate extension: `CREATE SCHEMA IF NOT EXISTS extensions; ALTER EXTENSION citext SET SCHEMA extensions;`. Try applying via Supabase MCP tools to see if automated migration is possible with available permissions.
+- **Handle Permission Scenario:** If migration succeeds, proceed to verification. If migration fails with permission error, document manual step: Provide user with SQL to execute in Supabase SQL Editor (Dashboard → SQL Editor → New Query) with clear instructions: "Execute this SQL to resolve extension location warning: [SQL statement]". Include explanation of why manual step is needed.
+- **Verify Functionality:** After extension relocation (automated or manual), test profiles table operations. Query profiles table via MCP to ensure citext type still works for email and username fields. Try case-insensitive searches to verify citext functionality preserved: `SELECT * FROM profiles WHERE email = 'TEST@EXAMPLE.COM'` should match lowercase email entries.
+
+---
+
+### Task 2.6 – Configure Auth security settings │ Agent_Backend
+
+- **Objective:** Address 2 WARN-level Auth security findings by enabling leaked password protection (HaveIBeenPwned.org integration) and additional MFA options, requiring user-guided configuration in Supabase Dashboard.
+- **Output:** User instructions for enabling Auth security features in Supabase Dashboard. User confirms completion of configuration steps. Enhanced auth security active with leaked password checking and expanded MFA options.
+- **Guidance:** These settings are only accessible via Supabase Dashboard UI, not via API or MCP, requiring user coordination. Provide clear step-by-step instructions with exact navigation path and toggle locations. Settings enhance security without breaking existing auth flows but should be communicated to user for awareness.
+
+- **Dashboard Navigation:** Guide user with exact path: "Open Supabase Dashboard (supabase.com/dashboard) → Select your project (thai-platform) → Click 'Authentication' in left sidebar → Select 'Security' tab".
+- **Enable Leaked Password Protection:** Instruct user: "In Security tab, find 'Leaked Password Protection' section. Enable the toggle. This integrates with HaveIBeenPwned.org database to prevent users from setting commonly compromised passwords. No additional configuration needed - feature activates immediately for new password sets/changes."
+- **Configure Additional MFA:** Instruct user: "In Security tab, find 'Multi-Factor Authentication' section. Review currently enabled methods. Enable at least one additional method beyond current configuration: TOTP (Authenticator apps like Google Authenticator), SMS (requires Twilio integration), or WebAuthn (hardware security keys). TOTP recommended as easiest to enable without external dependencies."
+
+---
+
+## Phase 2: Database Security & Optimization Summary
+> **Delivered:** Tasks 2.1, 2.2, 2.3, 2.4, 2.5, 2.6 (partial)  
+> **Agent:** Agent_Backend  
+> **Key Outputs:** 7 database migrations (RLS policies, security definer fix, function search_path hardening, extension relocation, orphaned table cleanup), all ERROR-level security findings resolved, 3 of 5 WARN-level findings resolved  
+> **Outstanding:** 2 WARN-level auth findings (leaked password protection, MFA options) blocked by Supabase plan limitation - requires Pro plan ($25/month) upgrade, acceptable for MVP development phase  
+> **Security Status:** Database hardened following Supabase/PostgreSQL best practices, MVP security posture acceptable for development/testing
+
+---
 
 Phase 3: Subtitle Editor Rebuild - Agent_SubtitleEditor_Timeline, Agent_SubtitleEditor_Operations
 

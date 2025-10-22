@@ -64,7 +64,8 @@ withDefaults(defineProps<Props>(), {
 
 <style scoped lang="scss">
 .content-detail {
-  max-width: 1440x;
+  max-width: 1440px;
+  width: 100%;
   margin: 0 auto;
   padding: 24px;
 
