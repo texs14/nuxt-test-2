@@ -1,8 +1,8 @@
 # Thai Language Learning Platform – Implementation Plan
 
 **Memory Strategy:** dynamic-md  
-**Last Modification:** Phase 2 completion - Manager Agent 1 (2025-10-22)  
-**Project Overview:** Nuxt 3-based Thai language learning platform MVP with video player, interactive subtitle-based exercises, AI-powered dictionary, and multi-language support. Core features include video deletion system, subtitle timeline editor, exercise enhancements, upload improvements, and UX fixes. Built with Supabase backend, Nuxt UI components, and BEM CSS methodology.
+**Last Modification:** Phase 7 added - Manager Agent 2 (2025-10-24)  
+**Project Overview:** Nuxt 3-based Thai language learning platform MVP with video player, interactive subtitle-based exercises, AI-powered dictionary, and multi-language support. Core features include video deletion system, subtitle timeline editor with advanced editing features, exercise enhancements, upload improvements, and UX fixes. Built with Supabase backend, Nuxt UI components, and BEM CSS methodology.
 
 ---
 
@@ -269,4 +269,164 @@ Task 6.1: Fix dictionary card viewport positioning - Agent_UIEnhancements
 3. Add dynamic positioning logic: if card overflows bottom, position above trigger; if overflows right, position left; handle corner cases
 4. Test positioning at different viewport sizes and scroll positions, ensuring cards always visible
 5. Add mobile-specific positioning handling (smaller screens, touch targets) and ensure cards don't cover trigger word
+
+---
+
+## Phase 7: Subtitle Editor Advanced Features
+
+### Task 7.1 – Subtitle edit panel persistence & translation controls │ Agent_SubtitleEditor_Operations
+**Depends on:** Phase 3 Task 3.3 output (SubtitleEditPanel.vue)
+
+- **Objective:** Add auto-save functionality and Gemini-powered translation buttons to SubtitleEditPanel for English and Russian textarea fields, enabling efficient multilingual subtitle editing workflow.
+- **Output:** Enhanced `SubtitleEditPanel.vue` with debounced auto-save (updates parent subtitle array), Translate buttons for EN/RU textareas invoking `useSubtitleTranslation.ts`, translation caching to prevent duplicate API calls, loading and error states.
+- **Guidance:** Reuse existing auto-save patterns from video editor. Integrate Gemini translation composable. Cache translations per subtitle ID to allow manual edits post-translation. Ensure dirty state surfaces to timeline for immediate visual feedback.
+
+1. **Implement Auto-Save:** Add Vue watch on `textTh`, `textEn`, `textRu` reactive refs with deep option and 2-second debounce. Emit `update:modelValue` to parent with updated subtitle object when debounce fires. Add save status indicator ("Saving..." → "Saved").
+2. **Add Translate Buttons:** Place Translate button next to English and Russian textareas. Button triggers translation of current Thai text (`textTh`) using `useSubtitleTranslation.ts` Gemini helper. Show loading spinner during API call.
+3. **Handle Translation Response:** On success, populate respective textarea (`textEn` or `textRu`) with translated text. Show error toast on failure. Cache translation per subtitle ID to avoid re-translating unless Thai text changes.
+4. **Preserve Manual Edits:** Track if user manually edited translated text after translation. Don't override manual edits on re-translate unless user confirms. Add "Re-translate" option if text was previously translated.
+
+---
+
+### Task 7.2 – Subtitle block edge resizing interactions │ Agent_SubtitleEditor_Timeline
+**Depends on:** Phase 3 Task 3.1, 3.2 outputs (TimelineBase, SubtitleBlock)
+
+- **Objective:** Enable precise subtitle timing adjustments by adding draggable resize handles to SubtitleBlock leading/trailing edges, allowing users to expand or narrow subtitle duration directly on timeline.
+- **Output:** Enhanced `SubtitleBlock.vue` with resize handles on left/right edges, drag logic for horizontal resizing adjusting start/end times, minimum duration constraints, granular timing-change events, and toast warnings when constraints hit.
+- **Guidance:** Extend existing drag implementation from Task 3.2. Add separate mousedown handlers for edge handles vs block body. Prevent handles from moving past adjacent subtitles or video duration. Use BEM modifiers for handle states (hover, active, disabled).
+
+1. **Add Resize Handles:** Create draggable handles at leading (left) and trailing (right) edges of SubtitleBlock using absolutely positioned divs with BEM class `.subtitle-block__resize-handle_leading` and `_trailing`. Style handles with visual affordance (vertical bar, hover state).
+2. **Implement Resize Logic:** Add mousedown handlers to handles that track initial mouse position and subtitle start/end times. On mousemove, calculate time delta from pixel movement using timeline calculations. Update start time (leading handle) or end time (trailing handle) while maintaining minimum duration (e.g., 0.5s).
+3. **Emit Timing Updates:** Emit `timing-change` event with updated subtitle object during resize. Update timeline position reactively. Synchronize playback cursor and edit panel if subtitle is selected.
+4. **Handle Constraints:** Prevent leading handle from moving past trailing handle (minimum duration). Prevent handles from crossing adjacent subtitle boundaries. Show toast warning "Cannot resize: minimum duration reached" or "Cannot resize: adjacent subtitle blocking". Ensure handles can't move beyond 0s or video duration.
+
+---
+
+### Task 7.3 – Timeline snapping & collision handling │ Agent_SubtitleEditor_Timeline
+**Depends on:** Task 7.2 output (edge resizing)
+
+- **Objective:** Implement smart collision detection and automatic snapping during subtitle drag/resize operations, ensuring subtitles align flush with neighbors when dropped nearby, eliminating gaps and overlaps.
+- **Output:** Enhanced timeline drag/resize behavior with collision detection, configurable snap threshold (0.1s epsilon), visual snap guides, automatic overlap resolution, and updated timeline state management ensuring chronological integrity.
+- **Guidance:** Build on drag/resize implementations from Tasks 3.2 and 7.2. Use epsilon-based proximity detection. Provide visual feedback before snap occurs (color change, snap guide lines). Maintain chronological order after all operations.
+
+1. **Implement Snap Detection:** During drag/resize operations, check if subtitle edges are within configurable epsilon (0.1s) of adjacent subtitle boundaries. Detect both leading-to-trailing and trailing-to-leading proximity for neighboring subtitles.
+2. **Visual Snap Feedback:** When snap condition detected, show visual indicators: change subtitle block color (e.g., highlight border), render vertical snap guide line at snap position. Update feedback reactively during drag before drop.
+3. **Execute Snap on Drop:** On mouseup event, if snap condition met, adjust subtitle start/end times to align exactly with neighbor boundary (no gap, no overlap). Emit final `timing-change` event with snapped values. Remove visual feedback.
+4. **Collision Resolution & Validation:** After any drop operation, run collision check across all subtitles. If overlaps detected, auto-adjust by shifting moved block to end exactly where previous block ends. Maintain chronological order by start time. Surface warning if manual intervention needed (rare edge case).
+
+---
+
+## Completion Log
+
+### Task 7.1 – Subtitle edit panel persistence & translation controls
+**Status:** ✅ COMPLETED  
+**Date:** 2025-10-25  
+**Agent:** Agent_SubtitleEditor_Operations  
+**Completed by:** Cascade AI
+
+**Implementation Summary:**
+- Enhanced `app/components/SubtitleTimeline/SubtitleEditPanel.vue` with full auto-save and translation features
+- **Auto-save**: Implemented 2-second debounced auto-save using `@vueuse/core` watching textTh, textEn, textRu, startTime, endTime
+- **Translation buttons**: Added UIButton translate controls for both EN and RU textareas with loading states
+- **Smart caching**: Implemented cache key format `${subtitleId}-${thaiTextHash}-${language}` to detect Thai text changes
+- **Manual edit preservation**: Added `wasTranslated` and `manuallyEdited` tracking flags
+- **Re-translate confirmation**: Integrated DeleteConfirmationModal for confirming re-translation when manual edits exist
+- **Dynamic button labels**: Translate buttons show "Re-translate" when user has manually edited translated text
+- **Thai text change detection**: Reset translation flags when Thai source text is modified
+- **Error handling**: Toast notifications on translation failures
+- **Save status indicator**: Displays "Saving..." → "Saved" feedback in footer
+
+**Files Modified:**
+- `app/components/SubtitleTimeline/SubtitleEditPanel.vue` (enhanced with all features)
+
+**Success Criteria Met:**
+- ✅ Auto-save triggers after 2 seconds of inactivity
+- ✅ Save status indicator functional
+- ✅ Translate buttons operational for EN/RU
+- ✅ Translation caching with Thai text hash
+- ✅ Loading spinners during translation
+- ✅ Error toasts on failure
+- ✅ Manual edits preserved with confirmation modal
+- ✅ BEM methodology maintained
+- ✅ Component integration contract intact
+
+---
+
+### Task 7.2 – Subtitle block edge resizing interactions
+**Status:** ✅ COMPLETED  
+**Date:** 2025-10-26  
+**Agent:** Agent_SubtitleEditor_Timeline  
+**Completed by:** Cascade AI
+
+**Implementation Summary:**
+- Enhanced `app/components/SubtitleTimeline/SubtitleBlock.vue` with edge resize functionality
+- **Resize handles**: Added leading (left) and trailing (right) handles with 8px width, hover states
+- **Drag logic**: Separate mousedown handlers for handles vs block body to prevent conflicts
+- **Leading resize**: Adjusts start time, constrained by 0s, previous subtitle end, and minimum duration
+- **Trailing resize**: Adjusts end time, constrained by video duration, next subtitle start, and minimum duration
+- **Real-time updates**: Emits `timing-change` events during resize with updated start/end times
+- **Adjacent subtitle detection**: Computed property finds prev/next subtitles from `otherSubtitles` array
+- **Constraint validation**: MIN_DURATION = 0.5s enforced for both resize directions
+- **Toast warnings**: Single toast per resize operation for boundary/constraint violations
+- **Visual feedback**: Handles show transparent → white on hover → blue when active
+- **BEM styling**: `.subtitle-block__resize-handle_leading`, `_trailing`, `_active` modifiers
+- **Cursor affordance**: `ew-resize` cursor on handles, proper z-index layering
+
+**Files Modified:**
+- `app/components/SubtitleTimeline/SubtitleBlock.vue` (added resize handles and logic)
+
+**Success Criteria Met:**
+- ✅ Resize handles visible with `ew-resize` cursor on hover
+- ✅ Leading handle adjusts start time, trailing adjusts end time
+- ✅ Block repositions reactively during resize
+- ✅ Minimum 0.5s duration enforced
+- ✅ Cannot resize past adjacent subtitles
+- ✅ Cannot resize beyond 0s or video duration
+- ✅ Toast warnings on constraint violations
+- ✅ Timing-change events emitted with updated subtitle
+- ✅ BEM methodology maintained
+- ✅ No conflicts with existing drag functionality
+
+---
+
+### Task 7.3 – Timeline snapping & collision handling
+**Status:** ✅ COMPLETED  
+**Date:** 2025-10-26  
+**Agent:** Agent_SubtitleEditor_Timeline  
+**Completed by:** Cascade AI
+
+**Implementation Summary:**
+- Implemented smart collision detection and snapping in `SubtitleBlock.vue` and `TimelineBase.vue`
+- **Snap detection**: 0.1s threshold for detecting proximity to adjacent subtitle boundaries
+- **Visual feedback**: Blue border on snapping blocks, vertical snap guide line at snap position
+- **Snap-on-drop**: Time adjustments applied only on mouseup, preserving smooth drag experience
+- **Drag snapping**: Snaps start to prev.end or end to next.start while preserving duration
+- **Resize snapping**: Snaps leading/trailing handle to adjacent boundaries
+- **Collision resolution**: Auto-repositions overlapping subtitles to adjacent boundary with toast warning
+- **Chronological maintenance**: Subtitles sorted by start_time after every timing change
+- **Boundary constraints**: Clamps to 0s and video duration after snap/collision resolution
+- **Visual snap guide**: 2px blue vertical line rendered at snap position with glow effect
+- **Snap state communication**: SubtitleBlock emits snap-state events for parent to position guide
+- **Performance optimized**: Early returns in collision checks, no layout thrashing
+
+**Files Modified:**
+- `app/components/SubtitleTimeline/SubtitleBlock.vue` (snap detection and visual feedback)
+- `app/components/SubtitleTimeline/TimelineBase.vue` (snap guide, collision resolution, sorting)
+
+**Bug Fixes:**
+- Fixed adjacent subtitle detection logic (2025-10-26): Corrected `adjacentSubtitles` computed to properly identify prev/next based on `end <= start` and `start >= end` rather than faulty index-based logic. All blocks now correctly detect neighbors for snapping.
+
+**Success Criteria Met:**
+- ✅ Visual snap guides appear when within 0.1s of neighbors
+- ✅ Subtitle blocks show blue highlight during snap
+- ✅ Drop snaps flush with neighbors (no gap/overlap)
+- ✅ Snap works for both drag and resize operations
+- ✅ Chronological order maintained after all operations
+- ✅ Overlaps auto-resolved to adjacent boundaries
+- ✅ Warning toasts for unresolvable conflicts
+- ✅ No performance lag during snap detection
+- ✅ BEM methodology maintained
+- ✅ Edge cases handled (first/last subtitle, no neighbors)
+
+---
 

@@ -25,7 +25,20 @@
         </div>
 
         <div class="subtitle-edit-panel__field">
-          <label class="subtitle-edit-panel__label" for="text-en"> English Text </label>
+          <div class="subtitle-edit-panel__label-row">
+            <label class="subtitle-edit-panel__label" for="text-en"> English Text </label>
+            <UIButton
+              variant="secondary"
+              size="xs"
+              class="subtitle-edit-panel__translate-button"
+              :loading="isTranslatingEn"
+              :disabled="!textTh.trim() || isTranslatingEn"
+              @click="handleTranslate('en')"
+            >
+              <Icon v-if="!isTranslatingEn" name="lucide:languages" />
+              {{ getTranslateButtonLabel('en') }}
+            </UIButton>
+          </div>
           <textarea
             id="text-en"
             v-model="textEn"
@@ -37,9 +50,22 @@
         </div>
 
         <div class="subtitle-edit-panel__field">
-          <label class="subtitle-edit-panel__label" for="text-ru">
-            Текст на русском (Russian Text)
-          </label>
+          <div class="subtitle-edit-panel__label-row">
+            <label class="subtitle-edit-panel__label" for="text-ru">
+              Текст на русском (Russian Text)
+            </label>
+            <UIButton
+              variant="secondary"
+              size="xs"
+              class="subtitle-edit-panel__translate-button"
+              :loading="isTranslatingRu"
+              :disabled="!textTh.trim() || isTranslatingRu"
+              @click="handleTranslate('ru')"
+            >
+              <Icon v-if="!isTranslatingRu" name="lucide:languages" />
+              {{ getTranslateButtonLabel('ru') }}
+            </UIButton>
+          </div>
           <textarea
             id="text-ru"
             v-model="textRu"
@@ -108,10 +134,10 @@
         Split
       </UIButton>
 
-      <UIButton 
-        variant="secondary" 
-        size="sm" 
-        :disabled="!canMerge" 
+      <UIButton
+        variant="secondary"
+        size="sm"
+        :disabled="!canMerge"
         :title="!canMerge ? 'No adjacent subtitle to merge' : ''"
         @click="handleMerge"
       >
@@ -120,6 +146,10 @@
       </UIButton>
 
       <div class="subtitle-edit-panel__footer-spacer" />
+
+      <span v-if="saveStatus" class="subtitle-edit-panel__save-status">
+        {{ saveStatus }}
+      </span>
 
       <UIButton variant="secondary" @click="handleCancel"> Cancel </UIButton>
       <UIButton variant="primary" :disabled="!isValid" @click="handleSave"> Save </UIButton>
@@ -133,12 +163,25 @@
       @confirm="confirmDelete"
       @cancel="cancelDelete"
     />
+
+    <!-- Re-translate Confirmation Modal -->
+    <DeleteConfirmationModal
+      v-model:open="showRetranslateConfirmation"
+      :title="retranslateConfirmationTitle"
+      message="This will override your manual edits. Continue?"
+      confirm-text="Re-translate"
+      cancel-text="Cancel"
+      @confirm="confirmRetranslate"
+      @cancel="cancelRetranslate"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed, onMounted, onUnmounted } from 'vue';
+import { ref, watch, computed, onMounted, onUnmounted, nextTick } from 'vue';
+import { useDebounceFn } from '@vueuse/core';
 import DeleteConfirmationModal from '~/components/modals/DeleteConfirmationModal.vue';
+import { useSubtitleTranslation } from '~/composables/useSubtitleTranslation';
 
 interface SubtitleObject {
   id: string | number;
@@ -167,7 +210,11 @@ interface Emits {
   (e: 'delete', subtitleId: string | number): void;
   (
     e: 'split-subtitle',
-    payload: { firstSegment: SubtitleObject; secondSegment: SubtitleObject; originalId: string | number }
+    payload: {
+      firstSegment: SubtitleObject;
+      secondSegment: SubtitleObject;
+      originalId: string | number;
+    }
   ): void;
   (
     e: 'merge-subtitle',
@@ -177,6 +224,10 @@ interface Emits {
 
 const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
+
+// Translation composable
+const { translateSubtitle } = useSubtitleTranslation();
+const toast = useToast();
 
 // Reactive text values for each language
 const textTh = ref('');
@@ -189,6 +240,41 @@ const endTime = ref(0);
 
 // Delete confirmation modal state
 const showDeleteConfirmation = ref(false);
+
+// Re-translate confirmation modal state
+const showRetranslateConfirmation = ref(false);
+const pendingRetranslateLanguage = ref<'en' | 'ru' | null>(null);
+const retranslateConfirmationTitle = computed(() => {
+  return pendingRetranslateLanguage.value === 'en'
+    ? 'Re-translate English?'
+    : 'Re-translate Russian?';
+});
+
+// Translation states
+const isTranslatingEn = ref(false);
+const isTranslatingRu = ref(false);
+
+// Track if field was translated vs manually edited
+const wasTranslated = ref({ en: false, ru: false });
+const manuallyEdited = ref({ en: false, ru: false });
+
+// Translation cache: key format `${subtitleId}-${thaiTextHash}-${language}`
+const translationCache = ref<Record<string, string>>({});
+
+// Simple hash function for Thai text
+const hashText = (text: string): string => {
+  let hash = 0;
+  for (let i = 0; i < text.length; i++) {
+    const char = text.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash = hash & hash;
+  }
+  return Math.abs(hash).toString(36);
+};
+
+// Save status
+const saveStatus = ref<string>('');
+const hasUnsavedChanges = ref(false);
 
 // Initialize text values from subtitle prop
 const initializeTextFields = () => {
@@ -268,8 +354,11 @@ const formatTime = (seconds: number): string => {
   return `${minutes}:${wholeSeconds.toString().padStart(2, '0')}.${decimal}`;
 };
 
-const handleSave = () => {
+// Debounced save logic
+const performSave = () => {
   if (!props.subtitle || !isValid.value) return;
+
+  saveStatus.value = 'Saving...';
 
   // Construct updated subtitle object with all changes
   const updatedSubtitle: SubtitleObject = {
@@ -284,6 +373,23 @@ const handleSave = () => {
   };
 
   emit('save', updatedSubtitle);
+
+  saveStatus.value = 'Saved';
+  hasUnsavedChanges.value = false;
+
+  // Clear save status after 2 seconds
+  setTimeout(() => {
+    saveStatus.value = '';
+  }, 2000);
+};
+
+const debouncedSave = useDebounceFn(() => {
+  performSave();
+}, 2000);
+
+const handleSave = () => {
+  if (!props.subtitle || !isValid.value) return;
+  performSave();
   emit('close');
 };
 
@@ -358,12 +464,15 @@ const calculateSplitPosition = (): number => {
   // Priority 1: Use current playback time if within subtitle range
   if (props.currentTime && props.currentTime > start && props.currentTime < end) {
     const playbackPos = props.currentTime;
-    
+
     // Ensure both segments meet minimum duration
     const firstSegmentDuration = playbackPos - start;
     const secondSegmentDuration = end - playbackPos;
-    
-    if (firstSegmentDuration >= MIN_SEGMENT_DURATION && secondSegmentDuration >= MIN_SEGMENT_DURATION) {
+
+    if (
+      firstSegmentDuration >= MIN_SEGMENT_DURATION &&
+      secondSegmentDuration >= MIN_SEGMENT_DURATION
+    ) {
       return playbackPos;
     }
   }
@@ -443,19 +552,19 @@ const nextSubtitle = computed(() => {
 
   // Sort subtitles by start time
   const sorted = [...props.allSubtitles].sort((a, b) => a.start - b.start);
-  
+
   // Find current subtitle index
   const currentIndex = sorted.findIndex((s) => s.id === props.subtitle!.id);
-  
+
   if (currentIndex === -1 || currentIndex === sorted.length - 1) return null;
-  
+
   return sorted[currentIndex + 1];
 });
 
 // Check if next subtitle is adjacent (can be merged)
 const canMerge = computed(() => {
   if (!props.subtitle || !nextSubtitle.value) return false;
-  
+
   const gap = nextSubtitle.value.start - endTime.value;
   return gap < MAX_MERGE_GAP;
 });
@@ -475,8 +584,14 @@ const mergeText = (
   }
 
   // Handle mixed types - convert to object
-  const t1 = typeof text1 === 'string' ? { th: text1, en: text1, ru: text1 } : text1 || { th: '', en: '', ru: '' };
-  const t2 = typeof text2 === 'string' ? { th: text2, en: text2, ru: text2 } : text2 || { th: '', en: '', ru: '' };
+  const t1 =
+    typeof text1 === 'string'
+      ? { th: text1, en: text1, ru: text1 }
+      : text1 || { th: '', en: '', ru: '' };
+  const t2 =
+    typeof text2 === 'string'
+      ? { th: text2, en: text2, ru: text2 }
+      : text2 || { th: '', en: '', ru: '' };
 
   return {
     th: [t1.th, t2.th].filter(Boolean).join(' '),
@@ -517,6 +632,203 @@ const handleMerge = () => {
     color: 'blue',
   });
 };
+
+// Get button label based on translation state
+const getTranslateButtonLabel = (language: 'en' | 'ru'): string => {
+  if (wasTranslated.value[language] && manuallyEdited.value[language]) {
+    return 'Re-translate';
+  }
+  return 'Translate';
+};
+
+// Translation handler
+const handleTranslate = async (language: 'en' | 'ru') => {
+  if (!textTh.value.trim() || !props.subtitle) return;
+
+  // Check if manual edits exist and show confirmation
+  if (wasTranslated.value[language] && manuallyEdited.value[language]) {
+    pendingRetranslateLanguage.value = language;
+    showRetranslateConfirmation.value = true;
+    return;
+  }
+
+  await performTranslation(language);
+};
+
+// Confirm re-translation (overwrites manual edits)
+const confirmRetranslate = async () => {
+  if (!pendingRetranslateLanguage.value) return;
+
+  const language = pendingRetranslateLanguage.value;
+  showRetranslateConfirmation.value = false;
+
+  // Clear cache for this language to force new translation
+  const thHash = hashText(textTh.value);
+  const cacheKey = `${props.subtitle?.id}-${thHash}-${language}`;
+  delete translationCache.value[cacheKey];
+
+  await performTranslation(language);
+  pendingRetranslateLanguage.value = null;
+};
+
+// Cancel re-translation
+const cancelRetranslate = () => {
+  showRetranslateConfirmation.value = false;
+  pendingRetranslateLanguage.value = null;
+};
+
+// Perform actual translation
+const performTranslation = async (language: 'en' | 'ru') => {
+  if (!textTh.value.trim() || !props.subtitle) return;
+
+  const thHash = hashText(textTh.value);
+  const cacheKey = `${props.subtitle.id}-${thHash}-${language}`;
+
+  // Check cache first
+  if (translationCache.value[cacheKey]) {
+    if (language === 'en') {
+      textEn.value = translationCache.value[cacheKey];
+      wasTranslated.value.en = true;
+      manuallyEdited.value.en = false;
+    } else {
+      textRu.value = translationCache.value[cacheKey];
+      wasTranslated.value.ru = true;
+      manuallyEdited.value.ru = false;
+    }
+    return;
+  }
+
+  // Set loading state
+  if (language === 'en') {
+    isTranslatingEn.value = true;
+  } else {
+    isTranslatingRu.value = true;
+  }
+
+  try {
+    const result = await translateSubtitle(textTh.value);
+
+    if (!result) {
+      toast.add({
+        title: 'Translation failed',
+        description: 'Please try again.',
+        color: 'red',
+      });
+      return;
+    }
+
+    // Update textarea and cache
+    if (language === 'en') {
+      textEn.value = result.en;
+      translationCache.value[cacheKey] = result.en;
+      wasTranslated.value.en = true;
+      manuallyEdited.value.en = false;
+      // Also cache RU if received
+      const ruCacheKey = `${props.subtitle.id}-${thHash}-ru`;
+      translationCache.value[ruCacheKey] = result.ru;
+    } else {
+      textRu.value = result.ru;
+      translationCache.value[cacheKey] = result.ru;
+      wasTranslated.value.ru = true;
+      manuallyEdited.value.ru = false;
+      // Also cache EN if received
+      const enCacheKey = `${props.subtitle.id}-${thHash}-en`;
+      translationCache.value[enCacheKey] = result.en;
+    }
+
+    hasUnsavedChanges.value = true;
+    debouncedSave();
+  } catch (error: any) {
+    toast.add({
+      title: 'Translation failed',
+      description: error.message || 'Please try again.',
+      color: 'red',
+    });
+  } finally {
+    if (language === 'en') {
+      isTranslatingEn.value = false;
+    } else {
+      isTranslatingRu.value = false;
+    }
+  }
+};
+
+// Track if component is initialized to skip initial watch trigger
+const isInitialized = ref(false);
+
+// Watch for manual edits to trigger debounced save
+watch([textTh, textEn, textRu, startTime, endTime], () => {
+  if (!props.subtitle || !isInitialized.value) return;
+  hasUnsavedChanges.value = true;
+  debouncedSave();
+});
+
+// Watch for manual edits to EN/RU to mark as manually edited
+watch(textEn, (newVal, oldVal) => {
+  if (!props.subtitle || !oldVal || newVal === oldVal || !isInitialized.value) return;
+
+  // If text was translated and now changed, mark as manually edited
+  if (wasTranslated.value.en) {
+    const thHash = hashText(textTh.value);
+    const cacheKey = `${props.subtitle.id}-${thHash}-en`;
+    if (translationCache.value[cacheKey] && translationCache.value[cacheKey] !== newVal) {
+      manuallyEdited.value.en = true;
+    }
+  }
+});
+
+watch(textRu, (newVal, oldVal) => {
+  if (!props.subtitle || !oldVal || newVal === oldVal || !isInitialized.value) return;
+
+  // If text was translated and now changed, mark as manually edited
+  if (wasTranslated.value.ru) {
+    const thHash = hashText(textTh.value);
+    const cacheKey = `${props.subtitle.id}-${thHash}-ru`;
+    if (translationCache.value[cacheKey] && translationCache.value[cacheKey] !== newVal) {
+      manuallyEdited.value.ru = true;
+    }
+  }
+});
+
+// Watch Thai text changes to invalidate translations
+watch(textTh, (newVal, oldVal) => {
+  if (!props.subtitle || !oldVal || newVal === oldVal || !isInitialized.value) return;
+
+  // When Thai text changes, reset translation flags
+  wasTranslated.value = { en: false, ru: false };
+  manuallyEdited.value = { en: false, ru: false };
+});
+
+// Set initialized flag after first subtitle load
+watch(
+  () => props.subtitle,
+  () => {
+    // Reset states when subtitle changes
+    isInitialized.value = false;
+    saveStatus.value = '';
+    hasUnsavedChanges.value = false;
+    wasTranslated.value = { en: false, ru: false };
+    manuallyEdited.value = { en: false, ru: false };
+
+    if (props.subtitle) {
+      // Delay to ensure all fields are initialized
+      nextTick(() => {
+        isInitialized.value = true;
+      });
+    }
+  },
+  { immediate: true }
+);
+
+// Close re-translate modal on subtitle change
+watch(
+  () => props.subtitle?.id,
+  () => {
+    showRetranslateConfirmation.value = false;
+    pendingRetranslateLanguage.value = null;
+  },
+  { immediate: true }
+);
 
 // Keyboard shortcuts
 const handleKeyDown = (event: KeyboardEvent) => {
@@ -637,6 +949,7 @@ onUnmounted(() => {
 }
 
 .subtitle-edit-panel__footer {
+  flex-wrap: wrap;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -646,6 +959,13 @@ onUnmounted(() => {
 
 .subtitle-edit-panel__footer-spacer {
   flex: 1;
+}
+
+.subtitle-edit-panel__save-status {
+  font-size: 13px;
+  color: var(--color-text-secondary, #6b7280);
+  font-weight: 500;
+  padding: 0 8px;
 }
 
 .subtitle-edit-panel__section {
@@ -660,12 +980,22 @@ onUnmounted(() => {
   margin-bottom: 0;
 }
 
+.subtitle-edit-panel__label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
 .subtitle-edit-panel__label {
   display: block;
-  margin-bottom: 8px;
   font-size: 14px;
   font-weight: 500;
   color: var(--color-text-primary, #374151);
+}
+
+.subtitle-edit-panel__translate-button {
+  flex-shrink: 0;
 }
 
 .subtitle-edit-panel__textarea {
@@ -803,6 +1133,10 @@ onUnmounted(() => {
 
   .subtitle-edit-panel__label {
     color: var(--color-text-primary, #f3f4f6);
+  }
+
+  .subtitle-edit-panel__save-status {
+    color: var(--color-text-secondary, #9ca3af);
   }
 
   .subtitle-edit-panel__textarea {

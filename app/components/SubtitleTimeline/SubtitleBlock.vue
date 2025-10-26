@@ -31,6 +31,7 @@ const props = withDefaults(defineProps<SubtitleBlockProps>(), {
 const emit = defineEmits<{
   click: [subtitle: SubtitleObject];
   'timing-change': [payload: { id: string | number; start: number; end: number }];
+  'snap-state': [payload: { active: boolean; targetTime: number | null }];
 }>();
 
 // Timeline calculations composable
@@ -47,6 +48,25 @@ const dragStartTime = ref({ start: 0, end: 0 });
 const tempStartTime = ref<number | null>(null);
 const tempEndTime = ref<number | null>(null);
 const hasCollision = ref(false);
+
+// Resize state
+const isResizing = ref(false);
+const resizeType = ref<'leading' | 'trailing' | null>(null);
+const resizeStartX = ref(0);
+const resizeStartTime = ref({ start: 0, end: 0 });
+const constraintWarningShown = ref(false);
+
+// Constants
+const MIN_DURATION = 0.5; // seconds
+const HANDLE_WIDTH = 8; // pixels
+const SNAP_THRESHOLD = 0.1; // seconds
+
+// Snap state
+const snapState = ref<{
+  active: boolean;
+  type: 'start' | 'end' | null;
+  targetTime: number | null;
+}>({ active: false, type: null, targetTime: null });
 
 // Calculate block position and dimensions
 const blockLeft = computed(() => {
@@ -74,19 +94,62 @@ const blockClasses = computed(() => [
   {
     'subtitle-timeline__block_selected': props.isSelected,
     'subtitle-timeline__block_dragging': isDragging.value,
+    'subtitle-timeline__block_resizing': isResizing.value,
     'subtitle-timeline__block_collision': hasCollision.value,
+    'subtitle-timeline__block_snapping': snapState.value.active,
   },
 ]);
 
+// Handle classes
+const leadingHandleClasses = computed(() => [
+  'subtitle-block__resize-handle',
+  'subtitle-block__resize-handle_leading',
+  {
+    'subtitle-block__resize-handle_active': isResizing.value && resizeType.value === 'leading',
+  },
+]);
+
+const trailingHandleClasses = computed(() => [
+  'subtitle-block__resize-handle',
+  'subtitle-block__resize-handle_trailing',
+  {
+    'subtitle-block__resize-handle_active': isResizing.value && resizeType.value === 'trailing',
+  },
+]);
+
+// Find adjacent subtitles
+const adjacentSubtitles = computed(() => {
+  const others = props.otherSubtitles.filter((s) => s.id !== props.subtitle.id);
+  
+  // Find previous subtitle: last one whose end time is <= current start time
+  const prevCandidates = others
+    .filter((s) => s.end <= props.subtitle.start)
+    .sort((a, b) => b.end - a.end); // Sort descending by end time
+  const prev = prevCandidates.length > 0 ? prevCandidates[0] : null;
+  
+  // Find next subtitle: first one whose start time is >= current end time
+  const nextCandidates = others
+    .filter((s) => s.start >= props.subtitle.end)
+    .sort((a, b) => a.start - b.start); // Sort ascending by start time
+  const next = nextCandidates.length > 0 ? nextCandidates[0] : null;
+  
+  return { prev, next };
+});
+
 // Handle block click
 const handleClick = () => {
-  if (!isDragging.value) {
+  if (!isDragging.value && !isResizing.value) {
     emit('click', props.subtitle);
   }
 };
 
 // Drag handlers
 const handleMouseDown = (event: MouseEvent) => {
+  // Only allow drag if not clicking on resize handle
+  if ((event.target as HTMLElement).classList.contains('subtitle-block__resize-handle')) {
+    return;
+  }
+
   event.preventDefault();
   event.stopPropagation();
 
@@ -183,13 +246,36 @@ const handleMouseMove = (event: MouseEvent) => {
   const collision = checkCollision(newStart, newEnd);
   hasCollision.value = collision;
 
-  // If collision detected and not allowed, optionally auto-adjust
-  if (collision && !props.allowCollisions) {
-    // For now, just show warning. Auto-adjustment can be enabled with a prop later
-    // const adjusted = findNearestValidPosition(newStart, newEnd);
-    // newStart = adjusted.start;
-    // newEnd = adjusted.end;
+  // Snap detection during drag
+  snapState.value = { active: false, type: null, targetTime: null };
+  
+  if (!collision && adjacentSubtitles.value.prev) {
+    const distanceToPrevEnd = Math.abs(newStart - adjacentSubtitles.value.prev.end);
+    if (distanceToPrevEnd <= SNAP_THRESHOLD) {
+      snapState.value = {
+        active: true,
+        type: 'start',
+        targetTime: adjacentSubtitles.value.prev.end,
+      };
+    }
   }
+  
+  if (!collision && adjacentSubtitles.value.next) {
+    const distanceToNextStart = Math.abs(newEnd - adjacentSubtitles.value.next.start);
+    if (distanceToNextStart <= SNAP_THRESHOLD) {
+      snapState.value = {
+        active: true,
+        type: 'end',
+        targetTime: adjacentSubtitles.value.next.start,
+      };
+    }
+  }
+  
+  // Emit snap state for visual guide
+  emit('snap-state', {
+    active: snapState.value.active,
+    targetTime: snapState.value.targetTime,
+  });
 
   tempStartTime.value = newStart;
   tempEndTime.value = newEnd;
@@ -200,35 +286,281 @@ const handleMouseUp = () => {
 
   isDragging.value = false;
 
+  let finalStart = tempStartTime.value;
+  let finalEnd = tempEndTime.value;
+
+  // Apply snap if active
+  if (snapState.value.active && snapState.value.targetTime !== null) {
+    const duration = (finalEnd || props.subtitle.end) - (finalStart || props.subtitle.start);
+    
+    if (snapState.value.type === 'start') {
+      // Snap start to previous subtitle end
+      finalStart = snapState.value.targetTime;
+      finalEnd = finalStart + duration;
+    } else if (snapState.value.type === 'end') {
+      // Snap end to next subtitle start
+      finalEnd = snapState.value.targetTime;
+      finalStart = finalEnd - duration;
+    }
+  }
+
   // Emit timing change if position actually changed and no collision (or collisions allowed)
-  if (tempStartTime.value !== null && tempEndTime.value !== null) {
+  if (finalStart !== null && finalEnd !== null) {
     const hasChanged =
-      Math.abs(tempStartTime.value - props.subtitle.start) > 0.01 ||
-      Math.abs(tempEndTime.value - props.subtitle.end) > 0.01;
+      Math.abs(finalStart - props.subtitle.start) > 0.01 ||
+      Math.abs(finalEnd - props.subtitle.end) > 0.01;
 
     // Only emit if changed and either no collision or collisions are allowed
     if (hasChanged && (!hasCollision.value || props.allowCollisions)) {
       emit('timing-change', {
         id: props.subtitle.id,
-        start: tempStartTime.value,
-        end: tempEndTime.value,
+        start: finalStart,
+        end: finalEnd,
       });
     }
   }
 
-  // Reset temp values and collision state
+  // Reset temp values and states
   tempStartTime.value = null;
   tempEndTime.value = null;
   hasCollision.value = false;
+  snapState.value = { active: false, type: null, targetTime: null };
+  
+  // Clear snap guide
+  emit('snap-state', { active: false, targetTime: null });
 
   document.removeEventListener('mousemove', handleMouseMove);
   document.removeEventListener('mouseup', handleMouseUp);
+};
+
+// Resize handlers
+const handleLeadingResize = (event: MouseEvent) => {
+  event.preventDefault();
+  event.stopPropagation();
+
+  isResizing.value = true;
+  resizeType.value = 'leading';
+  resizeStartX.value = event.clientX;
+  resizeStartTime.value = {
+    start: props.subtitle.start,
+    end: props.subtitle.end,
+  };
+  constraintWarningShown.value = false;
+
+  document.addEventListener('mousemove', handleResizeMove);
+  document.addEventListener('mouseup', handleResizeUp);
+};
+
+const handleTrailingResize = (event: MouseEvent) => {
+  event.preventDefault();
+  event.stopPropagation();
+
+  isResizing.value = true;
+  resizeType.value = 'trailing';
+  resizeStartX.value = event.clientX;
+  resizeStartTime.value = {
+    start: props.subtitle.start,
+    end: props.subtitle.end,
+  };
+  constraintWarningShown.value = false;
+
+  document.addEventListener('mousemove', handleResizeMove);
+  document.addEventListener('mouseup', handleResizeUp);
+};
+
+const handleResizeMove = (event: MouseEvent) => {
+  if (!isResizing.value || !resizeType.value) return;
+
+  const toast = useToast();
+  const deltaX = event.clientX - resizeStartX.value;
+  const deltaTime = pixelsToTime(Math.abs(deltaX), props.zoomLevel);
+  const timeOffset = deltaX >= 0 ? deltaTime : -deltaTime;
+
+  let newStart = resizeStartTime.value.start;
+  let newEnd = resizeStartTime.value.end;
+  
+  // Reset snap state
+  snapState.value = { active: false, type: null, targetTime: null };
+
+  if (resizeType.value === 'leading') {
+    // Adjust start time
+    newStart = resizeStartTime.value.start + timeOffset;
+
+    // Constraint: cannot go below 0
+    if (newStart < 0) {
+      newStart = 0;
+      if (!constraintWarningShown.value) {
+        toast.add({
+          title: 'Cannot resize past start',
+          description: 'Start time cannot be less than 0',
+          color: 'orange',
+          timeout: 2000,
+        });
+        constraintWarningShown.value = true;
+      }
+    }
+
+    // Constraint: cannot go past previous subtitle
+    if (adjacentSubtitles.value.prev && newStart < adjacentSubtitles.value.prev.end) {
+      newStart = adjacentSubtitles.value.prev.end;
+      if (!constraintWarningShown.value) {
+        toast.add({
+          title: 'Cannot resize',
+          description: 'Adjacent subtitle blocking',
+          color: 'orange',
+          timeout: 2000,
+        });
+        constraintWarningShown.value = true;
+      }
+    }
+
+    // Constraint: minimum duration
+    if (newEnd - newStart < MIN_DURATION) {
+      newStart = newEnd - MIN_DURATION;
+      if (!constraintWarningShown.value) {
+        toast.add({
+          title: 'Minimum duration reached',
+          description: `Subtitle must be at least ${MIN_DURATION}s`,
+          color: 'orange',
+          timeout: 2000,
+        });
+        constraintWarningShown.value = true;
+      }
+    }
+    
+    // Snap detection for leading handle
+    if (adjacentSubtitles.value.prev) {
+      const distanceToPrevEnd = Math.abs(newStart - adjacentSubtitles.value.prev.end);
+      if (distanceToPrevEnd <= SNAP_THRESHOLD && newEnd - adjacentSubtitles.value.prev.end >= MIN_DURATION) {
+        snapState.value = {
+          active: true,
+          type: 'start',
+          targetTime: adjacentSubtitles.value.prev.end,
+        };
+      }
+    }
+  } else if (resizeType.value === 'trailing') {
+    // Adjust end time
+    newEnd = resizeStartTime.value.end + timeOffset;
+
+    // Constraint: cannot exceed video duration
+    if (newEnd > props.duration) {
+      newEnd = props.duration;
+      if (!constraintWarningShown.value) {
+        toast.add({
+          title: 'Cannot resize past end',
+          description: 'End time cannot exceed video duration',
+          color: 'orange',
+          timeout: 2000,
+        });
+        constraintWarningShown.value = true;
+      }
+    }
+
+    // Constraint: cannot go past next subtitle
+    if (adjacentSubtitles.value.next && newEnd > adjacentSubtitles.value.next.start) {
+      newEnd = adjacentSubtitles.value.next.start;
+      if (!constraintWarningShown.value) {
+        toast.add({
+          title: 'Cannot resize',
+          description: 'Adjacent subtitle blocking',
+          color: 'orange',
+          timeout: 2000,
+        });
+        constraintWarningShown.value = true;
+      }
+    }
+
+    // Constraint: minimum duration
+    if (newEnd - newStart < MIN_DURATION) {
+      newEnd = newStart + MIN_DURATION;
+      if (!constraintWarningShown.value) {
+        toast.add({
+          title: 'Minimum duration reached',
+          description: `Subtitle must be at least ${MIN_DURATION}s`,
+          color: 'orange',
+          timeout: 2000,
+        });
+        constraintWarningShown.value = true;
+      }
+    }
+    
+    // Snap detection for trailing handle
+    if (adjacentSubtitles.value.next) {
+      const distanceToNextStart = Math.abs(newEnd - adjacentSubtitles.value.next.start);
+      if (distanceToNextStart <= SNAP_THRESHOLD && adjacentSubtitles.value.next.start - newStart >= MIN_DURATION) {
+        snapState.value = {
+          active: true,
+          type: 'end',
+          targetTime: adjacentSubtitles.value.next.start,
+        };
+      }
+    }
+  }
+  
+  // Emit snap state for visual guide
+  emit('snap-state', {
+    active: snapState.value.active,
+    targetTime: snapState.value.targetTime,
+  });
+
+  tempStartTime.value = newStart;
+  tempEndTime.value = newEnd;
+
+  // Emit timing change during resize
+  emit('timing-change', {
+    id: props.subtitle.id,
+    start: newStart,
+    end: newEnd,
+  });
+};
+
+const handleResizeUp = () => {
+  if (!isResizing.value) return;
+
+  let finalStart = tempStartTime.value || props.subtitle.start;
+  let finalEnd = tempEndTime.value || props.subtitle.end;
+
+  // Apply snap if active
+  if (snapState.value.active && snapState.value.targetTime !== null) {
+    if (snapState.value.type === 'start') {
+      // Snap start to previous subtitle end
+      finalStart = snapState.value.targetTime;
+    } else if (snapState.value.type === 'end') {
+      // Snap end to next subtitle start
+      finalEnd = snapState.value.targetTime;
+    }
+    
+    // Emit the snapped timing change
+    emit('timing-change', {
+      id: props.subtitle.id,
+      start: finalStart,
+      end: finalEnd,
+    });
+  }
+
+  isResizing.value = false;
+  resizeType.value = null;
+  constraintWarningShown.value = false;
+
+  // Reset temp values and snap state
+  tempStartTime.value = null;
+  tempEndTime.value = null;
+  snapState.value = { active: false, type: null, targetTime: null };
+  
+  // Clear snap guide
+  emit('snap-state', { active: false, targetTime: null });
+
+  document.removeEventListener('mousemove', handleResizeMove);
+  document.removeEventListener('mouseup', handleResizeUp);
 };
 
 // Cleanup on unmount
 onUnmounted(() => {
   document.removeEventListener('mousemove', handleMouseMove);
   document.removeEventListener('mouseup', handleMouseUp);
+  document.removeEventListener('mousemove', handleResizeMove);
+  document.removeEventListener('mouseup', handleResizeUp);
 });
 </script>
 
@@ -239,9 +571,21 @@ onUnmounted(() => {
     @click="handleClick"
     @mousedown="handleMouseDown"
   >
+    <!-- Leading resize handle -->
+    <div
+      :class="leadingHandleClasses"
+      @mousedown="handleLeadingResize"
+    />
+
     <span class="subtitle-timeline__block-text">
       {{ subtitle.text }}
     </span>
+
+    <!-- Trailing resize handle -->
+    <div
+      :class="trailingHandleClasses"
+      @mousedown="handleTrailingResize"
+    />
   </div>
 </template>
 
@@ -256,8 +600,8 @@ onUnmounted(() => {
   user-select: none;
   display: flex;
   align-items: center;
-  padding: 0 8px;
-  overflow: hidden;
+  padding: 0 12px;
+  overflow: visible;
   transition:
     opacity 0.2s ease,
     box-shadow 0.2s ease,
@@ -286,6 +630,17 @@ onUnmounted(() => {
   opacity: 0.7;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
   z-index: 4;
+}
+
+.subtitle-timeline__block_resizing {
+  opacity: 0.8;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+  z-index: 4;
+}
+
+.subtitle-timeline__block_snapping {
+  border: 2px solid #3b82f6;
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.4);
 }
 
 .subtitle-timeline__block_collision {
@@ -318,5 +673,45 @@ onUnmounted(() => {
   overflow: hidden;
   text-overflow: ellipsis;
   line-height: 1.2;
+  flex: 1;
+  pointer-events: none;
+}
+
+/* Resize handles */
+.subtitle-block__resize-handle {
+  position: absolute;
+  top: 0;
+  width: 8px;
+  height: 100%;
+  cursor: ew-resize;
+  background: transparent;
+  transition: background 0.2s ease;
+  z-index: 2;
+}
+
+.subtitle-block__resize-handle:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.subtitle-block__resize-handle_leading {
+  left: 0;
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
+}
+
+.subtitle-block__resize-handle_trailing {
+  right: 0;
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+}
+
+.subtitle-block__resize-handle_active {
+  background: #3b82f6;
+  opacity: 0.9;
+}
+
+/* Prevent text selection during resize */
+.subtitle-timeline__block_resizing .subtitle-timeline__block-text {
+  user-select: none;
 }
 </style>

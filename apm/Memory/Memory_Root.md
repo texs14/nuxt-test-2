@@ -67,3 +67,66 @@ Implementation Plan Phase Summaries are to be stored here; detailed Task Memory 
 - ✅ 3 of 5 WARN-level findings resolved (function search_path, extension placement)
 - ⚠️ 2 WARN-level findings remain: Auth features require Supabase Pro plan ($25/month) - acceptable for MVP development phase
 - ✅ Database security hardened following Supabase/PostgreSQL best practices
+
+## Phase 3 – Subtitle Editor Rebuild Summary
+
+**Outcome:** Delivered complete timeline-based subtitle editor replacing legacy table editor. All 8 core tasks completed with timeline infrastructure, drag-and-drop positioning, multi-language editing panel, CRUD operations, keyboard shortcuts, video synchronization, and auto-save. Advanced features (edge resizing, snapping) moved to Phase 7.
+
+**Involved Agents:**
+- Agent_SubtitleEditor_Timeline (4 tasks)
+- Agent_SubtitleEditor_Operations (4 tasks)
+
+**Task Logs:**
+- [Task 3.1 - Timeline Base Component with Time Axis](Phase_03_Subtitle_Editor_Rebuild/Task_3_1_Timeline_Base_Component.md)
+- [Task 3.2 - Subtitle Block Rendering and Positioning](Phase_03_Subtitle_Editor_Rebuild/Task_3_2_Subtitle_Block_Rendering_Positioning.md)
+- [Task 3.3 - Inline Editing Panel Multi-Language](Phase_03_Subtitle_Editor_Rebuild/Task_3_3_Inline_Editing_Panel_Multi_Language.md)
+- [Task 3.4 - Add Delete Operations](Phase_03_Subtitle_Editor_Rebuild/Task_3_4_Add_Delete_Operations.md)
+- [Task 3.5 - Split Merge Operations Keyboard Shortcuts](Phase_03_Subtitle_Editor_Rebuild/Task_3_5_Split_Merge_Operations_Keyboard_Shortcuts.md)
+- [Task 3.6 - Video Playback Synchronization](Phase_03_Subtitle_Editor_Rebuild/Task_3_6_Video_Playback_Synchronization.md)
+- [Task 3.7 - Auto-Save Integration](Phase_03_Subtitle_Editor_Rebuild/Task_3_7_Auto_Save_Integration.md)
+- [Task 3.8 - Replace Table-Based Editor](Phase_03_Subtitle_Editor_Rebuild/Task_3_8_Replace_Table_Editor.md)
+
+**Key Deliverables:**
+- `app/components/SubtitleTimeline/TimelineBase.vue` - Horizontal timeline with zoom, scroll, time axis
+- `app/components/SubtitleTimeline/SubtitleBlock.vue` - Draggable subtitle blocks with visual feedback
+- `app/components/SubtitleTimeline/SubtitleEditPanel.vue` - Multi-language inline editor (Thai/EN/RU)
+- `app/composables/subtitles/useTimelineCalculations.ts` - Bidirectional time↔pixel conversions
+- `app/composables/subtitles/useSubtitleOperations.ts` - Add/delete/split/merge operations
+- `app/composables/controls/useSubtitleKeyboard.ts` - Keyboard shortcuts (Ctrl+D, Ctrl+Shift+S, Ctrl+M)
+
+**Technical Highlights:**
+- Custom drag-and-drop implementation (superior to libraries for this use case)
+- Real-time video synchronization with playback cursor and click-to-seek
+- Collision detection preventing overlapping subtitles during drag
+- Auto-save with 2-second debounce and retry logic
+- Zero breaking changes - maintained existing SubtitleEditor component contract
+- Comprehensive testing with edge case handling (boundaries, empty states, timing conflicts)
+
+## Phase 7 – Subtitle Editor Advanced Features Summary
+
+**Outcome:** Enhanced subtitle editor with auto-save, Gemini translation, edge resizing, and smart snapping. All 3 tasks completed delivering production-ready multilingual editing workflow with precise timing controls and intelligent collision handling.
+
+**Involved Agents:**
+- Agent_SubtitleEditor_Operations (1 task)
+- Agent_SubtitleEditor_Timeline (2 tasks)
+
+**Completion Notes:**
+- Task 7.1 - Subtitle Edit Panel Persistence & Translation Controls (2025-10-25)
+- Task 7.2 - Subtitle Block Edge Resizing Interactions (2025-10-26)
+- Task 7.3 - Timeline Snapping & Collision Handling (2025-10-26)
+
+**Key Deliverables:**
+- Enhanced `SubtitleEditPanel.vue` with debounced auto-save and Gemini-powered translation buttons
+- Enhanced `SubtitleBlock.vue` with draggable resize handles on leading/trailing edges
+- Enhanced `TimelineBase.vue` with snap detection, visual guides, and collision resolution
+
+**Technical Highlights:**
+- **Auto-save:** 2-second debounced persistence watching Thai/EN/RU text and timing changes
+- **Translation:** Gemini API integration with smart caching (subtitle ID + Thai text hash)
+- **Manual edit preservation:** Tracks translated vs manually-edited state, confirmation on re-translate
+- **Edge resizing:** Separate drag handlers for handles vs block body, 0.5s minimum duration
+- **Constraint enforcement:** Cannot resize past adjacent subtitles or video boundaries
+- **Smart snapping:** 0.1s epsilon threshold with visual feedback (blue border, snap guide line)
+- **Collision resolution:** Auto-repositions overlapping subtitles to adjacent boundaries
+- **Chronological integrity:** Subtitles sorted by start_time after every timing operation
+- **Performance optimized:** Early returns, no layout thrashing during drag/resize operations

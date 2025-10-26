@@ -185,15 +185,99 @@ const handleSubtitleClick = (subtitle: SubtitleObject) => {
   emit('subtitle-select', subtitle);
 };
 
-// Handle subtitle timing change from drag
-const handleTimingChange = (payload: { id: string | number; start: number; end: number }) => {
-  // Find and update the subtitle in the subtitles array
-  const subtitle = props.subtitles.find((s) => s.id === payload.id);
-  if (subtitle) {
-    // Update the subtitle times (parent component should handle this via v-model or mutation)
-    subtitle.start = payload.start;
-    subtitle.end = payload.end;
+// Snap guide state
+const snapGuidePosition = ref<number | null>(null);
+const showSnapGuide = ref(false);
+
+// Handle snap state changes from SubtitleBlock
+const handleSnapState = (payload: { active: boolean; targetTime: number | null }) => {
+  showSnapGuide.value = payload.active;
+  if (payload.active && payload.targetTime !== null) {
+    snapGuidePosition.value = timeToPixels(payload.targetTime, zoomLevel.value);
+  } else {
+    snapGuidePosition.value = null;
   }
+};
+
+// Handle subtitle timing change from drag/resize
+const handleTimingChange = (payload: { id: string | number; start: number; end: number }) => {
+  const subtitle = props.subtitles.find((s) => s.id === payload.id);
+  if (!subtitle) return;
+
+  const toast = useToast();
+  let finalStart = payload.start;
+  let finalEnd = payload.end;
+  const duration = finalEnd - finalStart;
+
+  // Check for overlaps with other subtitles
+  const overlaps = props.subtitles.some((other) => {
+    if (other.id === payload.id) return false;
+    return finalStart < other.end && finalEnd > other.start;
+  });
+
+  if (overlaps) {
+    // Find adjacent subtitle boundaries for auto-resolution
+    const sorted = [...props.subtitles]
+      .filter((s) => s.id !== payload.id)
+      .sort((a, b) => a.start - b.start);
+
+    // Find previous subtitle
+    const prev = sorted.filter((s) => s.end <= finalStart).pop();
+    
+    if (prev) {
+      // Snap to end of previous subtitle
+      finalStart = prev.end;
+      finalEnd = finalStart + duration;
+
+      // Check if this creates new overlap with next subtitle
+      const stillOverlaps = sorted.some((other) => {
+        return finalStart < other.end && finalEnd > other.start;
+      });
+
+      if (stillOverlaps) {
+        toast.add({
+          title: 'Cannot place here',
+          description: 'Overlaps with adjacent subtitles',
+          color: 'orange',
+          timeout: 2000,
+        });
+        return; // Revert - don't apply change
+      }
+
+      toast.add({
+        title: 'Overlap detected',
+        description: 'Subtitle repositioned to adjacent boundary',
+        color: 'orange',
+        timeout: 2000,
+      });
+    } else {
+      // No valid position found
+      toast.add({
+        title: 'Cannot place here',
+        description: 'Overlaps with adjacent subtitles',
+        color: 'orange',
+        timeout: 2000,
+      });
+      return; // Revert - don't apply change
+    }
+  }
+
+  // Constrain to video duration
+  if (finalEnd > props.duration) {
+    finalEnd = props.duration;
+    finalStart = Math.max(0, finalEnd - duration);
+  }
+  if (finalStart < 0) {
+    finalStart = 0;
+    finalEnd = Math.min(duration, props.duration);
+  }
+
+  // Update the subtitle times
+  subtitle.start = finalStart;
+  subtitle.end = finalEnd;
+
+  // Maintain chronological order
+  props.subtitles.sort((a, b) => a.start - b.start);
 };
 
 // Handle add subtitle
@@ -493,6 +577,13 @@ onUnmounted(() => {
           </g>
         </svg>
 
+        <!-- Snap Guide -->
+        <div
+          v-if="showSnapGuide && snapGuidePosition !== null"
+          class="timeline__snap-guide"
+          :style="{ left: `${snapGuidePosition}px` }"
+        />
+
         <!-- Subtitle Blocks -->
         <SubtitleBlock
           v-for="subtitle in subtitles"
@@ -505,6 +596,7 @@ onUnmounted(() => {
           :allow-collisions="false"
           @click="handleSubtitleClick"
           @timing-change="handleTimingChange"
+          @snap-state="handleSnapState"
         />
       </div>
     </div>
@@ -701,5 +793,18 @@ onUnmounted(() => {
 .subtitle-timeline__save-status_unsaved {
   color: #6b7280;
   background-color: rgba(107, 114, 128, 0.1);
+}
+
+/* Snap Guide */
+.timeline__snap-guide {
+  position: absolute;
+  top: 0;
+  width: 2px;
+  height: 100%;
+  background: #3b82f6;
+  opacity: 0.6;
+  z-index: 5;
+  pointer-events: none;
+  box-shadow: 0 0 4px rgba(59, 130, 246, 0.5);
 }
 </style>
