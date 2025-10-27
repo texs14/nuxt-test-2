@@ -34,9 +34,41 @@
         {{ t('videos.exercise.startPage') }}
       </NuxtLink>
       <ClientOnly>
-        <UButton v-if="canModerate" class="btn btn_primary" type="button" @click="toggleEditMode">
-          {{ isEditMode ? t('videos.detail.cancelEdit') : t('videos.detail.edit') }}
-        </UButton>
+        <div v-if="canModerate" class="video-page__moderation-controls">
+          <UButton class="btn btn_primary" type="button" @click="toggleEditMode">
+            {{ isEditMode ? t('videos.detail.cancelEdit') : t('videos.detail.edit') }}
+          </UButton>
+          <div
+            v-if="videoStatus === 'moderation'"
+            class="video-page__moderation-panel"
+            :class="videoModerationModifiers"
+          >
+            <StatusBadge :status="videoStatus || 'moderation'" />
+            <div class="video-page__moderation-actions">
+              <UIButton
+                size="sm"
+                variant="success"
+                :loading="isProcessing"
+                :disabled="isProcessing || !isVideoInModeration"
+                @click="approveCurrentVideo"
+              >
+                {{ t('videos.addNew.approve') }}
+              </UIButton>
+              <UIButton
+                size="sm"
+                variant="danger"
+                :loading="isProcessing"
+                :disabled="isProcessing || !isVideoInModeration"
+                @click="rejectCurrentVideo"
+              >
+                {{ t('videos.status.rejected') }}
+              </UIButton>
+            </div>
+            <p v-if="approvalErrorMessage" class="video-page__moderation-error">
+              {{ approvalErrorMessage }}
+            </p>
+          </div>
+        </div>
       </ClientOnly>
     </template>
 
@@ -127,8 +159,11 @@ import type {
 import SubtitleClickExercise from '~/components/SubtitleClickExercise.vue';
 import ResembleTranscriptionLoader from '~/components/ResembleTranscriptionLoader.vue';
 import SubtitleEditor from '~/components/SubtitleTimeline/SubtitleEditor.vue';
+import StatusBadge from '~/components/StatusBadge.vue';
 import { useSubtitleEditorSync } from '~/composables/useSubtitleEditorSync';
 import { useSubtitleAutoSave } from '~/composables/useSubtitleAutoSave';
+import { useVideoApproval } from '~/composables/video/useVideoApproval';
+import UIButton from '~/components/ui/UIButton.vue';
 const route = useRoute();
 const {
   select: selectVideo,
@@ -163,6 +198,8 @@ interface VideoItem {
   level?: string | null;
   video_url?: string | null;
   subtitles?: RawSubtitleItem[] | null;
+  status?: 'moderation' | 'approved' | 'rejected' | null;
+  updated_at?: string | null;
 }
 
 const idParam = computed(() => route.params.id as string);
@@ -181,7 +218,7 @@ const {
     const result = await selectVideo(
       { id: idParam.value },
       {
-        columns: 'id, title, description, level, video_url, subtitles',
+        columns: 'id, title, description, level, video_url, subtitles, status, updated_at',
         limit: 1,
       }
     );
@@ -260,6 +297,59 @@ const descriptionText = computed(() => {
 const subs = computed<RawSubtitleItem[]>(() => (video.value?.subtitles || []) as RawSubtitleItem[]);
 const showExercise = ref(false);
 const exerciseRange = ref<PlaybackRange | null>(null);
+
+const videoStatus = ref<'moderation' | 'approved' | 'rejected' | null>(null);
+
+const {
+  approveVideo: approveVideoAction,
+  rejectVideo,
+  isApproving,
+  approvalError,
+  reset: resetApprovalState,
+} = useVideoApproval({
+  statusRef: videoStatus,
+  onApproved: (result) => {
+    if (!video.value) return;
+    video.value = {
+      ...video.value,
+      status: result.status,
+      updated_at: result.updated_at ?? video.value.updated_at ?? null,
+    } as VideoItem;
+  },
+  onRejected: (result) => {
+    if (!video.value) return;
+    video.value = {
+      ...video.value,
+      status: result.status,
+      updated_at: result.updated_at ?? video.value.updated_at ?? null,
+    } as VideoItem;
+  },
+});
+
+const isProcessing = computed(() => isApproving.value);
+const approvalErrorMessage = computed(() => approvalError.value);
+const isVideoInModeration = computed(() => videoStatus.value === 'moderation');
+const videoModerationModifiers = computed(() => ({
+  'video-page__moderation-panel_approved': videoStatus.value === 'approved',
+  'video-page__moderation-panel_rejected': videoStatus.value === 'rejected',
+}));
+
+watch(
+  () => video.value?.status,
+  (newStatus) => {
+    videoStatus.value =
+      (newStatus as 'moderation' | 'approved' | 'rejected' | null) ?? 'moderation';
+  },
+  { immediate: true }
+);
+
+watch(
+  () => idParam.value,
+  () => {
+    resetApprovalState();
+    videoStatus.value = 'moderation';
+  }
+);
 
 const loadingTimedOut = ref(false);
 let loadingTimeout: ReturnType<typeof setTimeout> | null = null;
@@ -403,6 +493,16 @@ const handleManualSave = async () => {
     console.error('Manual save failed:', error);
   }
 };
+
+async function approveCurrentVideo() {
+  if (!video.value?.id) return;
+  await approveVideoAction(String(video.value.id), videoStatus.value ?? undefined);
+}
+
+async function rejectCurrentVideo() {
+  if (!video.value?.id) return;
+  await rejectVideo(String(video.value.id), videoStatus.value ?? undefined);
+}
 
 // Beforeunload warning for unsaved changes
 onBeforeUnmount(() => {
@@ -828,6 +928,41 @@ function onTranscriptionError(message: string) {
 
   &__loader {
     margin-bottom: 8px;
+  }
+
+  &__moderation-controls {
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+    margin-top: 12px;
+  }
+
+  &__moderation-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border-left: 4px solid #fbbf24;
+    padding-left: 12px;
+
+    &_approved {
+      border-left-color: #10b981;
+    }
+
+    &_rejected {
+      border-left-color: #ef4444;
+    }
+  }
+
+  &__moderation-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  &__moderation-error {
+    margin: 0;
+    color: #b91c1c;
+    font-size: 0.875rem;
   }
 }
 </style>

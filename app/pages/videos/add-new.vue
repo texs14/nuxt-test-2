@@ -66,13 +66,13 @@
       <button
         class="video-upload-form__button video-upload-form__button_success"
         type="button"
-        :disabled="approving"
+        :disabled="isApproving"
         @click="approveVideo"
       >
-        {{ approving ? t('videos.addNew.approving') : t('videos.addNew.approve') }}
+        {{ isApproving ? t('videos.addNew.approving') : t('videos.addNew.approve') }}
       </button>
-      <p v-if="approveError" class="video-upload-form__error">{{ approveError }}</p>
-      <p v-if="approveSuccess" class="video-upload-form__success">
+      <p v-if="approvalError" class="video-upload-form__error">{{ approvalError }}</p>
+      <p v-if="approvalSuccess" class="video-upload-form__success">
         {{ t('videos.addNew.approveSuccess') }}
       </p>
     </section>
@@ -87,7 +87,9 @@ import FileUploadWithProgress from '~/components/upload/FileUploadWithProgress.v
 import MediaPreviewPlayer from '~/components/media/MediaPreviewPlayer.vue';
 import ResembleTranscriptionPanel from '~/components/transcription/ResembleTranscriptionPanel.vue';
 import { useMediaItem } from '~/composables/shared/useMediaItem';
+import { useVideoApproval } from '~/composables/video/useVideoApproval';
 import { normalizeEditorSubtitles } from '~/composables/subtitles/useSubtitleNormalization';
+import { useUserRole } from '~/composables/useUserRole';
 
 definePageMeta({
   middleware: 'moderator',
@@ -100,9 +102,18 @@ const selectedLang = ref<'ru' | 'en' | 'th'>('th');
 const resembleUuid = ref<string>('');
 const transcriptionStatus = ref<string>('');
 const transcriptionError = ref<string>('');
-const approving = ref(false);
-const approveError = ref('');
-const approveSuccess = ref(false);
+
+const mediaItem = useMediaItem('video');
+
+const {
+  approveVideo: approveVideoAction,
+  isApproving,
+  approvalError,
+  approvalSuccess,
+  reset: resetApprovalState,
+} = useVideoApproval({
+  statusRef: mediaItem.status,
+});
 
 const editId = computed(() => (route.query.editId ? String(route.query.editId) : ''));
 const isEditMode = computed(() => !!editId.value);
@@ -110,8 +121,6 @@ const isEditMode = computed(() => !!editId.value);
 useHead(() => ({
   title: isEditMode.value ? t('videos.addNew.headEdit') : t('videos.addNew.headCreate'),
 }));
-
-const mediaItem = useMediaItem('video');
 
 const uploadedFiles = ref<{ audioUrl?: string }>({});
 
@@ -122,6 +131,7 @@ watch(
   async (val) => {
     if (val) {
       await mediaItem.loadExisting(val);
+      resetApprovalState();
     }
   },
   { immediate: true }
@@ -160,31 +170,8 @@ async function saveVideo() {
 }
 
 async function approveVideo() {
-  if (!mediaItem.newId.value || approving.value) return;
-
-  approving.value = true;
-  approveError.value = '';
-  approveSuccess.value = false;
-
-  try {
-    const res = await fetch(
-      `/api/video-items/${encodeURIComponent(String(mediaItem.newId.value))}/approve`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-      }
-    );
-
-    const json = await res.json();
-    if (!res.ok) throw new Error(json?.error || 'Ошибка одобрения видео');
-
-    mediaItem.status.value = 'approved';
-    approveSuccess.value = true;
-  } catch (e: any) {
-    approveError.value = e?.message || 'Ошибка одобрения видео';
-  } finally {
-    approving.value = false;
-  }
+  if (!mediaItem.newId.value) return;
+  await approveVideoAction(String(mediaItem.newId.value), mediaItem.status.value);
 }
 </script>
 

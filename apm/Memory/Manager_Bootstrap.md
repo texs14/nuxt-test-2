@@ -35,7 +35,7 @@ The user is developing an MVP for a Thai language learning platform - an interac
 
 - Follow SOLID and DRY patterns
 - Reuse existing components/composables before creating new ones
-- Use UIButton for buttons, Nuxt UI modals for confirmations
+- Use UIButton for buttons, Nuxt UI modals for confirmations from ~/components/ui/UIButton.vue
 - Maintain BEM CSS methodology throughout
 - No file size restrictions yet (plan for future)
 

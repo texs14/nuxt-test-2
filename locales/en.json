@@ -385,7 +385,10 @@
       "terms": "Terms of service"
     },
     "common": {
-      "loading": "Загрузка..."
+      "loading": "Загрузка...",
+      "errors": {
+        "forbidden": "Insufficient permissions"
+      }
     }
   }
 }

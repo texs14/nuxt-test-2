@@ -1,8 +1,52 @@
 # Thai Language Learning Platform – Implementation Plan
 
 **Memory Strategy:** dynamic-md  
-**Last Modification:** Phase 7 added - Manager Agent 2 (2025-10-24)  
+**Last Modification:** Phase 8 added - Manager Agent 2 (2025-10-26)  
 **Project Overview:** Nuxt 3-based Thai language learning platform MVP with video player, interactive subtitle-based exercises, AI-powered dictionary, and multi-language support. Core features include video deletion system, subtitle timeline editor with advanced editing features, exercise enhancements, upload improvements, and UX fixes. Built with Supabase backend, Nuxt UI components, and BEM CSS methodology.
+
+---
+
+## Phase 8: Video Approval Workflow Hardening
+
+### Task 8.1 – Centralize video approval actions │ Agent_VideoManagement
+**Depends on:** Phase 1 deletion workflow patterns, Supabase `video_items` schema review
+
+- **Objective:** Refactor administrator approval logic into a reusable composable/service that updates `video_items.status` to `approved`, records approval metadata, and exposes consistent loading/error handling.
+- **Output:** New `useVideoApproval.ts` composable (or enhancement to existing video management composable) providing `approveVideo(videoId)` with status checks, Supabase RPC/update call, and toast feedback for success/failure. Shared across add-new, detail, and listing contexts.
+- **Guidance:** Use Supabase MCP client for updates; ensure only admins/moderators can call. Add optional `approved_at`/`approved_by` fields in local state (no schema change) for UI display. Follow SOLID/DRY—avoid duplicating approval code per view. Emit events so parent components can refresh data sources after approval.
+
+1. **Create Approval Composable:** Implement `useVideoApproval` handling Supabase update of `video_items.status` from `moderation` → `approved` with optimistic UI and error recovery. Include guards for already approved/rejected statuses.
+2. **Role Enforcement:** Integrate existing auth/role composables to ensure button actions are available only when `currentUser.role === 'admin' || 'moderator'`. Surface warning toast if non-admin attempts approval.
+3. **Feedback & Telemetry:** Emit success toast "Video approved" and trigger optional callback for analytics/logging. Provide detailed error messages (network failure, permission denied) and reset loading states.
+4. **Documentation:** Update Phase 8 memory log (upon execution) detailing Supabase queries, status transitions, and any additional metadata stored client-side.
+
+---
+
+### Task 8.2 – Ensure approval controls on add-new & detail pages │ Agent_VideoManagement
+**Depends on:** Task 8.1 composable
+
+- **Objective:** Update `app/pages/videos/add-new.vue` and `app/pages/videos/[id].vue` so administrators always see the approval button whenever `status === 'moderation'`, regardless of creation state.
+- **Output:** Both pages consume `useVideoApproval`, display UIButton-based approval control with consistent styling, and refresh video data after approval.
+- **Guidance:** Maintain BEM class naming (`video-upload-form__button_success`, etc.). Use `<UIButton>` if feasible; otherwise, wrap existing button with consistent CSS. Ensure SSR/client parity—button should render whenever server-provided props show `status: 'moderation'`. Handle loading/disabled states via composable. Update copy in i18n if new labels required.
+
+1. **Add-New Page:** Replace current conditional rendering so approval CTA mounts whenever user is admin and video status is `moderation`, even after reload. Wire to composable; on success, set local status to `approved` and hide section.
+2. **Detail Page (`videos/[id].vue`):** Introduce approval toolbar area for admins. Show video status badge and approval CTA. After approval, refetch or locally mutate video status to `approved`.
+3. **State Refresh:** Ensure both pages refresh Supabase data (re-run `useAsyncData`/`refreshNuxtData`) post-approval to sync with other consumers.
+4. **Accessibility:** Include `aria-label` and keyboard focus management for approval buttons. Disable button when approval in progress or video already approved/rejected.
+
+---
+
+### Task 8.3 – Surface approval controls in listings │ Agent_UIEnhancements
+**Depends on:** Task 8.1 composable
+
+- **Objective:** Allow administrators to approve videos directly from listings by adding approval controls to `app/components/VideoCard.vue` (used in `/videos` index) and any other list contexts consuming the card.
+- **Output:** VideoCard displays approval CTA (UIButton variant) and status badge for `moderation` videos when current user is admin. Uses `useVideoApproval` for actions and emits `approved` event so parent lists can refresh.
+- **Guidance:** Keep card layout responsive; place CTA within actions section with consistent spacing. Ensure BEM classes (`video-card__approve-button`). Avoid disturbing non-admin layout (button hidden). Provide tooltip/aria describing action. After approval, card should reflect new status without full page reload.
+
+1. **Augment Props & Emits:** Add optional `showApproval`/`onApproved` props so parents can opt-in. Default to false for non-admin contexts.
+2. **Integrate Composable:** Use `useVideoApproval` within card; manage local loading indicator and disable button while processing.
+3. **Visual Status Indicator:** Add badge or text showing "Awaiting moderation" to remind admins. Hide CTA if status not `moderation`.
+4. **Parent Updates:** Update videos index (and any other parent using VideoCard) to pass necessary props/events and refresh data source after approval.
 
 ---
 

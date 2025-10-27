@@ -1,19 +1,9 @@
 <template>
-  <div
-    class="volume-control"
-    @mouseenter="onMouseEnter"
-    @mouseleave="onMouseLeave"
-  >
-    <IconButton
-      aria-label="Громкость"
-      @click="toggle"
-    >
+  <div class="volume-control" @mouseenter="onMouseEnter" @mouseleave="onMouseLeave">
+    <IconButton aria-label="Громкость" @click="toggle">
       <VolumeIcon :size="18" />
     </IconButton>
-    <div
-      class="volume-control__popup"
-      :class="{ 'volume-control__popup_visible': visible }"
-    >
+    <div class="volume-control__popup" :class="{ 'volume-control__popup_visible': visible }">
       <input
         class="volume-control__slider"
         type="range"
@@ -86,7 +76,7 @@ const onInput = (e: Event) => {
   }
 
   &__slider {
-    transform: rotate(-90deg) translateY(-265%);
+    transform: rotate(-90deg) translateY(-310%);
     width: 160px;
     height: 20px;
   }
