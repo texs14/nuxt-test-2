@@ -97,6 +97,7 @@ const { t } = useI18n();
 const safeLocalePath = useSafeLocalePath();
 const { canModerate } = useUserRole();
 const { getLocalizedValue } = useLocalizedContent();
+const toast = useToast();
 
 const {
   approveVideo: approveVideoAction,
@@ -259,7 +260,7 @@ async function handleDeleteConfirm() {
       toast.add({
         title: 'Success',
         description: response.message || 'Video deleted successfully',
-        color: 'green',
+        color: 'success',
       });
 
       showDeleteModal.value = false;
@@ -271,14 +272,14 @@ async function handleDeleteConfirm() {
       toast.add({
         title: 'Error',
         description: response.error || response.message || 'Failed to delete video',
-        color: 'red',
+        color: 'error',
       });
     }
   } catch (err: any) {
     toast.add({
       title: 'Error',
       description: err.message || 'Network error occurred',
-      color: 'red',
+      color: 'error',
     });
   } finally {
     isDeleting.value = false;
