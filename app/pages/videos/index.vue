@@ -29,38 +29,12 @@
           :item="item"
           route-prefix="/videos/"
           :show-delete-button="canModerate"
+          :show-approval-controls="canModerate"
+          :video-status="item.status"
           @delete="openDeleteModal"
+          @approved="handleCardApproved"
+          @rejected="handleCardRejected"
         />
-        <div
-          v-if="canModerate"
-          class="content-page__moderation"
-          :class="getModerationModifiers(item.status)"
-        >
-          <StatusBadge :status="item.status || 'moderation'" />
-          <div v-if="item.status === 'moderation'" class="content-page__moderation-controls">
-            <UIButton
-              size="sm"
-              variant="success"
-              :loading="isProcessing(item.id)"
-              :disabled="isProcessing(item.id)"
-              @click="handleApprove(item)"
-            >
-              {{ t('videos.addNew.approve') }}
-            </UIButton>
-            <UIButton
-              size="sm"
-              variant="danger"
-              :disabled="isProcessing(item.id)"
-              :loading="isProcessing(item.id)"
-              @click="handleReject(item)"
-            >
-              {{ t('videos.status.rejected') }}
-            </UIButton>
-          </div>
-          <p v-if="getItemError(item.id)" class="content-page__moderation-error">
-            {{ getItemError(item.id) }}
-          </p>
-        </div>
       </div>
     </div>
 
@@ -77,14 +51,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { VideoItem, BaseContentItem } from '~/types/content';
 import DeleteConfirmationModal from '~/components/modals/DeleteConfirmationModal.vue';
 import VideoCard from '~/components/VideoCard.vue';
-import StatusBadge from '~/components/StatusBadge.vue';
-import { useVideoApproval } from '~/composables/video/useVideoApproval';
-import UIButton from '~/components/ui/UIButton.vue';
 
 const {
   select,
@@ -99,33 +70,6 @@ const { canModerate } = useUserRole();
 const { getLocalizedValue } = useLocalizedContent();
 const toast = useToast();
 
-const {
-  approveVideo: approveVideoAction,
-  rejectVideo,
-  approvalError,
-} = useVideoApproval({
-  onApproved: (result) => {
-    if (!items.value) return;
-    items.value = items.value.map((video) =>
-      String(video.id) === String(result.id) ? { ...video, status: result.status } : video
-    );
-  },
-  onRejected: (result) => {
-    if (!items.value) return;
-    items.value = items.value.map((video) =>
-      String(video.id) === String(result.id) ? { ...video, status: result.status } : video
-    );
-  },
-});
-
-const moderationState = reactive<{
-  loading: Record<string, boolean>;
-  errors: Record<string, string>;
-}>({
-  loading: {},
-  errors: {},
-});
-
 const addNewLink = computed(() => {
   return safeLocalePath({ name: 'videos-add-new' });
 });
@@ -139,57 +83,6 @@ const deleteMessage = computed(() => {
   if (!selectedVideo.value) return '';
   return `Are you sure you want to delete '${selectedVideo.value.title}'? This action cannot be undone.`;
 });
-
-function isProcessing(id: string | number) {
-  return moderationState.loading[String(id)] ?? false;
-}
-
-function getItemError(id: string | number) {
-  return moderationState.errors[String(id)] || '';
-}
-
-function getModerationModifiers(status: VideoItem['status']) {
-  return {
-    'content-page__moderation_approved': status === 'approved',
-    'content-page__moderation_rejected': status === 'rejected',
-  };
-}
-
-async function handleApprove(item: VideoItem) {
-  const id = String(item.id);
-  moderationState.errors[id] = '';
-  moderationState.loading[id] = true;
-
-  try {
-    const success = await approveVideoAction(id, item.status);
-    if (!success) {
-      moderationState.errors[id] = approvalError.value || t('videos.addNew.saveError');
-    }
-  } catch (err: any) {
-    const message = err?.message || t('videos.addNew.saveError');
-    moderationState.errors[id] = message;
-  } finally {
-    moderationState.loading[id] = false;
-  }
-}
-
-async function handleReject(item: VideoItem) {
-  const id = String(item.id);
-  moderationState.errors[id] = '';
-  moderationState.loading[id] = true;
-
-  try {
-    const success = await rejectVideo(id, item.status);
-    if (!success) {
-      moderationState.errors[id] = approvalError.value || t('videos.addNew.saveError');
-    }
-  } catch (err: any) {
-    const message = err?.message || t('videos.addNew.saveError');
-    moderationState.errors[id] = message;
-  } finally {
-    moderationState.loading[id] = false;
-  }
-}
 
 // Используем useLazyAsyncData чтобы запрос выполнялся на клиенте
 // где доступен токен авторизации для корректной работы RLS политик
@@ -235,6 +128,20 @@ function openDeleteModal(item: BaseContentItem) {
     title: getLocalizedValue(item.title),
   };
   showDeleteModal.value = true;
+}
+
+function handleCardApproved(payload: { id: string | number; status: 'approved' }) {
+  if (!items.value) return;
+  items.value = items.value.map((video) =>
+    String(video.id) === String(payload.id) ? { ...video, status: payload.status } : video
+  );
+}
+
+function handleCardRejected(payload: { id: string | number; status: 'rejected' }) {
+  if (!items.value) return;
+  items.value = items.value.map((video) =>
+    String(video.id) === String(payload.id) ? { ...video, status: payload.status } : video
+  );
 }
 
 function handleDeleteCancel() {

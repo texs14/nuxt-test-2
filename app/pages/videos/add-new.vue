@@ -60,19 +60,23 @@
     />
 
     <section
-      v-if="isAdmin && mediaItem.newId.value && mediaItem.status.value === 'moderation'"
+      v-if="canModerate && mediaItem.status.value === 'moderation'"
       class="video-upload-form__approve"
     >
-      <button
+      <UIButton
         class="video-upload-form__button video-upload-form__button_success"
+        size="sm"
+        variant="success"
         type="button"
-        :disabled="isApproving"
-        @click="approveVideo"
+        :loading="isApproving"
+        :disabled="isApproving || !hasPersistedVideo"
+        :aria-label="t('videos.addNew.approve')"
+        @click="approveCurrentVideo"
       >
         {{ isApproving ? t('videos.addNew.approving') : t('videos.addNew.approve') }}
-      </button>
-      <p v-if="approvalError" class="video-upload-form__error">{{ approvalError }}</p>
-      <p v-if="approvalSuccess" class="video-upload-form__success">
+      </UIButton>
+      <p v-if="approvalError" class="video-upload-form__error" role="alert">{{ approvalError }}</p>
+      <p v-if="approvalSuccess" class="video-upload-form__success" role="status">
         {{ t('videos.addNew.approveSuccess') }}
       </p>
     </section>
@@ -90,6 +94,7 @@ import { useMediaItem } from '~/composables/shared/useMediaItem';
 import { useVideoApproval } from '~/composables/video/useVideoApproval';
 import { normalizeEditorSubtitles } from '~/composables/subtitles/useSubtitleNormalization';
 import { useUserRole } from '~/composables/useUserRole';
+import UIButton from '~/components/ui/UIButton.vue';
 
 definePageMeta({
   middleware: 'moderator',
@@ -113,6 +118,12 @@ const {
   reset: resetApprovalState,
 } = useVideoApproval({
   statusRef: mediaItem.status,
+  onApproved: async (result) => {
+    mediaItem.status.value = result.status;
+    if (mediaItem.newId.value) {
+      await mediaItem.loadExisting(String(mediaItem.newId.value));
+    }
+  },
 });
 
 const editId = computed(() => (route.query.editId ? String(route.query.editId) : ''));
@@ -124,7 +135,8 @@ useHead(() => ({
 
 const uploadedFiles = ref<{ audioUrl?: string }>({});
 
-const { isAdmin } = useUserRole();
+const { canModerate } = useUserRole();
+const hasPersistedVideo = computed(() => Boolean(mediaItem.newId.value));
 
 watch(
   () => editId.value,
@@ -170,6 +182,11 @@ async function saveVideo() {
 }
 
 async function approveVideo() {
+  if (!mediaItem.newId.value) return;
+  await approveVideoAction(String(mediaItem.newId.value), mediaItem.status.value);
+}
+
+async function approveCurrentVideo() {
   if (!mediaItem.newId.value) return;
   await approveVideoAction(String(mediaItem.newId.value), mediaItem.status.value);
 }

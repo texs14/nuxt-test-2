@@ -48,6 +48,7 @@
               <UIButton
                 size="sm"
                 variant="success"
+                :aria-label="t('videos.addNew.approve')"
                 :loading="isProcessing"
                 :disabled="isProcessing || !isVideoInModeration"
                 @click="approveCurrentVideo"
@@ -57,6 +58,7 @@
               <UIButton
                 size="sm"
                 variant="danger"
+                :aria-label="t('videos.status.rejected')"
                 :loading="isProcessing"
                 :disabled="isProcessing || !isVideoInModeration"
                 @click="rejectCurrentVideo"
@@ -64,7 +66,7 @@
                 {{ t('videos.status.rejected') }}
               </UIButton>
             </div>
-            <p v-if="approvalErrorMessage" class="video-page__moderation-error">
+            <p v-if="approvalErrorMessage" class="video-page__moderation-error" role="alert">
               {{ approvalErrorMessage }}
             </p>
           </div>
@@ -212,6 +214,7 @@ const {
   data: video,
   pending: asyncPendingVideo,
   error: asyncErrorVideo,
+  refresh: refreshVideo,
 } = await useAsyncData<VideoItem | null>(
   () => `video-${idParam.value}`,
   async () => {
@@ -308,21 +311,13 @@ const {
   reset: resetApprovalState,
 } = useVideoApproval({
   statusRef: videoStatus,
-  onApproved: (result) => {
-    if (!video.value) return;
-    video.value = {
-      ...video.value,
-      status: result.status,
-      updated_at: result.updated_at ?? video.value.updated_at ?? null,
-    } as VideoItem;
+  onApproved: async (result) => {
+    videoStatus.value = result.status;
+    await refreshVideo();
   },
-  onRejected: (result) => {
-    if (!video.value) return;
-    video.value = {
-      ...video.value,
-      status: result.status,
-      updated_at: result.updated_at ?? video.value.updated_at ?? null,
-    } as VideoItem;
+  onRejected: async (result) => {
+    videoStatus.value = result.status;
+    await refreshVideo();
   },
 });
 
@@ -337,8 +332,7 @@ const videoModerationModifiers = computed(() => ({
 watch(
   () => video.value?.status,
   (newStatus) => {
-    videoStatus.value =
-      (newStatus as 'moderation' | 'approved' | 'rejected' | null) ?? 'moderation';
+    videoStatus.value = (newStatus as 'moderation' | 'approved' | 'rejected' | null) ?? null;
   },
   { immediate: true }
 );
@@ -347,7 +341,7 @@ watch(
   () => idParam.value,
   () => {
     resetApprovalState();
-    videoStatus.value = 'moderation';
+    videoStatus.value = null;
   }
 );
 

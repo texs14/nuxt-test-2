@@ -37,32 +37,77 @@
         </p>
       </div>
     </NuxtLink>
-    <div v-if="showDeleteButton" class="video-card-wrapper__actions">
-      <UIButton variant="danger" size="sm" @click="handleDelete">Delete</UIButton>
+    <div v-if="showActions" class="video-card-wrapper__actions">
+      <div v-if="showApprovalButtons" class="video-card-wrapper__status" role="status">
+        <StatusBadge :status="currentStatus || 'moderation'" />
+        <span class="video-card-wrapper__status-label">{{ moderationLabel }}</span>
+      </div>
+      <UIButton v-if="showDeleteButtonComputed" variant="danger" size="sm" @click="handleDelete">
+        Delete
+      </UIButton>
+      <UIButton
+        v-if="showApprovalButtons"
+        class="video-card-wrapper__approve-button"
+        variant="success"
+        size="sm"
+        :loading="isApproving"
+        :disabled="isApproving"
+        :aria-label="t('videos.addNew.approve')"
+        @click="handleApprove"
+      >
+        {{ isApproving ? t('videos.addNew.approving') : t('videos.addNew.approve') }}
+      </UIButton>
+      <UIButton
+        v-if="showApprovalButtons"
+        class="video-card-wrapper__reject-button"
+        variant="danger"
+        size="sm"
+        :loading="isApproving"
+        :disabled="isApproving"
+        :aria-label="t('videos.status.rejected')"
+        @click="handleReject"
+      >
+        {{ t('videos.status.rejected') }}
+      </UIButton>
     </div>
+    <p v-if="approvalErrorMessage" class="video-card-wrapper__error" role="alert">
+      {{ approvalErrorMessage }}
+    </p>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import type { BaseContentItem } from '~/types/content';
+import StatusBadge from '~/components/StatusBadge.vue';
+import { useVideoApproval } from '~/composables/video/useVideoApproval';
+import { useUserRole } from '~/composables/useUserRole';
 
 interface Props {
   item: BaseContentItem;
   routePrefix: string;
   showDeleteButton?: boolean;
+  showApprovalControls?: boolean;
+  videoStatus?: 'moderation' | 'approved' | 'rejected' | null;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   showDeleteButton: false,
+  showApprovalControls: false,
+  videoStatus: null,
 });
 
 const emit = defineEmits<{
   delete: [item: BaseContentItem];
+  approved: [payload: { id: string | number; status: 'approved' }];
+  rejected: [payload: { id: string | number; status: 'rejected' }];
 }>();
 
 const localePath = useLocalePath();
 const { getLocalizedValue, getDuration } = useLocalizedContent();
+const { t } = useI18n();
+const { canModerate } = useUserRole();
 
 const itemRoute = computed(() => {
   return localePath(`${props.routePrefix}${props.item.id}`);
@@ -81,6 +126,51 @@ const formattedDuration = computed(() => {
   if (!props.item.duration) return '';
   return getDuration(props.item.duration);
 });
+
+const currentStatus = ref<'moderation' | 'approved' | 'rejected' | null>(props.videoStatus);
+
+watch(
+  () => props.videoStatus,
+  (status) => {
+    currentStatus.value = status ?? null;
+  }
+);
+
+const {
+  approveVideo,
+  rejectVideo,
+  isApproving,
+  approvalError: approvalErrorRef,
+  reset: resetApprovalState,
+} = useVideoApproval({
+  statusRef: currentStatus,
+  onApproved: (result) => {
+    currentStatus.value = result.status;
+    emit('approved', { id: props.item.id, status: 'approved' });
+  },
+  onRejected: (result) => {
+    currentStatus.value = result.status;
+    emit('rejected', { id: props.item.id, status: 'rejected' });
+  },
+});
+
+watch(
+  () => props.item.id,
+  () => {
+    resetApprovalState();
+    currentStatus.value = props.videoStatus ?? null;
+  }
+);
+
+const showDeleteButtonComputed = computed(() => props.showDeleteButton);
+const showApprovalControls = computed(() => props.showApprovalControls && canModerate.value);
+const showApprovalButtons = computed(
+  () => showApprovalControls.value && currentStatus.value === 'moderation'
+);
+const showActions = computed(() => showDeleteButtonComputed.value || showApprovalButtons.value);
+
+const moderationLabel = computed(() => t('videos.status.moderation'));
+const approvalErrorMessage = computed(() => approvalErrorRef.value);
 
 function getLevelBadgeClass(level: string | null): string {
   const baseClass = 'content-card__level-text';
@@ -102,6 +192,16 @@ function getLevelBadgeClass(level: string | null): string {
 function handleDelete() {
   emit('delete', props.item);
 }
+
+async function handleApprove() {
+  if (!props.item.id) return;
+  await approveVideo(String(props.item.id), currentStatus.value ?? undefined);
+}
+
+async function handleReject() {
+  if (!props.item.id) return;
+  await rejectVideo(String(props.item.id), currentStatus.value ?? undefined);
+}
 </script>
 
 <style lang="scss" scoped>
@@ -113,7 +213,38 @@ function handleDelete() {
   &__actions {
     display: flex;
     justify-content: flex-end;
+    align-items: center;
+    flex-wrap: wrap;
     gap: 8px;
+  }
+
+  &__status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-right: auto;
+  }
+
+  &__status-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #f59e0b;
+    text-transform: uppercase;
+  }
+
+  &__approve-button {
+    min-width: 120px;
+  }
+
+  &__reject-button {
+    min-width: 120px;
+  }
+
+  &__error {
+    color: #b91c1c;
+    font-size: 0.75rem;
+    margin: 0;
+    align-self: flex-end;
   }
 }
 
